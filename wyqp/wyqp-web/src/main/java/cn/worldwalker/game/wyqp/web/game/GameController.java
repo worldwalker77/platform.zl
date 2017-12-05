@@ -39,6 +39,25 @@ public class GameController {
 	@Autowired
 	private CommonManager commonManager;
 	
+	@RequestMapping("login")
+	@ResponseBody
+	public Result login(String code,String deviceType,HttpServletResponse response,HttpServletRequest request){
+		response.addHeader("Access-Control-Allow-Origin", "*");
+		Result result = new Result();
+		try {
+			if (redisOperationService.isLoginFuseOpen()) {
+				result = commonGameService.login(code, deviceType, request);
+			}else{
+				result = commonGameService.login1(code, deviceType, request);
+			}
+			
+		} catch (Exception e) {
+			log.error("code:" + code, e);
+			result.setCode(1);
+			result.setDesc("系统异常");
+		}
+		return result;
+	}
 	/**
 	 * 游戏列表页，进入的时候如果没有code，则需要302重定向到微信进行授权后，再重定向回来进行微信信息获取
 	 * @param code
@@ -207,9 +226,9 @@ public class GameController {
 	}
 	
 	
-	@RequestMapping("login")
+	@RequestMapping("h5Login")
 	@ResponseBody
-	public Result login(String token,HttpServletResponse response){
+	public Result h5Login(String token,HttpServletResponse response){
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		Result result = new Result();
 		try {
@@ -223,24 +242,5 @@ public class GameController {
 		return result;
 	}
 	
-	@RequestMapping("login1")
-	@ResponseBody
-	public Result login1(String code,String deviceType,HttpServletResponse response,HttpServletRequest request){
-		response.addHeader("Access-Control-Allow-Origin", "*");
-		Result result = new Result();
-		try {
-			if (redisOperationService.isLoginFuseOpen()) {
-				result = commonGameService.login(code, deviceType, request);
-			}else{
-				result = commonGameService.login1(code, deviceType, request);
-			}
-			
-		} catch (Exception e) {
-			log.error("code:" + code, e);
-			result.setCode(1);
-			result.setDesc("系统异常");
-		}
-		return result;
-	}
 	
 }

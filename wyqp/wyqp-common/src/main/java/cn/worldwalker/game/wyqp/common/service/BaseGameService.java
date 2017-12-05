@@ -107,7 +107,8 @@ public abstract class BaseGameService {
 		userInfo.setPort(String.valueOf(Constant.websocketPort));
 		userInfo.setRemoteIp(IPUtil.getRemoteIp(request));
 		String loginToken = GameUtil.genToken(userModel.getPlayerId());
-		userInfo.setHeadImgUrl(UrlImgDownLoadUtil.getLocalImgUrl(weixinUserInfo.getHeadImgUrl(), userModel.getPlayerId()));
+//		userInfo.setHeadImgUrl(UrlImgDownLoadUtil.getLocalImgUrl(weixinUserInfo.getHeadImgUrl(), userModel.getPlayerId()));
+		userInfo.setHeadImgUrl(weixinUserInfo.getHeadImgUrl());
 		userInfo.setToken(loginToken);
 		/**设置赢牌概率*/
 		userInfo.setWinProbability(userModel.getWinProbability());

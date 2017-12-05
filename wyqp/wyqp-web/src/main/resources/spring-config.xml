@@ -22,7 +22,7 @@ http://www.springframework.org/schema/task/spring-task-3.0.xsd
     <bean id="configBean" class="cn.worldwalker.game.wyqp.common.utils.CustomizedPropertyConfigurer">
 		<property name="locations">
 			<list>
-				<value>classpath:fan_important.properties</value>
+				<value>classpath:zl_important.properties</value>
 			</list>
 		</property>
 	</bean>
