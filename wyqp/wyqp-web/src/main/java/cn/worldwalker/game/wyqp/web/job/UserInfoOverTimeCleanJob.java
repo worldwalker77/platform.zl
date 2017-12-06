@@ -27,7 +27,7 @@ public class UserInfoOverTimeCleanJob {
 			try {
 				String token = entry.getKey();
 				Long time = entry.getValue();
-				if (System.currentTimeMillis() - time > Constant.userInfoOverTimeLimit) {
+				if (System.currentTimeMillis() - time > Constant.userInfoOverTimeLimit*1000) {
 					redisOperationService.delUserInfo(token);
 				}
 			} catch (Exception e) {
