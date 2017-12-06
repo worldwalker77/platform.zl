@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameInfoMemoryContainer {
 	
 	public static String logFuse = "1";
-	public static String loginFuse = "1";
+	public static String loginFuse = "0";
 	public static Map<String, String> tokenUserInfoMap = new ConcurrentHashMap<String, String>();
 	public static Map<String, Long> tokenTimeMap = new ConcurrentHashMap<String, Long>();
 	public static Map<String, String> roomIdGameTypeUpdateTimeMap = new ConcurrentHashMap<String, String>();
