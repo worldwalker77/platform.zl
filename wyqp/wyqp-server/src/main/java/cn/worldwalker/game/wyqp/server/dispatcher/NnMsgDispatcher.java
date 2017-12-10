@@ -57,6 +57,9 @@ public class NnMsgDispatcher extends BaseMsgDisPatcher {
 			case userRecord:
 				nnGameService.userRecord(ctx, request, userInfo);
 				break;
+			/**********以下为茶楼相关************/
+			case createTeaHouse:
+				nnGameService.createTeaHouse(ctx, request, userInfo);
 			default:
 				break;
 		}

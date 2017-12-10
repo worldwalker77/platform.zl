@@ -6,6 +6,7 @@ import java.util.Map;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.OrderModel;
 import cn.worldwalker.game.wyqp.common.domain.base.ProductModel;
+import cn.worldwalker.game.wyqp.common.domain.base.TeaHouseModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserFeedbackModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel;
@@ -52,5 +53,15 @@ public interface CommonManager {
 	public Integer getProxyIdByPlayerId(Integer playerId);
 	
 	public Integer addRoomCard(Map<String, Object> map);
+	
+	/**以下为茶楼相关*/
+	public void createTeaHouse(TeaHouseModel teaHouseModel);
+	public List<TeaHouseModel> queryPlayerTeaHouseList(Integer playerId);
+	public void delTeaHouse(Integer teaHouseNum, Integer playerId);
+	public void joinTeaHouse(Integer teaHouseNum, Integer playerId, String nickName);
+	public void auditEntryTeaHouse(Integer teaHouseNum, Integer playerId);
+	public List<TeaHouseModel> queryTeaHousePlayerList(Integer teaHouseNum);
+	public TeaHouseModel getTeaHouseTypeByTeaHouseNum(Integer teaHouseNum);
+	public void delTeaHouseUser(Integer teaHouseNum, Integer playerId);
 	
 }

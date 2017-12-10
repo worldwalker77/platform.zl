@@ -60,6 +60,9 @@ public class JhMsgDispatcher extends BaseMsgDisPatcher {
 			case userRecord:
 				jhGameService.userRecord(ctx, request, userInfo);
 				break;
+			/**********以下为茶楼相关************/
+			case createTeaHouse:
+				jhGameService.createTeaHouse(ctx, request, userInfo);
 			default:
 				break;
 		}

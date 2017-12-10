@@ -24,7 +24,9 @@ public class BaseMsg {
 	private Integer proxyId;
 	private Integer productId;
 	private Integer playerNumLimit;
-	
+	/**以下为茶楼相关*/
+	private Integer teaHouseNum;
+	private Integer tableNum;
 	public Integer getPlayerNumLimit() {
 		return playerNumLimit;
 	}
@@ -144,6 +146,18 @@ public class BaseMsg {
 	}
 	public void setProductId(Integer productId) {
 		this.productId = productId;
+	}
+	public Integer getTeaHouseNum() {
+		return teaHouseNum;
+	}
+	public void setTeaHouseNum(Integer teaHouseNum) {
+		this.teaHouseNum = teaHouseNum;
+	}
+	public Integer getTableNum() {
+		return tableNum;
+	}
+	public void setTableNum(Integer tableNum) {
+		this.tableNum = tableNum;
 	}
 	
 }

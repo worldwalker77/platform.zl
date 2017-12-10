@@ -32,5 +32,6 @@
     <typeAliases>
 		<typeAlias type="cn.worldwalker.game.wyqp.common.backend.GameQuery" alias="gameQuery"/>
 		<typeAlias type="cn.worldwalker.game.wyqp.common.backend.GameModel" alias="gameModel"/>
+		<typeAlias type="cn.worldwalker.game.wyqp.common.domain.base.TeaHouseModel" alias="teaHouseModel"/>
 	</typeAliases>
 </configuration>

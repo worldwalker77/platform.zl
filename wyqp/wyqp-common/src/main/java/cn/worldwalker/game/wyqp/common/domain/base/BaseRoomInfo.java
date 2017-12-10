@@ -36,6 +36,10 @@ public class BaseRoomInfo {
 	private Integer gameType;
 	
 	private Integer playerNumLimit;
+	
+	/**以下为茶楼相关*/
+	private Integer teaHouseNum;
+	private Integer tableNum;
 
 	public Integer getPlayerNumLimit() {
 		return playerNumLimit;
@@ -159,6 +163,22 @@ public class BaseRoomInfo {
 
 	public void setGameType(Integer gameType) {
 		this.gameType = gameType;
+	}
+
+	public Integer getTeaHouseNum() {
+		return teaHouseNum;
+	}
+
+	public void setTeaHouseNum(Integer teaHouseNum) {
+		this.teaHouseNum = teaHouseNum;
+	}
+
+	public Integer getTableNum() {
+		return tableNum;
+	}
+
+	public void setTableNum(Integer tableNum) {
+		this.tableNum = tableNum;
 	}
 
 }

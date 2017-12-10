@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.worldwalker.game.wyqp.common.dao.TeaHouseDao">
+	
+	
+	<resultMap id="teaHouseModelResultMap" type="teaHouseModel" >
+		<result column="id" property="id"/>
+		<result column="tea_house_id" property="teaHouseId"/>
+		<result column="tea_house_type_id" property="teaHouseTypeId"/>
+		<result column="tea_house_num" property="teaHouseNum"/>
+		<result column="player_id" property="playerId"/>
+		<result column="nick_name" property="nickName"/>
+		<result column="status" property="status"/>
+		<result column="game_type" property="gameType"/>
+		<result column="total_game" property="totalGame"/>
+		<result column="room_banker_type" property="roomBankerType"/>
+		<result column="multiple_limit" property="multipleLimit"/>
+		<result column="pay_type" property="payType"/>
+	</resultMap>
+	
+	<insert id="insertTeaHouseUser" parameterType="teaHouseModel">  
+	     <selectKey keyProperty="id" resultType="Integer">  
+	         select LAST_INSERT_ID()  
+	     </selectKey>  
+	     insert into t_tea_house( 
+		     					tea_house_id, 
+		     					player_id, 
+		     					nick_name,
+		     					create_time,
+		     					update_time
+	     					) 
+	     			values(  
+		     					#{teaHouseId}, 
+		     					#{playerId},
+		     					#{nickName},
+		     					now(),
+		     					now()
+		     				)    
+    </insert>
+	
+	<insert id="insertTeaHouse" parameterType="teaHouseModel">  
+	     <selectKey keyProperty="teaHouseId" resultType="Integer">  
+	         select LAST_INSERT_ID()  
+	     </selectKey>  
+	     insert into t_tea_house( 
+		     					tea_house_type_id, 
+		     					tea_house_num, 
+		     					player_id,
+		     					create_time,
+		     					update_time
+	     					) 
+	     			values(  
+		     					#{teaHouseTypeId}, 
+		     					#{teaHouseNum},
+		     					#{playerId},
+		     					now(),
+		     					now()
+		     				)    
+    </insert>
+    
+	<insert id="insertTeaHouseType" parameterType="teaHouseModel">  
+	     <selectKey keyProperty="teaHouseTypeId" resultType="Integer">  
+	         select LAST_INSERT_ID()  
+	     </selectKey>  
+	     insert into t_tea_house_type( 
+		     					game_type, 
+		     					total_game, 
+		     					room_banker_type,
+		     					multiple_limit,
+		     					pay_type,
+		     					create_time,
+		     					update_time
+	     					) 
+	     			values(  
+		     					#{gameType}, 
+		     					#{totalGame},
+		     					#{roomBankerType},
+		     					#{multipleLimit},
+		     					#{payType},
+		     					now(),
+		     					now()
+		     				)    
+    </insert>
+    
+    <update id="auditTeaHouseUser" parameterType="teaHouseModel">
+	    update t_tea_house_user
+	    set  status=1
+	    where 
+	    player_id=#{playerId} and tea_house_num=#{teaHouseNum}
+	    and status=0
+	 </update>
+	 
+	 <delete id="deleteTeaHouseUserByCondition"  parameterType="teaHouseModel">
+		 delete from t_tea_house_user
+		 WHERE 1 = 1
+		 <if test="teaHouseNum !=null"> and tea_house_num=#{teaHouseNum}</if>
+		 <if test="playerId !=null"> and player_id=#{playerId}</if>
+	</delete>
+	
+	<delete id="deleteTeaHouseByCondition"  parameterType="teaHouseModel">
+		 delete from t_tea_house
+		 WHERE 1 = 1
+		 <if test="teaHouseNum !=null"> and tea_house_num=#{teaHouseNum}</if>
+		 <if test="playerId !=null"> and player_id=#{playerId}</if>
+	</delete>
+    
+    
+	<select id="getTeaHousePlayerList"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	    select a.player_id,a.nick_name,a.create_time
+	    from t_tea_house_user a left join t_tea_house
+	    on a.tea_house_num = b.tea_house_num
+	    where a.tea_house_num = #{teaHouseNum} and b.player_id = #{playerId}
+	</select>
+	<select id="getPlayerTeaHouseList"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	    select a.tea_house_id,a.tea_house_name,a.tea_house_num,a.create_time,
+	    b.game_type,b.total_game,b.room_banker_type,b.multiple_limit,b.pay_type
+	    from t_tea_house a left join t_tea_house_type b
+	    on a.tea_house_type_id = b.tea_house_type_id
+	    where a.player_id = #{playerId}
+	    <if test="teaHouseTypeId != null"> and a.tea_house_type_id=#{teaHouseTypeId}</if>
+	</select>
+	
+	<select id="getTeaHouseTypeByTeaHouseNum"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	    select b.*
+	    from t_tea_house a left join t_tea_house_type b
+	    on a.tea_house_type_id = b.tea_house_type_id
+	    where a.tea_house_num = #{teaHouseNum}
+	</select>
+	
+	<select id="getTeaHouseTypeByCondition"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	    select tea_house_type_id
+	    from t_tea_house_type
+	    where 1=1
+	    <if test="gameType != null"> and game_type=#{gameType}</if>
+		<if test="totalGame != null"> and total_game=#{totalGame}</if>
+		<if test="roomBankerType != null"> and room_banker_type=#{roomBankerType}</if>
+		<if test="multipleLimit != null"> and multiple_limit=#{multipleLimit}</if>
+		<if test="payType != null"> and pay_type=#{payType}</if>
+	</select>
+	
+	<select id="getTeaHouseUserByCondition"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	    select tea_house_num
+	    from t_tea_house_user
+	    where 1=1
+	    <if test="teaHouseNum != null"> and tea_house_num=#{teaHouseNum}</if>
+		<if test="playerId != null"> and player_id=#{playerId}</if>
+	</select>
+
+</mapper>
+
+

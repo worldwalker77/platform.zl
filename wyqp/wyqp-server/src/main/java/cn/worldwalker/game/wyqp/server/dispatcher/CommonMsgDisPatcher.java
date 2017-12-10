@@ -58,6 +58,27 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case notice:
 				commonGameService.notice(ctx, request, userInfo);
 				break;
+				
+			/**********以下为茶楼相关************/
+			case queryPlayerTeaHouseList:
+				commonGameService.queryPlayerTeaHouseList(ctx, request, userInfo);
+			case delTeaHouse:
+				commonGameService.delTeaHouse(ctx, request, userInfo);
+			case entryTeaHouse:
+				commonGameService.entryTeaHouse(ctx, request, userInfo);
+			case joinTeaHouse:
+				commonGameService.joinTeaHouse(ctx, request, userInfo);
+			case auditEntryTeaHouse:
+				commonGameService.auditEntryTeaHouse(ctx, request, userInfo);
+			case queryTeaHousePlayerList:
+				commonGameService.queryTeaHousePlayerList(ctx, request, userInfo);
+			case delTeaHouseUser:
+				commonGameService.delTeaHouseUser(ctx, request, userInfo);
+			case entryTeaHouseTable:
+				commonGameService.entryTeaHouseTable(ctx, request, userInfo);
+			case queryTeaHouseTablePlayerList:
+				commonGameService.queryTeaHouseTablePlayerList(ctx, request, userInfo);
+				break;
 			default:
 				break;
 			}

@@ -481,4 +481,35 @@ public class RedisOperationService {
 		return false;
 	}
 	
+	/**茶楼号+牌桌号->roomId 映射*/
+	public void setTeaHouseNumTableNumRoomId(Integer teaHouseNum, Integer tableNum, Integer roomId){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.hset(Constant.teaHouseNumTableNumRoomIdMap, teaHouseNum + "" + tableNum, String.valueOf(roomId));
+		}else{
+			GameInfoMemoryContainer.teaHouseNumTableNumRoomIdMap.put(teaHouseNum + "" + tableNum, String.valueOf(roomId));
+		}
+		
+	}
+	
+	public void delRoomIdByTeaHouseNumTableNum(Integer teaHouseNum, Integer tableNum){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.hdel(Constant.teaHouseNumTableNumRoomIdMap, teaHouseNum + "" + tableNum);
+		}else{
+			GameInfoMemoryContainer.teaHouseNumTableNumRoomIdMap.remove(teaHouseNum + "" + tableNum);
+		}
+	}
+	
+	public Integer getRoomIdByTeaHouseNumTableNum(Integer teaHouseNum, Integer tableNum){
+		String roomIdStr = null;
+		if (gameInfoStorageType == 0 ) {
+			roomIdStr = jedisTemplate.hget(Constant.teaHouseNumTableNumRoomIdMap, teaHouseNum + "" + tableNum);
+		}else{
+			roomIdStr = GameInfoMemoryContainer.teaHouseNumTableNumRoomIdMap.get(teaHouseNum + "" + tableNum);
+		}
+		if (StringUtils.isNotBlank(roomIdStr)) {
+			return Integer.valueOf(roomIdStr);
+		}
+		return null;
+	}
+	
 }

@@ -17,6 +17,7 @@ import cn.worldwalker.game.wyqp.common.dao.OrderDao;
 import cn.worldwalker.game.wyqp.common.dao.ProductDao;
 import cn.worldwalker.game.wyqp.common.dao.ProxyDao;
 import cn.worldwalker.game.wyqp.common.dao.RoomCardLogDao;
+import cn.worldwalker.game.wyqp.common.dao.TeaHouseDao;
 import cn.worldwalker.game.wyqp.common.dao.UserDao;
 import cn.worldwalker.game.wyqp.common.dao.UserFeedbackDao;
 import cn.worldwalker.game.wyqp.common.dao.UserRecordDao;
@@ -28,9 +29,13 @@ import cn.worldwalker.game.wyqp.common.domain.base.ProductModel;
 import cn.worldwalker.game.wyqp.common.domain.base.ProxyModel;
 import cn.worldwalker.game.wyqp.common.domain.base.RecordModel;
 import cn.worldwalker.game.wyqp.common.domain.base.RoomCardLogModel;
+import cn.worldwalker.game.wyqp.common.domain.base.TeaHouseModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserFeedbackModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel;
+import cn.worldwalker.game.wyqp.common.domain.jh.JhMsg;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnMsg;
+import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.PlayerStatusEnum;
 import cn.worldwalker.game.wyqp.common.enums.RoomCardConsumeEnum;
 import cn.worldwalker.game.wyqp.common.enums.RoomCardOperationEnum;
@@ -58,6 +63,8 @@ public class CommonManagerImpl implements CommonManager{
 	private ProxyDao proxyDao;
 	@Autowired
 	private VersionDao versionDao;
+	@Autowired
+	private TeaHouseDao teaHouseDao;
 	
 	@Override
 	public UserModel getUserByWxOpenId(String openId){
@@ -323,4 +330,121 @@ public class CommonManagerImpl implements CommonManager{
 	public Integer addRoomCard(Map<String, Object> map) {
 		return userDao.addRoomCard(map);
 	}
+	
+	/************以下为茶楼相关**************/
+	@Override
+	public void createTeaHouse(TeaHouseModel model) {
+		/**查询茶楼号是否存在，如果存在则提示重新创建*/
+		TeaHouseModel teaHouseNumModel = new TeaHouseModel();
+		teaHouseNumModel.setTeaHouseNum(model.getTeaHouseNum());
+		teaHouseNumModel = teaHouseDao.getTeaHouseTypeByTeaHouseNum(teaHouseNumModel);
+		if (teaHouseNumModel != null) {
+			throw new BusinessException(ExceptionEnum.TEA_HOUSE_NUM_EXIST);
+		}
+		
+		GameTypeEnum gameTypeEnum = GameTypeEnum.getGameTypeEnumByType(model.getGameType());
+		TeaHouseModel typeModel = new TeaHouseModel();
+		switch (gameTypeEnum) {
+			case nn:
+				typeModel.setGameType(model.getGameType());
+				typeModel.setTotalGame(model.getTotalGame());
+				typeModel.setRoomBankerType(model.getRoomBankerType());
+				typeModel.setMultipleLimit(model.getMultipleLimit());
+				typeModel.setPayType(model.getPayType());
+				break;
+			case mj:
+				break;
+			case jh:
+				typeModel.setGameType(model.getGameType());
+				typeModel.setTotalGame(model.getTotalGame());
+				typeModel.setPayType(model.getPayType());
+				break;
+			default:
+				break;
+			}
+		/**查询此种类型茶楼id*/
+		TeaHouseModel resModel = teaHouseDao.getTeaHouseTypeByCondition(typeModel);
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseName(model.getTeaHouseName());
+		teaHouseModel.setTeaHouseNum(model.getTeaHouseNum());
+		teaHouseModel.setPlayerId(model.getPlayerId());
+		teaHouseModel.setNickName(model.getNickName());
+		/**此种类型茶楼id存在*/
+		if (resModel != null) {
+			/**查询玩家是否存在此种类型的茶楼，如果存在则提示不能创建*/
+			TeaHouseModel tempModel = new TeaHouseModel();
+			tempModel.setPlayerId(model.getPlayerId());
+			tempModel.setTeaHouseTypeId(resModel.getTeaHouseTypeId());
+			List<TeaHouseModel> list = teaHouseDao.getPlayerTeaHouseList(tempModel);
+			if (CollectionUtils.isNotEmpty(list)) {
+				throw new BusinessException(ExceptionEnum.PLAYER_TEA_HOUSE_TYPE_EXIST.index, ExceptionEnum.PLAYER_TEA_HOUSE_TYPE_EXIST.description + ",茶楼号为:" + list.get(0).getTeaHouseNum());
+			}
+			teaHouseModel.setTeaHouseTypeId(resModel.getTeaHouseTypeId());
+			teaHouseDao.insertTeaHouse(teaHouseModel);
+		}else{/**此种类型茶楼不存在，则先要创建此种类型，然后获取类型id后，创建茶楼*/
+			teaHouseDao.insertTeaHouseType(typeModel);
+			teaHouseModel.setTeaHouseTypeId(typeModel.getTeaHouseTypeId());
+			teaHouseDao.insertTeaHouse(teaHouseModel);
+		}
+	}
+	
+	@Override
+	public List<TeaHouseModel> queryPlayerTeaHouseList(Integer playerId) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setPlayerId(playerId);
+		return teaHouseDao.getPlayerTeaHouseList(teaHouseModel);
+	}
+	
+	@Override
+	public void delTeaHouse(Integer teaHouseNum, Integer playerId) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		teaHouseDao.deleteTeaHouseUserByCondition(teaHouseModel);
+		teaHouseModel.setPlayerId(playerId);
+		teaHouseDao.deleteTeaHouseByCondition(teaHouseModel);
+		
+	}
+	
+	@Override
+	public void joinTeaHouse(Integer teaHouseNum, Integer playerId,String nickName) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		teaHouseModel.setPlayerId(playerId);
+		if (teaHouseDao.getTeaHouseUserByCondition(teaHouseModel) != null) {
+			throw new BusinessException(ExceptionEnum.ALREADY_EXIST_IN_TEA_HOUSE_NUM);
+		}
+		teaHouseModel.setNickName(nickName);
+		teaHouseModel.setStatus(0);
+		teaHouseDao.insertTeaHouseUser(teaHouseModel);
+	}
+	
+	@Override
+	public void auditEntryTeaHouse(Integer teaHouseNum, Integer playerId) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		teaHouseModel.setPlayerId(playerId);
+		teaHouseDao.auditTeaHouseUser(teaHouseModel);
+	}
+	
+	@Override
+	public List<TeaHouseModel> queryTeaHousePlayerList(Integer teaHouseNum) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		return teaHouseDao.getTeaHousePlayerList(teaHouseModel);
+	}
+	
+	@Override
+	public void delTeaHouseUser(Integer teaHouseNum,Integer playerId) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		teaHouseModel.setPlayerId(playerId);
+		teaHouseDao.deleteTeaHouseUserByCondition(teaHouseModel);
+	}
+	@Override
+	public TeaHouseModel getTeaHouseTypeByTeaHouseNum(Integer teaHouseNum) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		return teaHouseDao.getTeaHouseTypeByTeaHouseNum(teaHouseModel);
+	}
+	
 }

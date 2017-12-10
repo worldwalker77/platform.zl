@@ -22,6 +22,13 @@ public class GameUtil {
         int s = random.nextInt(max)%(max-min+1) + min;	
 		return s;
 	}
+	public static int genTeaHouseNum(){
+		int max=99999;
+        int min=10000;
+        Random random = new Random();
+        int s = random.nextInt(max)%(max-min+1) + min;	
+		return s;
+	}
 	
 	public static Integer genPlayerId(){
 		int max=999999;

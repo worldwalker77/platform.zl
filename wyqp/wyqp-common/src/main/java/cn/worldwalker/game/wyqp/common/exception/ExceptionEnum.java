@@ -27,6 +27,10 @@ public enum ExceptionEnum {
     TOTAL_GAME_OVER(21, "牌局已经结束"),
     ALREADY_IN_ROOM(22, "您已经在房间中，请输入房间号进入"),
     GIVE_AWAY_ROOM_CARD_FAIL(23, "赠送房卡失败"),
+    TEA_HOUSE_NUM_ERROR(24, "茶楼号参数有误"),
+    PLAYER_TEA_HOUSE_TYPE_EXIST(25, "玩家此种类型的茶楼已经存在"),
+    TEA_HOUSE_NUM_EXIST(26, "茶楼号已经存在，请重新创建"),
+    ALREADY_EXIST_IN_TEA_HOUSE_NUM(27, "你已经在茶楼中，请从我的茶楼列表进入"),
     /**斗牛100-199*/
     
     /**斗牛200-299*/

@@ -27,11 +27,14 @@ import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.OrderModel;
 import cn.worldwalker.game.wyqp.common.domain.base.ProductModel;
 import cn.worldwalker.game.wyqp.common.domain.base.RedisRelaModel;
+import cn.worldwalker.game.wyqp.common.domain.base.TeaHouseModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserFeedbackModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel;
 import cn.worldwalker.game.wyqp.common.domain.base.WeiXinUserInfo;
+import cn.worldwalker.game.wyqp.common.domain.jh.JhMsg;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnMsg;
 import cn.worldwalker.game.wyqp.common.enums.ChatTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.DissolveStatusEnum;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
@@ -49,7 +52,6 @@ import cn.worldwalker.game.wyqp.common.roomlocks.RoomLockContainer;
 import cn.worldwalker.game.wyqp.common.rpc.WeiXinRpc;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.IPUtil;
-import cn.worldwalker.game.wyqp.common.utils.UrlImgDownLoadUtil;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.DateUtils;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.HttpUtil;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.MapUtils;
@@ -200,6 +202,9 @@ public abstract class BaseGameService {
 		Date date = new Date();
 		roomInfo.setCreateTime(date);
 		roomInfo.setUpdateTime(date);
+		/**茶楼相关参数**/
+		roomInfo.setTeaHouseNum(msg.getTeaHouseNum());
+		roomInfo.setTableNum(msg.getTableNum());
 		
 		List playerList = roomInfo.getPlayerList();
 		BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(0);
@@ -714,6 +719,10 @@ public abstract class BaseGameService {
 			channelContainer.sendTextMsgByPlayerIds(new Result(0, MsgTypeEnum.entryHall.msgType), playerId);
 			return;
 		}
+		/**茶楼相关*/
+		returnRoomInfo.setTeaHouseNum(roomInfo.getTeaHouseNum());
+		returnRoomInfo.setTableNum(roomInfo.getTableNum());
+		
 		result.setGameType(roomInfo.getGameType());
 		result.setMsgType(MsgTypeEnum.refreshRoom.msgType);
 		result.setData(returnRoomInfo);
@@ -1007,5 +1016,158 @@ public abstract class BaseGameService {
 		String paySign = PayCommonUtil.createSign(Charsets.UTF_8.toString(), sortMap);
 		sortMap.put("sign", paySign);
 		return sortMap;
+	}
+	
+	/*************以下为茶楼相关*********************/
+	
+	public void createTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.createTeaHouse.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setPlayerId(playerId);
+		teaHouseModel.setNickName(userInfo.getNickName());
+		Integer teaHouseNum = GameUtil.genTeaHouseNum();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		teaHouseModel.setTeaHouseName(String.valueOf(teaHouseNum));
+		Integer gameType = request.getGameType();
+		teaHouseModel.setGameType(gameType);
+		
+		teaHouseModel.setTotalGame(msg.getTotalGames());
+		teaHouseModel.setPayType(msg.getPayType());
+		GameTypeEnum gameTypeEnum = GameTypeEnum.getGameTypeEnumByType(gameType);
+		
+		switch (gameTypeEnum) {
+			case nn:
+				NnMsg nnMsg = (NnMsg)msg;
+				teaHouseModel.setRoomBankerType(nnMsg.getRoomBankerType());
+				teaHouseModel.setMultipleLimit(nnMsg.getMultipleLimit());
+				data.put("roomBankerType", nnMsg.getRoomBankerType());
+				data.put("multipleLimit", nnMsg.getMultipleLimit());
+				break;
+			case mj:
+				break;
+			case jh:
+				JhMsg jhMsg = (JhMsg)msg;
+				break;
+			default:
+				break;
+			}
+		commonManager.createTeaHouse(teaHouseModel);
+		data.put("teaHouseNum", teaHouseNum);
+		data.put("totalGame", msg.getTotalGames());
+		data.put("payType", msg.getPayType());
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void queryPlayerTeaHouseList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.queryPlayerTeaHouseList.msgType);
+		Integer playerId = request.getMsg().getPlayerId();
+		data.put("playerTeaHouseList", commonManager.queryPlayerTeaHouseList(playerId));
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void delTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.delTeaHouse.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		commonManager.delTeaHouse(msg.getTeaHouseNum(),playerId);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void entryTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.entryTeaHouse.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	public void joinTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.joinTeaHouse.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		commonManager.joinTeaHouse(msg.getTeaHouseNum(), playerId, userInfo.getNickName());
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	public void auditEntryTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.auditEntryTeaHouse.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		commonManager.auditEntryTeaHouse(msg.getTeaHouseNum(), msg.getOtherPlayerId());
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	public void queryTeaHousePlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.queryTeaHousePlayerList.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		data.put("teaHousePlayerList", commonManager.queryTeaHousePlayerList(msg.getTeaHouseNum()));
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	public void delTeaHouseUser(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.delTeaHouseUser.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		commonManager.delTeaHouseUser(msg.getTeaHouseNum(), playerId);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+		notice(ctx, request, userInfo);
+	}
+	public void queryTeaHouseTablePlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.queryTeaHouseTablePlayerList.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		Integer teaHouseNum = msg.getTeaHouseNum();
+		Integer tableNum = msg.getTableNum();
+		Integer roomId = redisOperationService.getRoomIdByTeaHouseNumTableNum(teaHouseNum, tableNum);
+		List<Map<String, Object>> returnList = new ArrayList<Map<String, Object>>(); 
+		if (roomId != null) {
+			BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
+			List playerList = roomInfo.getPlayerList();
+			int size = playerList.size();
+			for(int i = 0; i < size; i++){
+				Map<String, Object> map = new HashMap<String, Object>();
+				BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(i);
+				map.put("playerId", playerInfo.getPlayerId());
+				map.put("nickName", playerInfo.getNickName());
+				returnList.add(map);
+			}
+		}
+		data.put("playerList", returnList);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 }

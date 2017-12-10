@@ -34,6 +34,18 @@ public enum MsgTypeEnum {
 	unifiedOrder(29, "微信预支付前统一下单接口"),
 //	notReadyTimer(30, "未准备玩家计时器"),
 	
+	/**茶楼相关*/
+	createTeaHouse(80, "创建茶楼"),
+	queryPlayerTeaHouseList(81, "查询玩家茶楼列表"),
+	delTeaHouse(82, "删除茶楼"),
+	auditEntryTeaHouse(83, "审核申请加入茶楼的玩家"),
+	queryTeaHousePlayerList(84, "查询茶楼下玩家列表"),
+	delTeaHouseUser(85, "将玩家移出茶楼"),
+	entryTeaHouse(86, "进入茶楼"),
+	entryTeaHouseTable(87, "进入茶楼下的某个牌桌"),
+	joinTeaHouse(88, "申请加入茶楼"),
+	queryTeaHouseTablePlayerList(89, "查询茶楼里面某个牌桌的玩家列表"),
+	
 	/**斗牛特有100-199*/
 	readyRobBanker(100, "准备抢庄"),
 	robBanker(101, "抢庄"),

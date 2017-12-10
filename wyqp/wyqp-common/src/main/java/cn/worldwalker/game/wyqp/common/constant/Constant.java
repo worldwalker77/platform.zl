@@ -100,5 +100,8 @@ public class Constant {
 	
 	public static final String CODE_URL = "http://" + domain + clientFileUnrarFolder + "VERSION/game_code_VERSION.zip";//"D:/test/";
 
+	
+	/**茶楼号+table号与游戏房间号之间的映射关系map*/
+	public final static String teaHouseNumTableNumRoomIdMap = curCompany + "_tea_house_num_table_num_room_id_map";
 
 }
