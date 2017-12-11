@@ -50,6 +50,8 @@ public class OfflinePlayerCleanJob /**extends SingleServerJobByRedis*/{
 				if (roomInfo == null) {
 					/**如果无房间信息，则说明可能其他离线玩家已经将房间删除，不需要再推送消息给其他玩家*/
 					redisOperationService.cleanPlayerAndRoomInfo(model.getRoomId(), String.valueOf(model.getPlayerId()));
+					/**茶楼相关*/
+					redisOperationService.delRoomIdByTeaHouseNumTableNum(roomInfo.getTeaHouseNum(), roomInfo.getTableNum());
 					return;
 				}
 				/**如果房间没有更新小于4分钟*/
@@ -63,6 +65,8 @@ public class OfflinePlayerCleanJob /**extends SingleServerJobByRedis*/{
 				result.setData(data);
 				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, model.getPlayerId()));
 				redisOperationService.cleanPlayerAndRoomInfo(model.getRoomId(), GameUtil.getPlayerIdStrArr(playerList));
+				/**茶楼相关*/
+				redisOperationService.delRoomIdByTeaHouseNumTableNum(roomInfo.getTeaHouseNum(), roomInfo.getTableNum());
 			}
 		}
 	}

@@ -14,7 +14,14 @@ public class TeaHouseModel{
 	private Integer roomBankerType;
 	private Integer multipleLimit;
 	private Integer payType;
+	private String teaHouseOwnerWord;
 	
+	public String getTeaHouseOwnerWord() {
+		return teaHouseOwnerWord;
+	}
+	public void setTeaHouseOwnerWord(String teaHouseOwnerWord) {
+		this.teaHouseOwnerWord = teaHouseOwnerWord;
+	}
 	public Integer getTeaHouseId() {
 		return teaHouseId;
 	}

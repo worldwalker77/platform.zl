@@ -40,6 +40,8 @@ public class RoomInfoCleanJob /**extends SingleServerJobByRedis*/ {
 				}
 				List playerList = roomInfo.getPlayerList();
 				redisOperationService.cleanPlayerAndRoomInfo(model.getRoomId(), GameUtil.getPlayerIdStrArr(playerList));
+				/**茶楼相关*/
+				redisOperationService.delRoomIdByTeaHouseNumTableNum(roomInfo.getTeaHouseNum(), roomInfo.getTableNum());
 			}
 		}
 	}

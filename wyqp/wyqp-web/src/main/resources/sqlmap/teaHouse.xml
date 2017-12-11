@@ -24,15 +24,15 @@
 	     <selectKey keyProperty="id" resultType="Integer">  
 	         select LAST_INSERT_ID()  
 	     </selectKey>  
-	     insert into t_tea_house( 
-		     					tea_house_id, 
+	     insert into t_tea_house_user( 
+		     					tea_house_num, 
 		     					player_id, 
 		     					nick_name,
 		     					create_time,
 		     					update_time
 	     					) 
 	     			values(  
-		     					#{teaHouseId}, 
+		     					#{teaHouseNum}, 
 		     					#{playerId},
 		     					#{nickName},
 		     					now(),
@@ -48,6 +48,7 @@
 		     					tea_house_type_id, 
 		     					tea_house_num, 
 		     					player_id,
+		     					tea_house_owner_word,
 		     					create_time,
 		     					update_time
 	     					) 
@@ -55,6 +56,7 @@
 		     					#{teaHouseTypeId}, 
 		     					#{teaHouseNum},
 		     					#{playerId},
+		     					#{teaHouseOwnerWord},
 		     					now(),
 		     					now()
 		     				)    
@@ -106,13 +108,13 @@
 	</delete>
     
     
-	<select id="getTeaHousePlayerList"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	<select id="getTeaHousePlayerList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
 	    select a.player_id,a.nick_name,a.create_time
 	    from t_tea_house_user a left join t_tea_house
 	    on a.tea_house_num = b.tea_house_num
 	    where a.tea_house_num = #{teaHouseNum} and b.player_id = #{playerId}
 	</select>
-	<select id="getPlayerTeaHouseList"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	<select id="getPlayerTeaHouseList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
 	    select a.tea_house_id,a.tea_house_name,a.tea_house_num,a.create_time,
 	    b.game_type,b.total_game,b.room_banker_type,b.multiple_limit,b.pay_type
 	    from t_tea_house a left join t_tea_house_type b
@@ -121,14 +123,14 @@
 	    <if test="teaHouseTypeId != null"> and a.tea_house_type_id=#{teaHouseTypeId}</if>
 	</select>
 	
-	<select id="getTeaHouseTypeByTeaHouseNum"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	<select id="getTeaHouseTypeByTeaHouseNum"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
 	    select b.*
 	    from t_tea_house a left join t_tea_house_type b
 	    on a.tea_house_type_id = b.tea_house_type_id
 	    where a.tea_house_num = #{teaHouseNum}
 	</select>
 	
-	<select id="getTeaHouseTypeByCondition"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	<select id="getTeaHouseTypeByCondition"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
 	    select tea_house_type_id
 	    from t_tea_house_type
 	    where 1=1
@@ -139,7 +141,7 @@
 		<if test="payType != null"> and pay_type=#{payType}</if>
 	</select>
 	
-	<select id="getTeaHouseUserByCondition"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	<select id="getTeaHouseUserByCondition"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
 	    select tea_house_num
 	    from t_tea_house_user
 	    where 1=1
@@ -147,7 +149,7 @@
 		<if test="playerId != null"> and player_id=#{playerId}</if>
 	</select>
 	
-	<select id="getTeaHouseByCondition"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	<select id="getTeaHouseByCondition"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
 	    select tea_house_num,tea_house_name,tea_house_type_id,player_id
 	    from t_tea_house
 	    where 1=1

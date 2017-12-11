@@ -26,6 +26,26 @@ public class UserRecordModel {
 	private Date createTime;
 	
 	private List<RecordModel> recordList;
+	
+	private Integer teaHouseNum;
+	
+	private Integer tableNum;
+	
+	public Integer getTeaHouseNum() {
+		return teaHouseNum;
+	}
+
+	public void setTeaHouseNum(Integer teaHouseNum) {
+		this.teaHouseNum = teaHouseNum;
+	}
+
+	public Integer getTableNum() {
+		return tableNum;
+	}
+
+	public void setTableNum(Integer tableNum) {
+		this.tableNum = tableNum;
+	}
 
 	public Long getId() {
 		return id;

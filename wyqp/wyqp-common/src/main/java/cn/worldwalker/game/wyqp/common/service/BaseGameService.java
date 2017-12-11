@@ -390,6 +390,8 @@ public abstract class BaseGameService {
 		if (playerList.size() == 1) {
 			/**解散房间*/
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
+			/**茶楼相关*/
+			redisOperationService.delRoomIdByTeaHouseNumTableNum(roomInfo.getTeaHouseNum(), roomInfo.getTableNum());
 			/**将用户缓存信息里面的roomId设置为null*/
 			userInfo.setRoomId(null);
 			redisOperationService.setUserInfo(request.getToken(), userInfo);
@@ -478,6 +480,8 @@ public abstract class BaseGameService {
 		if (agreeDissolveCount >= (playerList.size()/2 + 1)) {
 			/**解散房间*/
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
+			/**茶楼相关*/
+			redisOperationService.delRoomIdByTeaHouseNumTableNum(roomInfo.getTeaHouseNum(), roomInfo.getTableNum());
 			/**解散后需要进行结算*/
 			data.put("roomInfo", roomInfo);
 			result.setMsgType(MsgTypeEnum.successDissolveRoom.msgType);
@@ -553,6 +557,8 @@ public abstract class BaseGameService {
 		if (agreeDissolveCount >= playerList.size()) {
 			/**解散房间*/
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
+			/**茶楼相关*/
+			redisOperationService.delRoomIdByTeaHouseNumTableNum(roomInfo.getTeaHouseNum(), roomInfo.getTableNum());
 		}else{/**如果只有部分人确认，则只删除当前玩家的标记*/
 			redisOperationService.hdelOfflinePlayerIdRoomIdGameTypeTime(msg.getPlayerId());
 			redisOperationService.hdelPlayerIdRoomIdGameType(msg.getPlayerId());
@@ -1147,7 +1153,6 @@ public abstract class BaseGameService {
 		Integer playerId = msg.getPlayerId();
 		commonManager.delTeaHouseUser(msg.getTeaHouseNum(), msg.getOtherPlayerId(), playerId);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
-		notice(ctx, request, userInfo);
 	}
 	/**
 	 * 玩家主动退出茶楼
@@ -1163,35 +1168,57 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.delTeaHouseUser.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
-		commonManager.delTeaHouseUser(msg.getTeaHouseNum(), msg.getOtherPlayerId(), playerId);
+		commonManager.exitTeaHouse(msg.getTeaHouseNum(), playerId);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
-		notice(ctx, request, userInfo);
 	}
 	public void queryTeaHouseTablePlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
-		Map<String, Object> data = new HashMap<String, Object>();
+		Map<Integer, Object> data = new HashMap<Integer, Object>();
 		result.setData(data);
 		result.setGameType(request.getGameType());
 		result.setMsgType(MsgTypeEnum.queryTeaHouseTablePlayerList.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
 		Integer teaHouseNum = msg.getTeaHouseNum();
-		Integer tableNum = msg.getTableNum();
-		Integer roomId = redisOperationService.getRoomIdByTeaHouseNumTableNum(teaHouseNum, tableNum);
-		List<Map<String, Object>> returnList = new ArrayList<Map<String, Object>>(); 
-		if (roomId != null) {
-			BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
-			List playerList = roomInfo.getPlayerList();
-			int size = playerList.size();
-			for(int i = 0; i < size; i++){
-				Map<String, Object> map = new HashMap<String, Object>();
-				BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(i);
-				map.put("playerId", playerInfo.getPlayerId());
-				map.put("nickName", playerInfo.getNickName());
-				returnList.add(map);
+		for(int tableNum = 1; tableNum < 9; tableNum++){
+			Integer roomId = redisOperationService.getRoomIdByTeaHouseNumTableNum(teaHouseNum, tableNum);
+			List<Map<String, Object>> returnList = new ArrayList<Map<String, Object>>(); 
+			if (roomId != null) {
+				BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
+				List playerList = roomInfo.getPlayerList();
+				int size = playerList.size();
+				for(int i = 0; i < size; i++){
+					Map<String, Object> map = new HashMap<String, Object>();
+					BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(i);
+					map.put("playerId", playerInfo.getPlayerId());
+					map.put("nickName", playerInfo.getNickName());
+					map.put("headImgUrl", playerInfo.getHeadImgUrl());
+					returnList.add(map);
+				}
 			}
+			data.put(tableNum, returnList);
 		}
-		data.put("playerList", returnList);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void teaHouseRecord(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.teaHouseRecord.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	public void myTeaHouseRecord(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.myTeaHouseRecord.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 }

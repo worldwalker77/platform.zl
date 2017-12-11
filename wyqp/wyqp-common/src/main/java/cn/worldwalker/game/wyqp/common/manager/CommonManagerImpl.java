@@ -201,6 +201,8 @@ public class CommonManagerImpl implements CommonManager{
 			model.setRecordInfo(recordInfo);
 			model.setRemark(RoomCardConsumeEnum.getRoomCardConsumeEnum(roomInfo.getGameType(), roomInfo.getPayType(), roomInfo.getTotalGames()).desc);
 			model.setCreateTime(createTime);
+			model.setTeaHouseNum(roomInfo.getTeaHouseNum()==null?0:roomInfo.getTeaHouseNum());
+			model.setTableNum(roomInfo.getTableNum()==null?0:roomInfo.getTableNum());
 			modelList.add(model);
 		}
 		userRecordDao.batchInsertRecord(modelList);
