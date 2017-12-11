@@ -1117,7 +1117,7 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.auditEntryTeaHouse.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
-		commonManager.auditEntryTeaHouse(msg.getTeaHouseNum(), msg.getOtherPlayerId());
+		commonManager.auditEntryTeaHouse(msg.getTeaHouseNum(), msg.getOtherPlayerId(), msg.getStatus());
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	public void queryTeaHousePlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
@@ -1131,6 +1131,12 @@ public abstract class BaseGameService {
 		data.put("teaHousePlayerList", commonManager.queryTeaHousePlayerList(msg.getTeaHouseNum()));
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
+	/**
+	 * 楼主将玩家移除茶楼
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
 	public void delTeaHouseUser(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -1139,7 +1145,25 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.delTeaHouseUser.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
-		commonManager.delTeaHouseUser(msg.getTeaHouseNum(), playerId);
+		commonManager.delTeaHouseUser(msg.getTeaHouseNum(), msg.getOtherPlayerId(), playerId);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+		notice(ctx, request, userInfo);
+	}
+	/**
+	 * 玩家主动退出茶楼
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void exitTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.delTeaHouseUser.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		commonManager.delTeaHouseUser(msg.getTeaHouseNum(), msg.getOtherPlayerId(), playerId);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		notice(ctx, request, userInfo);
 	}

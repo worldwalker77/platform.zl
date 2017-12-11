@@ -27,6 +27,14 @@ public class BaseMsg {
 	/**以下为茶楼相关*/
 	private Integer teaHouseNum;
 	private Integer tableNum;
+	private Integer status;
+	
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 	public Integer getPlayerNumLimit() {
 		return playerNumLimit;
 	}

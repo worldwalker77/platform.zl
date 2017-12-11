@@ -79,6 +79,9 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case queryTeaHouseTablePlayerList:
 				commonGameService.queryTeaHouseTablePlayerList(ctx, request, userInfo);
 				break;
+			case exitTeaHouse:
+				commonGameService.exitTeaHouse(ctx, request, userInfo);
+				break;
 			default:
 				break;
 			}

@@ -31,6 +31,7 @@ public enum ExceptionEnum {
     PLAYER_TEA_HOUSE_TYPE_EXIST(25, "玩家此种类型的茶楼已经存在"),
     TEA_HOUSE_NUM_EXIST(26, "茶楼号已经存在，请重新创建"),
     ALREADY_EXIST_IN_TEA_HOUSE_NUM(27, "你已经在茶楼中，请从我的茶楼列表进入"),
+    NO_PERMISSION(28, "无权限"),
     /**斗牛100-199*/
     
     /**斗牛200-299*/

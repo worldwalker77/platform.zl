@@ -86,10 +86,9 @@
     
     <update id="auditTeaHouseUser" parameterType="teaHouseModel">
 	    update t_tea_house_user
-	    set  status=1
+	    set  status=#{status}
 	    where 
 	    player_id=#{playerId} and tea_house_num=#{teaHouseNum}
-	    and status=0
 	 </update>
 	 
 	 <delete id="deleteTeaHouseUserByCondition"  parameterType="teaHouseModel">
@@ -143,6 +142,14 @@
 	<select id="getTeaHouseUserByCondition"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
 	    select tea_house_num
 	    from t_tea_house_user
+	    where 1=1
+	    <if test="teaHouseNum != null"> and tea_house_num=#{teaHouseNum}</if>
+		<if test="playerId != null"> and player_id=#{playerId}</if>
+	</select>
+	
+	<select id="getTeaHouseByCondition"  parameterType = "teaHouseModel" resultMap="gameModelResultMap">
+	    select tea_house_num,tea_house_name,tea_house_type_id,player_id
+	    from t_tea_house
 	    where 1=1
 	    <if test="teaHouseNum != null"> and tea_house_num=#{teaHouseNum}</if>
 		<if test="playerId != null"> and player_id=#{playerId}</if>

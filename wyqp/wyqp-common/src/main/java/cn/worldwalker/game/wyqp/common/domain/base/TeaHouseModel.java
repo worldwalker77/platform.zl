@@ -14,6 +14,7 @@ public class TeaHouseModel{
 	private Integer roomBankerType;
 	private Integer multipleLimit;
 	private Integer payType;
+	
 	public Integer getTeaHouseId() {
 		return teaHouseId;
 	}

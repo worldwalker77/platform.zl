@@ -59,9 +59,10 @@ public interface CommonManager {
 	public List<TeaHouseModel> queryPlayerTeaHouseList(Integer playerId);
 	public void delTeaHouse(Integer teaHouseNum, Integer playerId);
 	public void joinTeaHouse(Integer teaHouseNum, Integer playerId, String nickName);
-	public void auditEntryTeaHouse(Integer teaHouseNum, Integer playerId);
+	public void auditEntryTeaHouse(Integer teaHouseNum, Integer playerId, Integer status);
 	public List<TeaHouseModel> queryTeaHousePlayerList(Integer teaHouseNum);
 	public TeaHouseModel getTeaHouseTypeByTeaHouseNum(Integer teaHouseNum);
-	public void delTeaHouseUser(Integer teaHouseNum, Integer playerId);
+	public void delTeaHouseUser(Integer teaHouseNum, Integer otherPlayerId, Integer playerId);
+	public void exitTeaHouse(Integer teaHouseNum, Integer playerId);
 	
 }

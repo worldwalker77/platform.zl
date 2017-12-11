@@ -419,10 +419,11 @@ public class CommonManagerImpl implements CommonManager{
 	}
 	
 	@Override
-	public void auditEntryTeaHouse(Integer teaHouseNum, Integer playerId) {
+	public void auditEntryTeaHouse(Integer teaHouseNum, Integer playerId, Integer status) {
 		TeaHouseModel teaHouseModel = new TeaHouseModel();
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
 		teaHouseModel.setPlayerId(playerId);
+		teaHouseModel.setStatus(status);
 		teaHouseDao.auditTeaHouseUser(teaHouseModel);
 	}
 	
@@ -434,10 +435,14 @@ public class CommonManagerImpl implements CommonManager{
 	}
 	
 	@Override
-	public void delTeaHouseUser(Integer teaHouseNum,Integer playerId) {
+	public void delTeaHouseUser(Integer teaHouseNum, Integer otherPlayerId, Integer playerId) {
 		TeaHouseModel teaHouseModel = new TeaHouseModel();
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
 		teaHouseModel.setPlayerId(playerId);
+		if (teaHouseDao.getTeaHouseByCondition(teaHouseModel) == null) {
+			throw new BusinessException(ExceptionEnum.NO_PERMISSION);
+		}
+		teaHouseModel.setPlayerId(otherPlayerId);
 		teaHouseDao.deleteTeaHouseUserByCondition(teaHouseModel);
 	}
 	@Override
@@ -445,6 +450,13 @@ public class CommonManagerImpl implements CommonManager{
 		TeaHouseModel teaHouseModel = new TeaHouseModel();
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
 		return teaHouseDao.getTeaHouseTypeByTeaHouseNum(teaHouseModel);
+	}
+	@Override
+	public void exitTeaHouse(Integer teaHouseNum, Integer playerId) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		teaHouseModel.setPlayerId(playerId);
+		teaHouseDao.deleteTeaHouseUserByCondition(teaHouseModel);
 	}
 	
 }
