@@ -67,6 +67,16 @@
 	    select room_id,create_time, record_info, remark from t_user_record 
 	    where player_id = #{playerId} and game_type = #{gameType} order by create_time desc limit 20
 	</select>
+	
+	<select id="getTeaHouseRecord"  parameterType = "cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel" resultMap="userRecordResultMap">
+	    select room_id,tea_house_num,table_num, record_info, remark,create_time from t_user_record 
+	    where tea_house_num = #{teaHouseNum} group by room_id order by create_time desc limit 20
+	</select>
+	
+	<select id="getMyTeaHouseRecord"  parameterType = "cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel" resultMap="userRecordResultMap">
+	    select room_id,tea_house_num,table_num, record_info, remark,create_time from t_user_record 
+	    where tea_house_num = #{teaHouseNum} and player_id=#{playerId} order by create_time desc limit 20
+	</select>
 </mapper>
 
 

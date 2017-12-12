@@ -55,6 +55,7 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 				break;
 			case unifiedOrder:
 				commonGameService.unifiedOrder(ctx, request, userInfo);
+				break;
 			case notice:
 				commonGameService.notice(ctx, request, userInfo);
 				break;
@@ -62,25 +63,46 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			/**********以下为茶楼相关************/
 			case queryPlayerTeaHouseList:
 				commonGameService.queryPlayerTeaHouseList(ctx, request, userInfo);
+				break;
 			case delTeaHouse:
 				commonGameService.delTeaHouse(ctx, request, userInfo);
-			case entryTeaHouse:
-				commonGameService.entryTeaHouse(ctx, request, userInfo);
-			case joinTeaHouse:
-				commonGameService.joinTeaHouse(ctx, request, userInfo);
+				break;
 			case auditEntryTeaHouse:
 				commonGameService.auditEntryTeaHouse(ctx, request, userInfo);
+				break;
 			case queryTeaHousePlayerList:
 				commonGameService.queryTeaHousePlayerList(ctx, request, userInfo);
+				break;
 			case delTeaHouseUser:
 				commonGameService.delTeaHouseUser(ctx, request, userInfo);
+				break;
+			case entryTeaHouse:
+				commonGameService.entryTeaHouse(ctx, request, userInfo);
+				break;
 			case entryTeaHouseTable:
 				commonGameService.entryTeaHouseTable(ctx, request, userInfo);
+				break;
+			case joinTeaHouse:
+				commonGameService.joinTeaHouse(ctx, request, userInfo);
+				break;
 			case queryTeaHouseTablePlayerList:
 				commonGameService.queryTeaHouseTablePlayerList(ctx, request, userInfo);
 				break;
 			case exitTeaHouse:
 				commonGameService.exitTeaHouse(ctx, request, userInfo);
+				break;
+				
+			case playerApplyList:
+				commonGameService.playerApplyList(ctx, request, userInfo);
+				break;
+			case teaHouseRecord:
+				commonGameService.teaHouseRecord(ctx, request, userInfo);
+				break;
+			case myTeaHouseRecord:
+				commonGameService.myTeaHouseRecord(ctx, request, userInfo);
+				break;
+			case queryPlayerJoinedTeaHouseList:
+				commonGameService.queryPlayerJoinedTeaHouseList(ctx, request, userInfo);
 				break;
 			default:
 				break;

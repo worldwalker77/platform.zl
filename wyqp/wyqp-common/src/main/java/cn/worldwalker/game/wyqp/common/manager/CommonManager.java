@@ -64,5 +64,9 @@ public interface CommonManager {
 	public TeaHouseModel getTeaHouseTypeByTeaHouseNum(Integer teaHouseNum);
 	public void delTeaHouseUser(Integer teaHouseNum, Integer otherPlayerId, Integer playerId);
 	public void exitTeaHouse(Integer teaHouseNum, Integer playerId);
+	public List<TeaHouseModel> queryPlayerJoinedTeaHouseList(Integer teaHouseNum);
+	public List<UserRecordModel> getTeaHouseRecord(Integer teaHouseNum);
+	public List<UserRecordModel> getMyTeaHouseRecord(Integer teaHouseNum, Integer playerId);
+	public boolean isPlayerInTeaHouse(Integer teaHouseNum, Integer playerId);
 	
 }

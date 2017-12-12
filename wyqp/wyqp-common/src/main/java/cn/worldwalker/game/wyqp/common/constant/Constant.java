@@ -103,5 +103,8 @@ public class Constant {
 	
 	/**茶楼号+table号与游戏房间号之间的映射关系map*/
 	public final static String teaHouseNumTableNumRoomIdMap = curCompany + "_tea_house_num_table_num_room_id_map";
+	
+	/**playerId与tea_house_num的映射*/
+	public final static String playerIdTeaHouseNumMap = curCompany + "_player_id_tea_house_num_map";
 
 }

@@ -100,9 +100,12 @@ public abstract class BaseGameService {
 		if (redisRelaModel != null) {
 			roomId = redisRelaModel.getRoomId();
 		}
+		Integer teaHouseNum = redisOperationService.getTeaHouseNumByPlayerId(userModel.getPlayerId());
+		
 		UserInfo userInfo = new UserInfo();
 		userInfo.setPlayerId(userModel.getPlayerId());
 		userInfo.setRoomId(roomId);
+		userInfo.setTeaHouseNum(teaHouseNum);
 		userInfo.setNickName(weixinUserInfo.getName());
 		userInfo.setLevel(userModel.getUserLevel() == null ? 1 : userModel.getUserLevel());
 		userInfo.setServerIp(Constant.localIp);
@@ -1081,6 +1084,16 @@ public abstract class BaseGameService {
 		data.put("playerTeaHouseList", commonManager.queryPlayerTeaHouseList(playerId));
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
+	public void queryPlayerJoinedTeaHouseList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.queryPlayerJoinedTeaHouseList.msgType);
+		Integer playerId = request.getMsg().getPlayerId();
+		data.put("playerJoinedTeaHouseList", commonManager.queryPlayerJoinedTeaHouseList(playerId));
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
 	
 	public void delTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
@@ -1102,6 +1115,15 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.entryTeaHouse.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
+		Integer teaHouseNum = msg.getTeaHouseNum();
+		
+		boolean isIn = commonManager.isPlayerInTeaHouse(teaHouseNum, playerId);
+		/**如果当前玩家已经在茶楼中*/
+		if (isIn) {
+			
+		}else{
+			
+		}
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	public void joinTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
@@ -1165,7 +1187,7 @@ public abstract class BaseGameService {
 		Map<String, Object> data = new HashMap<String, Object>();
 		result.setData(data);
 		result.setGameType(request.getGameType());
-		result.setMsgType(MsgTypeEnum.delTeaHouseUser.msgType);
+		result.setMsgType(MsgTypeEnum.exitTeaHouse.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
 		commonManager.exitTeaHouse(msg.getTeaHouseNum(), playerId);
@@ -1209,6 +1231,8 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.teaHouseRecord.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
+		List<UserRecordModel> list = commonManager.getTeaHouseRecord(msg.getTeaHouseNum());
+		result.setData(list);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	public void myTeaHouseRecord(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
@@ -1219,6 +1243,20 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.myTeaHouseRecord.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
+		List<UserRecordModel> list = commonManager.getMyTeaHouseRecord(msg.getTeaHouseNum(),playerId);
+		result.setData(list);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void playerApplyList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.playerApplyList.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		data.put("playerApplyList", commonManager.queryPlayerJoinedTeaHouseList(playerId));
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 }

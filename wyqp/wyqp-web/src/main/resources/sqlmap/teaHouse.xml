@@ -110,7 +110,7 @@
     
 	<select id="getTeaHousePlayerList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
 	    select a.player_id,a.nick_name,a.create_time
-	    from t_tea_house_user a left join t_tea_house
+	    from t_tea_house_user a left join t_tea_house b
 	    on a.tea_house_num = b.tea_house_num
 	    where a.tea_house_num = #{teaHouseNum} and b.player_id = #{playerId}
 	</select>
@@ -121,6 +121,14 @@
 	    on a.tea_house_type_id = b.tea_house_type_id
 	    where a.player_id = #{playerId}
 	    <if test="teaHouseTypeId != null"> and a.tea_house_type_id=#{teaHouseTypeId}</if>
+	</select>
+	
+	<select id="getPlayerJoinedTeaHouseList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
+	    select a.tea_house_num,a.status,c.game_type,c.total_game,c.room_banker_type,c.multiple_limit,c.pay_type
+	    from t_tea_house_user a 
+	    left join t_tea_house b on a.tea_house_num = b.tea_house_num
+	    left join t_tea_house_type c on b.tea_house_type_id = c.tea_house_type_id
+	    where a.player_id = #{playerId}
 	</select>
 	
 	<select id="getTeaHouseTypeByTeaHouseNum"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">

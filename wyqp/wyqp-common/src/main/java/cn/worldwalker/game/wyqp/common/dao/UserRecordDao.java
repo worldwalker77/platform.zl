@@ -12,4 +12,8 @@ public interface UserRecordDao {
 	
 	public List<UserRecordModel> getUserRecord(UserRecordModel model);
 	
+	public List<UserRecordModel> getTeaHouseRecord(UserRecordModel model);
+	
+	public List<UserRecordModel> getMyTeaHouseRecord(UserRecordModel model);
+	
 }

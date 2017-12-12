@@ -63,6 +63,7 @@ public class JhMsgDispatcher extends BaseMsgDisPatcher {
 			/**********以下为茶楼相关************/
 			case createTeaHouse:
 				jhGameService.createTeaHouse(ctx, request, userInfo);
+				break;
 			default:
 				break;
 		}

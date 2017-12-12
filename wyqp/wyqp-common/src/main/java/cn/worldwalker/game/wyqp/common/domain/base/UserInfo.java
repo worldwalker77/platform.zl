@@ -29,6 +29,17 @@ public class UserInfo {
 	private String y;
 	
 	private Integer winProbability = 0;
+	
+	private Integer teaHouseNum;
+	
+	
+	public Integer getTeaHouseNum() {
+		return teaHouseNum;
+	}
+
+	public void setTeaHouseNum(Integer teaHouseNum) {
+		this.teaHouseNum = teaHouseNum;
+	}
 
 	public Integer getWinProbability() {
 		return winProbability;

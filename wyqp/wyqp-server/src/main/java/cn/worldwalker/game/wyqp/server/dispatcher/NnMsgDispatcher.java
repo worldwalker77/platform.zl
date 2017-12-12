@@ -60,6 +60,7 @@ public class NnMsgDispatcher extends BaseMsgDisPatcher {
 			/**********以下为茶楼相关************/
 			case createTeaHouse:
 				nnGameService.createTeaHouse(ctx, request, userInfo);
+				break;
 			default:
 				break;
 		}

@@ -21,5 +21,6 @@ public class GameInfoMemoryContainer {
 	public static Map<String, Integer> ipConnectCountMap = new ConcurrentHashMap<String, Integer>();
 	public static Stack<String> roomCardOperationFailList = new Stack<String>();
 	public static Map<String, String> teaHouseNumTableNumRoomIdMap = new ConcurrentHashMap<String, String>();
+	public static Map<String, String> playerIdTeaHouseNumMap = new ConcurrentHashMap<String, String>();
 	
 }

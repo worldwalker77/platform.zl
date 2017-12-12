@@ -512,4 +512,36 @@ public class RedisOperationService {
 		return null;
 	}
 	
+	/**playerId->teaHouseNum 映射*/
+	public void setPlayerIdTeaHouseNum(Integer playerId, Integer teaHouseNum){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.hset(Constant.playerIdTeaHouseNumMap, String.valueOf(playerId), String.valueOf(teaHouseNum));
+		}else{
+			GameInfoMemoryContainer.playerIdTeaHouseNumMap.put(String.valueOf(playerId), String.valueOf(teaHouseNum));
+		}
+		
+	}
+	
+	public Integer getTeaHouseNumByPlayerId(Integer playerId){
+		String str = null;
+		if (gameInfoStorageType == 0 ) {
+			str = jedisTemplate.hget(Constant.playerIdTeaHouseNumMap, String.valueOf(playerId));
+		}else{
+			str = GameInfoMemoryContainer.playerIdTeaHouseNumMap.get(String.valueOf(playerId));
+		}
+		if (StringUtils.isBlank(str)) {
+			return null;
+		}
+		return Integer.valueOf(str);
+	}
+	
+	public void hdelPlayerIdTeaHouseNum(Integer playerId){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.hdel(Constant.playerIdTeaHouseNumMap, String.valueOf(playerId));
+		}else{
+			GameInfoMemoryContainer.playerIdTeaHouseNumMap.remove(String.valueOf(playerId));
+		}
+		
+	}
+	
 }

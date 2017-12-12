@@ -121,12 +121,18 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.createTeaHouse.msgType, MsgTypeEnum.createTeaHouse);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.queryPlayerTeaHouseList.msgType, MsgTypeEnum.queryPlayerTeaHouseList);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.delTeaHouse.msgType, MsgTypeEnum.delTeaHouse);
-		notNeedLockMsgTypeMap.put(MsgTypeEnum.entryTeaHouse.msgType, MsgTypeEnum.entryTeaHouse);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.auditEntryTeaHouse.msgType, MsgTypeEnum.auditEntryTeaHouse);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.queryTeaHousePlayerList.msgType, MsgTypeEnum.queryTeaHousePlayerList);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.delTeaHouseUser.msgType, MsgTypeEnum.delTeaHouseUser);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.entryTeaHouseTable.msgType, MsgTypeEnum.entryTeaHouseTable);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.joinTeaHouse.msgType, MsgTypeEnum.joinTeaHouse);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.queryTeaHouseTablePlayerList.msgType, MsgTypeEnum.queryTeaHouseTablePlayerList);
+		
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.exitTeaHouse.msgType, MsgTypeEnum.exitTeaHouse);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.playerApplyList.msgType, MsgTypeEnum.playerApplyList);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.teaHouseRecord.msgType, MsgTypeEnum.teaHouseRecord);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.myTeaHouseRecord.msgType, MsgTypeEnum.myTeaHouseRecord);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.queryPlayerJoinedTeaHouseList.msgType, MsgTypeEnum.queryPlayerJoinedTeaHouseList);
 		
 		
 	}

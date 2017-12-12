@@ -383,11 +383,14 @@ public class CommonManagerImpl implements CommonManager{
 			}
 			teaHouseModel.setTeaHouseTypeId(resModel.getTeaHouseTypeId());
 			teaHouseDao.insertTeaHouse(teaHouseModel);
+			
 		}else{/**此种类型茶楼不存在，则先要创建此种类型，然后获取类型id后，创建茶楼*/
 			teaHouseDao.insertTeaHouseType(typeModel);
 			teaHouseModel.setTeaHouseTypeId(typeModel.getTeaHouseTypeId());
 			teaHouseDao.insertTeaHouse(teaHouseModel);
 		}
+		/**将当前玩家加入茶楼*/
+		teaHouseDao.insertTeaHouseUser(teaHouseModel);
 	}
 	
 	@Override
@@ -459,6 +462,46 @@ public class CommonManagerImpl implements CommonManager{
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
 		teaHouseModel.setPlayerId(playerId);
 		teaHouseDao.deleteTeaHouseUserByCondition(teaHouseModel);
+	}
+	
+	@Override
+	public List<TeaHouseModel> queryPlayerJoinedTeaHouseList(Integer playerId) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setPlayerId(playerId);
+		return teaHouseDao.getPlayerJoinedTeaHouseList(teaHouseModel);
+	}
+	@Override
+	public List<UserRecordModel> getTeaHouseRecord(Integer teaHouseNum) {
+		UserRecordModel model = new UserRecordModel();
+		model.setTeaHouseNum(teaHouseNum);
+		List<UserRecordModel> list = userRecordDao.getTeaHouseRecord(model);
+		for(UserRecordModel userRecordModel : list){
+			userRecordModel.setRecordList(JsonUtil.json2list(userRecordModel.getRecordInfo(), RecordModel.class));
+			userRecordModel.setRecordInfo(null);
+		}
+		return list;
+	}
+	@Override
+	public List<UserRecordModel> getMyTeaHouseRecord(Integer teaHouseNum, Integer playerId) {
+		UserRecordModel model = new UserRecordModel();
+		model.setTeaHouseNum(teaHouseNum);
+		model.setPlayerId(playerId);
+		List<UserRecordModel> list = userRecordDao.getMyTeaHouseRecord(model);
+		for(UserRecordModel userRecordModel : list){
+			userRecordModel.setRecordList(JsonUtil.json2list(userRecordModel.getRecordInfo(), RecordModel.class));
+			userRecordModel.setRecordInfo(null);
+		}
+		return list;
+	}
+	@Override
+	public boolean isPlayerInTeaHouse(Integer teaHouseNum, Integer playerId) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setPlayerId(playerId);
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		if (teaHouseDao.getTeaHouseUserByCondition(teaHouseModel) == null) {
+			return false;
+		}
+		return true;
 	}
 	
 }

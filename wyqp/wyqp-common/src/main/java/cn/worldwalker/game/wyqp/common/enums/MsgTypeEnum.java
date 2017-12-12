@@ -46,9 +46,10 @@ public enum MsgTypeEnum {
 	joinTeaHouse(88, "申请加入茶楼"),
 	queryTeaHouseTablePlayerList(89, "查询茶楼里面某个牌桌的玩家列表"),
 	exitTeaHouse(90, "退出茶楼"),
-	myApply(91, "我的申请"),
+	playerApplyList(91, "我的加入茶楼申请列表"),
 	teaHouseRecord(92, "茶楼战绩"),
 	myTeaHouseRecord(93, "我的茶楼战绩"),
+	queryPlayerJoinedTeaHouseList(94, "查询我加入的茶楼列表"),
 	
 	/**斗牛特有100-199*/
 	readyRobBanker(100, "准备抢庄"),
