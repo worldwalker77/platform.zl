@@ -1177,7 +1177,24 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	/**
-	 * 玩家主动退出茶楼
+	 * 退出已经加入的茶楼
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void delFromTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.delFromTeaHouse.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		commonManager.exitTeaHouse(msg.getTeaHouseNum(), playerId);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	/**
+	 * 退出茶楼到大厅
 	 * @param ctx
 	 * @param request
 	 * @param userInfo
@@ -1190,7 +1207,6 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.exitTeaHouse.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
-		commonManager.exitTeaHouse(msg.getTeaHouseNum(), playerId);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	public void queryTeaHouseTablePlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
@@ -1257,6 +1273,61 @@ public abstract class BaseGameService {
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
 		data.put("playerApplyList", commonManager.queryPlayerJoinedTeaHouseList(playerId));
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void teaHouseConfig(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.teaHouseConfig.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void teaHouseBigWinner(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.teaHouseBigWinner.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void tuhaoBoard(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.tuhaoBoard.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void paishenBoard(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.paishenBoard.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void openRoomList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.openRoomList.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 }

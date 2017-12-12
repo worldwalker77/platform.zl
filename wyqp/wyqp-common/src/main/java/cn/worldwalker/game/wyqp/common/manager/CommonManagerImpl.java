@@ -390,6 +390,7 @@ public class CommonManagerImpl implements CommonManager{
 			teaHouseDao.insertTeaHouse(teaHouseModel);
 		}
 		/**将当前玩家加入茶楼*/
+		teaHouseModel.setStatus(1);
 		teaHouseDao.insertTeaHouseUser(teaHouseModel);
 	}
 	

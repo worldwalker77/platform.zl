@@ -28,6 +28,7 @@
 		     					tea_house_num, 
 		     					player_id, 
 		     					nick_name,
+		     					status,
 		     					create_time,
 		     					update_time
 	     					) 
@@ -35,6 +36,7 @@
 		     					#{teaHouseNum}, 
 		     					#{playerId},
 		     					#{nickName},
+		     					#{status},
 		     					now(),
 		     					now()
 		     				)    

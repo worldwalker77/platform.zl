@@ -35,6 +35,11 @@ public enum MsgTypeEnum {
 //	notReadyTimer(30, "未准备玩家计时器"),
 	
 	/**茶楼相关*/
+	
+	tuhaoBoard(50, "土豪榜"),
+	paishenBoard(51, "牌神榜"),
+	openRoomList(52, "已开房"),
+	
 	createTeaHouse(80, "创建茶楼"),
 	queryPlayerTeaHouseList(81, "查询玩家茶楼列表"),
 	delTeaHouse(82, "删除茶楼"),
@@ -44,12 +49,15 @@ public enum MsgTypeEnum {
 	entryTeaHouse(86, "进入茶楼"),
 	entryTeaHouseTable(87, "进入茶楼下的某个牌桌"),
 	joinTeaHouse(88, "申请加入茶楼"),
-	queryTeaHouseTablePlayerList(89, "查询茶楼里面某个牌桌的玩家列表"),
-	exitTeaHouse(90, "退出茶楼"),
-	playerApplyList(91, "我的加入茶楼申请列表"),
+	queryTeaHouseTablePlayerList(89, "查询茶楼里面牌桌的玩家列表"),
+	delFromTeaHouse(90, "退出已经加入的茶楼"),
+	playerApplyList(91, "茶楼申请列表"),
 	teaHouseRecord(92, "茶楼战绩"),
 	myTeaHouseRecord(93, "我的茶楼战绩"),
 	queryPlayerJoinedTeaHouseList(94, "查询我加入的茶楼列表"),
+	exitTeaHouse(95, "退出进入的茶楼"),
+	teaHouseConfig(96, "茶楼设置"),
+	teaHouseBigWinner(97, "茶楼大赢家"),
 	
 	/**斗牛特有100-199*/
 	readyRobBanker(100, "准备抢庄"),

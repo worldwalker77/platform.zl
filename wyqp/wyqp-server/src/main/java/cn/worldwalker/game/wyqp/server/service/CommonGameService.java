@@ -132,6 +132,7 @@ public class CommonGameService extends BaseGameService{
 			switch (gameTypeEnum) {
 				case nn:
 					NnMsg nnMsg = new NnMsg();
+					nnMsg.setPlayerId(msg.getPlayerId());
 					nnMsg.setTeaHouseNum(teaHouseNum);
 					nnMsg.setTableNum(tableNum);
 					nnMsg.setTotalGames(resModel.getTotalGame());
@@ -146,6 +147,7 @@ public class CommonGameService extends BaseGameService{
 					break;
 				case jh:
 					JhMsg jhMsg = new JhMsg();
+					jhMsg.setPlayerId(msg.getPlayerId());
 					jhMsg.setTeaHouseNum(teaHouseNum);
 					jhMsg.setTableNum(tableNum);
 					jhMsg.setTotalGames(resModel.getTotalGame());

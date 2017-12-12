@@ -32,42 +32,46 @@ public class OfflinePlayerCleanJob /**extends SingleServerJobByRedis*/{
 	 */
 //	@Override
 	public void doTask() {
-		List<RedisRelaModel> list = redisOperationService.getAllOfflinePlayerIdRoomIdGameTypeTime();
-		for(RedisRelaModel model : list){
-			if (System.currentTimeMillis() - model.getUpdateTime() > roomClearTime) {
-				Result result = new Result();
-				BaseRoomInfo roomInfo = null;
-				if (GameTypeEnum.nn.gameType.equals(model.getGameType()) ) {
-					roomInfo = redisOperationService.getRoomInfoByRoomId(model.getRoomId(), NnRoomInfo.class);
-					result.setGameType(GameTypeEnum.nn.gameType);
-				}else if(GameTypeEnum.mj.gameType.equals(model.getGameType()) ){
-					roomInfo = redisOperationService.getRoomInfoByRoomId(model.getRoomId(), MjRoomInfo.class);
-					result.setGameType(GameTypeEnum.mj.gameType);
-				}else if(GameTypeEnum.jh.gameType.equals(model.getGameType()) ){
-					roomInfo = redisOperationService.getRoomInfoByRoomId(model.getRoomId(), JhRoomInfo.class);
-					result.setGameType(GameTypeEnum.jh.gameType);
-				}
-				if (roomInfo == null) {
-					/**如果无房间信息，则说明可能其他离线玩家已经将房间删除，不需要再推送消息给其他玩家*/
-					redisOperationService.cleanPlayerAndRoomInfo(model.getRoomId(), String.valueOf(model.getPlayerId()));
+		try {
+			List<RedisRelaModel> list = redisOperationService.getAllOfflinePlayerIdRoomIdGameTypeTime();
+			for(RedisRelaModel model : list){
+				if (System.currentTimeMillis() - model.getUpdateTime() > roomClearTime) {
+					Result result = new Result();
+					BaseRoomInfo roomInfo = null;
+					if (GameTypeEnum.nn.gameType.equals(model.getGameType()) ) {
+						roomInfo = redisOperationService.getRoomInfoByRoomId(model.getRoomId(), NnRoomInfo.class);
+						result.setGameType(GameTypeEnum.nn.gameType);
+					}else if(GameTypeEnum.mj.gameType.equals(model.getGameType()) ){
+						roomInfo = redisOperationService.getRoomInfoByRoomId(model.getRoomId(), MjRoomInfo.class);
+						result.setGameType(GameTypeEnum.mj.gameType);
+					}else if(GameTypeEnum.jh.gameType.equals(model.getGameType()) ){
+						roomInfo = redisOperationService.getRoomInfoByRoomId(model.getRoomId(), JhRoomInfo.class);
+						result.setGameType(GameTypeEnum.jh.gameType);
+					}
+					if (roomInfo == null) {
+						/**如果无房间信息，则说明可能其他离线玩家已经将房间删除，不需要再推送消息给其他玩家*/
+						redisOperationService.cleanPlayerAndRoomInfo(model.getRoomId(), String.valueOf(model.getPlayerId()));
+						/**茶楼相关*/
+						redisOperationService.delRoomIdByTeaHouseNumTableNum(roomInfo.getTeaHouseNum(), roomInfo.getTableNum());
+						return;
+					}
+					/**如果房间没有更新小于4分钟*/
+					if (System.currentTimeMillis() - roomInfo.getUpdateTime().getTime() < roomClearTime) {
+						continue;
+					}
+					List playerList = roomInfo.getPlayerList();
+					result.setMsgType(MsgTypeEnum.dissolveRoomCausedByOffline.msgType);
+					Map<String, Object> data = new HashMap<String, Object>();
+					data.put("playerId", model.getPlayerId());
+					result.setData(data);
+					channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, model.getPlayerId()));
+					redisOperationService.cleanPlayerAndRoomInfo(model.getRoomId(), GameUtil.getPlayerIdStrArr(playerList));
 					/**茶楼相关*/
 					redisOperationService.delRoomIdByTeaHouseNumTableNum(roomInfo.getTeaHouseNum(), roomInfo.getTableNum());
-					return;
 				}
-				/**如果房间没有更新小于4分钟*/
-				if (System.currentTimeMillis() - roomInfo.getUpdateTime().getTime() < roomClearTime) {
-					continue;
-				}
-				List playerList = roomInfo.getPlayerList();
-				result.setMsgType(MsgTypeEnum.dissolveRoomCausedByOffline.msgType);
-				Map<String, Object> data = new HashMap<String, Object>();
-				data.put("playerId", model.getPlayerId());
-				result.setData(data);
-				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, model.getPlayerId()));
-				redisOperationService.cleanPlayerAndRoomInfo(model.getRoomId(), GameUtil.getPlayerIdStrArr(playerList));
-				/**茶楼相关*/
-				redisOperationService.delRoomIdByTeaHouseNumTableNum(roomInfo.getTeaHouseNum(), roomInfo.getTableNum());
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	

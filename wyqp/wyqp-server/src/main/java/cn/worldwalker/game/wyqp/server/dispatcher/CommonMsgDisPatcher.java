@@ -38,7 +38,7 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 				commonGameService.userFeedback(ctx, request, userInfo);
 				break;
 			case heartBeat:
-				channelContainer.sendTextMsgByPlayerIds(new Result(GameTypeEnum.nn.gameType, MsgTypeEnum.heartBeat.msgType), userInfo.getPlayerId());
+				channelContainer.sendTextMsgByPlayerIds(new Result(GameTypeEnum.common.gameType, MsgTypeEnum.heartBeat.msgType), userInfo.getPlayerId());
 				break;
 			case refreshRoom:
 				channelContainer.addChannel(ctx, userInfo.getPlayerId());
@@ -88,8 +88,8 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case queryTeaHouseTablePlayerList:
 				commonGameService.queryTeaHouseTablePlayerList(ctx, request, userInfo);
 				break;
-			case exitTeaHouse:
-				commonGameService.exitTeaHouse(ctx, request, userInfo);
+			case delFromTeaHouse:
+				commonGameService.delFromTeaHouse(ctx, request, userInfo);
 				break;
 				
 			case playerApplyList:
@@ -103,6 +103,25 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 				break;
 			case queryPlayerJoinedTeaHouseList:
 				commonGameService.queryPlayerJoinedTeaHouseList(ctx, request, userInfo);
+				break;
+			case exitTeaHouse:
+				commonGameService.exitTeaHouse(ctx, request, userInfo);
+				break;
+				
+			case teaHouseConfig:
+				commonGameService.teaHouseConfig(ctx, request, userInfo);
+				break;
+			case teaHouseBigWinner:
+				commonGameService.teaHouseBigWinner(ctx, request, userInfo);
+				break;
+			case tuhaoBoard:
+				commonGameService.tuhaoBoard(ctx, request, userInfo);
+				break;
+			case paishenBoard:
+				commonGameService.paishenBoard(ctx, request, userInfo);
+				break;
+			case openRoomList:
+				commonGameService.openRoomList(ctx, request, userInfo);
 				break;
 			default:
 				break;
