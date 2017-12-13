@@ -32,6 +32,7 @@ public enum ExceptionEnum {
     TEA_HOUSE_NUM_EXIST(26, "茶楼号已经存在，请重新创建"),
     ALREADY_EXIST_IN_TEA_HOUSE_NUM(27, "你已经在茶楼中，请从我的茶楼列表进入"),
     NO_PERMISSION(28, "无权限"),
+    TEA_HOUSE_NOT_EXIST(29, "茶楼号不存在"),
     /**斗牛100-199*/
     
     /**斗牛200-299*/

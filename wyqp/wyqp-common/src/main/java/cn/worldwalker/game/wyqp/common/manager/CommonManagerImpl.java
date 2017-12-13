@@ -524,5 +524,14 @@ public class CommonManagerImpl implements CommonManager{
 	public List<UserRecordModel> getPaishenBoard() {
 		return userRecordDao.getPaishenBoard(new UserRecordModel());
 	}
+	@Override
+	public boolean isTeaHouseExist(Integer teaHouseNum) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		if (teaHouseDao.getTeaHouseByCondition(teaHouseModel) == null) {
+			return false;
+		}
+		return true;
+	}
 	
 }

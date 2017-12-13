@@ -1137,6 +1137,9 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.joinTeaHouse.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
+		if (!commonManager.isTeaHouseExist(msg.getTeaHouseNum())) {
+			throw new BusinessException(ExceptionEnum.TEA_HOUSE_NOT_EXIST);
+		}
 		boolean isIn = commonManager.isPlayerInTeaHouse(msg.getTeaHouseNum(), playerId);
 		/**如果当前玩家已经在茶楼中,则直接进入茶楼*/
 		if (isIn) {

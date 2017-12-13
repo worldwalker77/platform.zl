@@ -68,6 +68,7 @@ public interface CommonManager {
 	public List<UserRecordModel> getTeaHouseRecord(Integer teaHouseNum);
 	public List<UserRecordModel> getMyTeaHouseRecord(Integer teaHouseNum, Integer playerId);
 	public boolean isPlayerInTeaHouse(Integer teaHouseNum, Integer playerId);
+	public boolean isTeaHouseExist(Integer teaHouseNum);
 	public void updateTeaHouseByCondition(Integer teaHouseNum, Integer playerId, String teaHouseOwnerWord);
 	
 	public List<UserRecordModel> getTeaHouseBigWinner(Integer teaHouseNum);
