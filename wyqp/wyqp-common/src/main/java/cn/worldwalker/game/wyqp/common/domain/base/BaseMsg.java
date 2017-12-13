@@ -28,7 +28,14 @@ public class BaseMsg {
 	private Integer teaHouseNum;
 	private Integer tableNum;
 	private Integer status;
+	private String teaHouseOwnerWord;
 	
+	public String getTeaHouseOwnerWord() {
+		return teaHouseOwnerWord;
+	}
+	public void setTeaHouseOwnerWord(String teaHouseOwnerWord) {
+		this.teaHouseOwnerWord = teaHouseOwnerWord;
+	}
 	public Integer getStatus() {
 		return status;
 	}

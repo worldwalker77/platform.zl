@@ -63,10 +63,14 @@ public interface CommonManager {
 	public List<TeaHouseModel> queryTeaHousePlayerList(Integer teaHouseNum);
 	public TeaHouseModel getTeaHouseTypeByTeaHouseNum(Integer teaHouseNum);
 	public void delTeaHouseUser(Integer teaHouseNum, Integer otherPlayerId, Integer playerId);
-	public void exitTeaHouse(Integer teaHouseNum, Integer playerId);
+	public void delFromTeaHouse(Integer teaHouseNum, Integer playerId);
 	public List<TeaHouseModel> queryPlayerJoinedTeaHouseList(Integer teaHouseNum);
 	public List<UserRecordModel> getTeaHouseRecord(Integer teaHouseNum);
 	public List<UserRecordModel> getMyTeaHouseRecord(Integer teaHouseNum, Integer playerId);
 	public boolean isPlayerInTeaHouse(Integer teaHouseNum, Integer playerId);
+	public void updateTeaHouseByCondition(Integer teaHouseNum, Integer playerId, String teaHouseOwnerWord);
+	
+	public List<UserRecordModel> getTeaHouseBigWinner(Integer teaHouseNum);
+	public List<UserRecordModel> getPaishenBoard();
 	
 }

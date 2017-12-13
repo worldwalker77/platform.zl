@@ -18,6 +18,7 @@
 		<result column="room_banker_type" property="roomBankerType"/>
 		<result column="multiple_limit" property="multipleLimit"/>
 		<result column="pay_type" property="payType"/>
+		<result column="tea_house_owner_word" property="teaHouseOwnerWord"/>
 	</resultMap>
 	
 	<insert id="insertTeaHouseUser" parameterType="teaHouseModel">  
@@ -134,7 +135,7 @@
 	</select>
 	
 	<select id="getTeaHouseTypeByTeaHouseNum"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
-	    select b.*
+	    select b.*,a.tea_house_owner_word
 	    from t_tea_house a left join t_tea_house_type b
 	    on a.tea_house_type_id = b.tea_house_type_id
 	    where a.tea_house_num = #{teaHouseNum}
@@ -162,6 +163,14 @@
 	<select id="getTeaHouseByCondition"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
 	    select tea_house_num,tea_house_name,tea_house_type_id,player_id
 	    from t_tea_house
+	    where 1=1
+	    <if test="teaHouseNum != null"> and tea_house_num=#{teaHouseNum}</if>
+		<if test="playerId != null"> and player_id=#{playerId}</if>
+	</select>
+	
+	<select id="updateTeaHouseByCondition"  parameterType = "teaHouseModel" >
+	    update t_tea_house
+	    set tea_house_owner_word = #{teaHouseOwnerWord}
 	    where 1=1
 	    <if test="teaHouseNum != null"> and tea_house_num=#{teaHouseNum}</if>
 		<if test="playerId != null"> and player_id=#{playerId}</if>

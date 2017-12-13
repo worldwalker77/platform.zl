@@ -31,6 +31,36 @@ public class UserRecordModel {
 	
 	private Integer tableNum;
 	
+	private String nickName;
+	
+	private String headImgUrl;
+	
+	private Integer totalScore;
+	
+	public Integer getTotalScore() {
+		return totalScore;
+	}
+
+	public void setTotalScore(Integer totalScore) {
+		this.totalScore = totalScore;
+	}
+
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	public String getHeadImgUrl() {
+		return headImgUrl;
+	}
+
+	public void setHeadImgUrl(String headImgUrl) {
+		this.headImgUrl = headImgUrl;
+	}
+
 	public Integer getTeaHouseNum() {
 		return teaHouseNum;
 	}

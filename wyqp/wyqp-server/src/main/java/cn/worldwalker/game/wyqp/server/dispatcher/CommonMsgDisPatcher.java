@@ -79,6 +79,7 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case entryTeaHouse:
 				commonGameService.entryTeaHouse(ctx, request, userInfo);
 				break;
+				/**进入茶楼茶桌*/
 			case entryTeaHouseTable:
 				commonGameService.entryTeaHouseTable(ctx, request, userInfo);
 				break;

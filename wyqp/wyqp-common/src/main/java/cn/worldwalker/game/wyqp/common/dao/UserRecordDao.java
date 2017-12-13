@@ -16,4 +16,8 @@ public interface UserRecordDao {
 	
 	public List<UserRecordModel> getMyTeaHouseRecord(UserRecordModel model);
 	
+	public List<UserRecordModel> getTeaHouseBigWinner(UserRecordModel model);
+	
+	public List<UserRecordModel> getPaishenBoard(UserRecordModel model);
+	
 }

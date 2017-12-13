@@ -194,6 +194,8 @@ public class CommonManagerImpl implements CommonManager{
 			UserRecordModel model = new UserRecordModel();
 			model.setGameType(roomInfo.getGameType());
 			model.setPlayerId(player.getPlayerId());
+			model.setNickName(player.getNickName());
+			model.setHeadImgUrl(player.getHeadImgUrl());
 			model.setRoomId(roomInfo.getRoomId());
 			model.setPayType(roomInfo.getPayType());
 			model.setTotalGames(roomInfo.getTotalGames());
@@ -458,7 +460,7 @@ public class CommonManagerImpl implements CommonManager{
 		return teaHouseDao.getTeaHouseTypeByTeaHouseNum(teaHouseModel);
 	}
 	@Override
-	public void exitTeaHouse(Integer teaHouseNum, Integer playerId) {
+	public void delFromTeaHouse(Integer teaHouseNum, Integer playerId) {
 		TeaHouseModel teaHouseModel = new TeaHouseModel();
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
 		teaHouseModel.setPlayerId(playerId);
@@ -503,6 +505,24 @@ public class CommonManagerImpl implements CommonManager{
 			return false;
 		}
 		return true;
+	}
+	@Override
+	public void updateTeaHouseByCondition(Integer teaHouseNum, Integer playerId, String teaHouseOwnerWord) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setPlayerId(playerId);
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		teaHouseModel.setTeaHouseOwnerWord(teaHouseOwnerWord);
+		teaHouseDao.updateTeaHouseByCondition(teaHouseModel);
+	}
+	@Override
+	public List<UserRecordModel> getTeaHouseBigWinner(Integer teaHouseNum) {
+		UserRecordModel model = new UserRecordModel();
+		model.setTeaHouseNum(teaHouseNum);
+		return userRecordDao.getTeaHouseBigWinner(model);
+	}
+	@Override
+	public List<UserRecordModel> getPaishenBoard() {
+		return userRecordDao.getPaishenBoard(new UserRecordModel());
 	}
 	
 }

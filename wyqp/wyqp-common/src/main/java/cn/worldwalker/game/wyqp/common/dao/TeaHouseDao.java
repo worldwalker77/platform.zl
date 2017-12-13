@@ -19,5 +19,6 @@ public interface TeaHouseDao {
 	public TeaHouseModel getTeaHouseUserByCondition(TeaHouseModel teaHouseModel);
 	public TeaHouseModel getTeaHouseByCondition(TeaHouseModel teaHouseModel);
 	public List<TeaHouseModel> getPlayerJoinedTeaHouseList(TeaHouseModel teaHouseModel);
+	public Integer updateTeaHouseByCondition(TeaHouseModel teaHouseModel);
 	
 }
