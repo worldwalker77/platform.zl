@@ -93,8 +93,8 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 				commonGameService.delFromTeaHouse(ctx, request, userInfo);
 				break;
 				
-			case playerApplyList:
-				commonGameService.playerApplyList(ctx, request, userInfo);
+			case queryNeedAuditPlayerList:
+				commonGameService.queryNeedAuditPlayerList(ctx, request, userInfo);
 				break;
 			case teaHouseRecord:
 				commonGameService.teaHouseRecord(ctx, request, userInfo);

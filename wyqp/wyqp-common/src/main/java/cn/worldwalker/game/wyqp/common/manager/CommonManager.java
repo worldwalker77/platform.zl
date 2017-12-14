@@ -74,4 +74,6 @@ public interface CommonManager {
 	public List<UserRecordModel> getTeaHouseBigWinner(Integer teaHouseNum);
 	public List<UserRecordModel> getPaishenBoard();
 	
+	public List<TeaHouseModel> queryNeedAuditPlayerList(Integer teaHouseNum, Integer playerId);
+	
 }

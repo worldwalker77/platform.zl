@@ -112,10 +112,9 @@
     
     
 	<select id="getTeaHousePlayerList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
-	    select a.player_id,a.nick_name,a.create_time
-	    from t_tea_house_user a left join t_tea_house b
-	    on a.tea_house_num = b.tea_house_num
-	    where a.tea_house_num = #{teaHouseNum} and b.player_id = #{playerId}
+	    select player_id,nick_name,create_time
+	    from t_tea_house_user
+	    where tea_house_num = #{teaHouseNum}
 	</select>
 	<select id="getPlayerTeaHouseList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
 	    select a.tea_house_id,a.tea_house_name,a.tea_house_num,a.create_time,
@@ -134,8 +133,15 @@
 	    where a.player_id = #{playerId}
 	</select>
 	
+	<select id="getNeedAuditPlayerList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
+	    select b.player_id,b.nick_name,b.head_img_url,b.status
+	    from t_tea_hous a left join t_tea_house_user b
+	    on a.tea_house_num = b.tea_house_num
+	    where a.player_id = #{playerId} and a.tea_house_num = #{teaHouseNum} and b.status = 0
+	</select>
+	
 	<select id="getTeaHouseTypeByTeaHouseNum"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
-	    select b.*,a.tea_house_owner_word
+	    select b.*,a.tea_house_owner_word,a.tea_house_num
 	    from t_tea_house a left join t_tea_house_type b
 	    on a.tea_house_type_id = b.tea_house_type_id
 	    where a.tea_house_num = #{teaHouseNum}

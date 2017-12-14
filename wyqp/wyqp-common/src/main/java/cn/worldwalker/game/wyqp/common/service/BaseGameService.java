@@ -568,7 +568,7 @@ public abstract class BaseGameService {
 		}
 		/**通知玩家返回大厅*/
 		result.setMsgType(MsgTypeEnum.delRoomConfirmBeforeReturnHall.msgType);
-//		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
+		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
 		/**将roomId从用户信息中去除*/
 		userInfo.setRoomId(null);
 		redisOperationService.setUserInfo(request.getToken(), userInfo);
@@ -1164,13 +1164,11 @@ public abstract class BaseGameService {
 	}
 	public void queryTeaHousePlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
-		Map<String, Object> data = new HashMap<String, Object>();
-		result.setData(data);
 		result.setGameType(request.getGameType());
 		result.setMsgType(MsgTypeEnum.queryTeaHousePlayerList.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
-		data.put("teaHousePlayerList", commonManager.queryTeaHousePlayerList(msg.getTeaHouseNum()));
+		result.setData(commonManager.queryTeaHousePlayerList(msg.getTeaHouseNum()));
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	/**
@@ -1280,14 +1278,14 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	
-	public void playerApplyList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+	public void queryNeedAuditPlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
 		
 		result.setGameType(request.getGameType());
-		result.setMsgType(MsgTypeEnum.playerApplyList.msgType);
+		result.setMsgType(MsgTypeEnum.queryNeedAuditPlayerList.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
-		result.setData(commonManager.queryPlayerJoinedTeaHouseList(playerId));
+		result.setData(commonManager.queryNeedAuditPlayerList(msg.getTeaHouseNum(), playerId));
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	

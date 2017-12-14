@@ -33,8 +33,6 @@ import cn.worldwalker.game.wyqp.common.domain.base.TeaHouseModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserFeedbackModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel;
-import cn.worldwalker.game.wyqp.common.domain.jh.JhMsg;
-import cn.worldwalker.game.wyqp.common.domain.nn.NnMsg;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.PlayerStatusEnum;
 import cn.worldwalker.game.wyqp.common.enums.RoomCardConsumeEnum;
@@ -532,6 +530,13 @@ public class CommonManagerImpl implements CommonManager{
 			return false;
 		}
 		return true;
+	}
+	@Override
+	public List<TeaHouseModel> queryNeedAuditPlayerList(Integer teaHouseNum, Integer playerId) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		teaHouseModel.setPlayerId(playerId);
+		return teaHouseDao.getNeedAuditPlayerList(teaHouseModel);
 	}
 	
 }

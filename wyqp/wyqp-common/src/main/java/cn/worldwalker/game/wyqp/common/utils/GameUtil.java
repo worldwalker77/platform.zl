@@ -23,8 +23,8 @@ public class GameUtil {
 		return s;
 	}
 	public static int genTeaHouseNum(){
-		int max=99999;
-        int min=10000;
+		int max=999999;
+        int min=100000;
         Random random = new Random();
         int s = random.nextInt(max)%(max-min+1) + min;	
 		return s;
