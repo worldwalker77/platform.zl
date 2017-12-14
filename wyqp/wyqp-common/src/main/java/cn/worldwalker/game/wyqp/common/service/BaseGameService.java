@@ -1075,7 +1075,9 @@ public abstract class BaseGameService {
 		redisOperationService.setPlayerIdTeaHouseNum(playerId, teaHouseNum);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
-	
+	public static void main(String[] args) {
+		System.out.println(System.currentTimeMillis());
+	}
 	public void queryPlayerTeaHouseList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
 		result.setGameType(request.getGameType());
