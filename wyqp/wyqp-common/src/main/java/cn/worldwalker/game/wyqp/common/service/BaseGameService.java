@@ -1280,7 +1280,6 @@ public abstract class BaseGameService {
 	
 	public void queryNeedAuditPlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
-		
 		result.setGameType(request.getGameType());
 		result.setMsgType(MsgTypeEnum.queryNeedAuditPlayerList.msgType);
 		BaseMsg msg = request.getMsg();

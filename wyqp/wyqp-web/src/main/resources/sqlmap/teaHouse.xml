@@ -135,7 +135,7 @@
 	
 	<select id="getNeedAuditPlayerList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
 	    select b.player_id,b.nick_name,b.head_img_url,b.status
-	    from t_tea_hous a left join t_tea_house_user b
+	    from t_tea_house a left join t_tea_house_user b
 	    on a.tea_house_num = b.tea_house_num
 	    where a.player_id = #{playerId} and a.tea_house_num = #{teaHouseNum} and b.status = 0
 	</select>
