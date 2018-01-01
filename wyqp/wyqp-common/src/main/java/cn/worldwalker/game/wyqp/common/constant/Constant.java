@@ -30,12 +30,14 @@ public class Constant {
 	
 	public final static Integer websocketPort = Integer.valueOf(CustomizedPropertyConfigurer.getContextProperty("websocket.port"));
 	
-	/**牛牛中，庄类型为抢庄的时候，机器ip与房间id，time的list 映射*/
+	/**牛牛中，庄类型为抢庄的时候超过10s都没抢庄，则自动分配庄家（默认上一局的赢家）*/
 	public final static String nnRobIpRoomIdTimeMap = curCompany + "_nn_rob_ip_room_id_time_map_" + localIp;
 	/**牛牛中，5秒定时器，自动翻牌*/
 	public final static String nnShowCardIpRoomIdTimeMap = curCompany + "_nn_show_card_ip_room_id_time_map_" + localIp;
-	/**炸金花两个玩家开始准备后，倒计时10秒，没准备的玩家直接设置为观察者，其余的玩家继续游戏*/
+	/**牛牛/炸金花两个玩家开始准备后，倒计时10秒，没准备的玩家自动准备*/
 	public final static String notReadyIpRoomIdTimeMap = curCompany + "_not_ready_ip_room_id_time_map_" + localIp;
+	/**牛牛/炸金花没有压分，自动压最低分*/
+	public final static String nnNotStakeScoreIpRoomIdTimeMap = curCompany + "_nn_not_stake_socre_ip_room_id_time_map_" + localIp;
 	/**炸金花玩家超过30s没操作，则自动弃牌*/
 	public final static String jhNoOperationIpPlayerIdRoomIdTimeMap = curCompany + "_jh_no_operation_ip_player_id_room_id_time_map_" + localIp;
 	

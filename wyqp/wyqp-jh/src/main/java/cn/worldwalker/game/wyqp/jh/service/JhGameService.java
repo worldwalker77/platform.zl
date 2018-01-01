@@ -75,7 +75,7 @@ public class JhGameService extends BaseGameService{
 		JhRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, JhRoomInfo.class);
 		/**如果玩家点击准备的时候房间已经在游戏中状态，说明可能是点击关闭结算窗口操作，并且刚好10秒倒计时已经发牌了，产生了并发，避免玩家状态乱了，这里需要做控制*/
 		if (roomInfo.getStatus().equals(JhRoomStatusEnum.inGame.status)) {
-			result.setMsgType(request.getMsgType());
+			result.setMsgType(MsgTypeEnum.ready.msgType);
 			data.put("playerId", userInfo.getPlayerId());
 			channelContainer.sendTextMsgByPlayerIds(result, playerId);
 			return;
@@ -146,7 +146,7 @@ public class JhGameService extends BaseGameService{
 		
 		roomInfo.setUpdateTime(new Date());
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
-		result.setMsgType(request.getMsgType());
+		result.setMsgType(MsgTypeEnum.ready.msgType);
 		data.put("playerId", userInfo.getPlayerId());
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 		/**如果准备的玩家数为2，则启动计时器，并返回消息告诉前端开始10秒计时*/
@@ -739,6 +739,12 @@ public class JhGameService extends BaseGameService{
 				log.info("扣除房卡结束===============");
 			}
 		}
+		/**删除各种定时标记*/
+		redisOperationService.delNotReadyIpRoomIdTime(roomInfo.getRoomId());
+		for(JhPlayerInfo player : playerList){
+			redisOperationService.delJhNoOperationIpPlayerIdRoomIdTime(player.getPlayerId());
+		}
+		
 	}
 	public Integer getTotalStakeTimes(List<JhPlayerInfo> playerList){
 		Integer totalStakeTimes = playerList.get(0).getStakeTimes();

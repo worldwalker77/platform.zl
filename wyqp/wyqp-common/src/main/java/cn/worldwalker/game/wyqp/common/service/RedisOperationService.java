@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cn.worldwalker.game.wyqp.common.constant.Constant;
@@ -43,10 +42,13 @@ public class RedisOperationService {
 	
 	/**roomId->roomInfo 映射*/
 	public void setRoomIdRoomInfo(Integer roomId, BaseRoomInfo roomInfo){
+		Date date = new Date();
 		if (gameInfoStorageType == 0 ) {
 			jedisTemplate.hset(Constant.roomIdRoomInfoMap, String.valueOf(roomId), JsonUtil.toJson(roomInfo));
+			setRoomIdGameTypeUpdateTime(roomId, roomInfo.getGameType(), date);
 		}else{
 			GameInfoMemoryContainer.roomIdRoomInfoMap.put(String.valueOf(roomId), JsonUtil.toJson(roomInfo));
+			GameInfoMemoryContainer.roomIdGameTypeUpdateTimeMap.put(String.valueOf(roomId), roomInfo.getGameType() + "_" + date.getTime());
 		}
 	}
 	
@@ -297,6 +299,34 @@ public class RedisOperationService {
 			map = jedisTemplate.hgetAll(Constant.notReadyIpRoomIdTimeMap);
 		}else{
 			map.putAll(GameInfoMemoryContainer.notReadyIpRoomIdTimeMap);
+			
+		}
+		return map;
+	}
+	/**金花/牛牛未压分自动压分ip->roomId->time 映射*/
+	public void setNnNotStakeScoreIpRoomIdTime(Integer roomId){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.hset(Constant.nnNotStakeScoreIpRoomIdTimeMap, String.valueOf(roomId), String.valueOf(System.currentTimeMillis()));
+		}else{
+			GameInfoMemoryContainer.nnNotStakeScoreIpRoomIdTimeMap.put(String.valueOf(roomId), String.valueOf(System.currentTimeMillis()));
+		}
+		
+	}
+	
+	public void delNnNotStakeScoreIpRoomIdTime(Integer roomId){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.hdel(Constant.nnNotStakeScoreIpRoomIdTimeMap, String.valueOf(roomId));
+		}else{
+			GameInfoMemoryContainer.nnNotStakeScoreIpRoomIdTimeMap.remove(String.valueOf(roomId));
+		}
+	}
+	
+	public Map<String, String> getAllNnNotStakeScoreIpRoomIdTime(){
+		Map<String, String> map = new HashMap<String, String>();
+		if (gameInfoStorageType == 0 ) {
+			map = jedisTemplate.hgetAll(Constant.nnNotStakeScoreIpRoomIdTimeMap);
+		}else{
+			map.putAll(GameInfoMemoryContainer.nnNotStakeScoreIpRoomIdTimeMap);
 			
 		}
 		return map;

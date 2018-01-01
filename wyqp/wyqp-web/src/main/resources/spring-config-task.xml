@@ -35,23 +35,32 @@ http://www.springframework.org/schema/task/spring-task-3.0.xsd
     </task:scheduled-tasks>
     
     <task:scheduled-tasks scheduler="scheduler">
-    	<task:scheduled ref="nnRobBankerOverTimeNoticeJob" method="doTask"  cron="0/5 * * * * ?"/>
-    </task:scheduled-tasks>
-    
-    <task:scheduled-tasks scheduler="scheduler">
-    	<task:scheduled ref="readyOverTimeNoticeJob" method="doTask"  cron="0/5 * * * * ?"/>
-    </task:scheduled-tasks>
-    
-    <task:scheduled-tasks scheduler="scheduler">
-    	<task:scheduled ref="jhNoOperationOverTimeNoticeJob" method="doTask"  cron="0/30 * * * * ?"/>
-    </task:scheduled-tasks>
-    
-    <task:scheduled-tasks scheduler="scheduler">
     	<task:scheduled ref="accessTokenRefreshJob" method="doTask"  cron="0 0 0/2 * * ?"/>
     </task:scheduled-tasks>
     
     <task:scheduled-tasks scheduler="scheduler">
     	<task:scheduled ref="userInfoOverTimeCleanJob" method="doTask"  cron="0 0/10 * * * ?"/>
+    </task:scheduled-tasks>
+    
+    <!-- 牛牛/金花超时自动准备 -->
+    <task:scheduled-tasks scheduler="scheduler">
+    	<task:scheduled ref="readyOverTimeNoticeJob" method="doTask"  cron="0/5 * * * * ?"/>
+    </task:scheduled-tasks>
+    <!-- 牛牛超时自动抢庄 -->
+    <task:scheduled-tasks scheduler="scheduler">
+    	<task:scheduled ref="nnRobBankerOverTimeNoticeJob" method="doTask"  cron="0/5 * * * * ?"/>
+    </task:scheduled-tasks>
+    <!-- 牛牛超时自动压分 -->
+    <task:scheduled-tasks scheduler="scheduler">
+    	<task:scheduled ref="nnStakeScoreOverTimeNoticeJob" method="doTask"  cron="0/5 * * * * ?"/>
+    </task:scheduled-tasks>
+    <!-- 牛牛超时自动翻牌 -->
+    <task:scheduled-tasks scheduler="scheduler">
+    	<task:scheduled ref="nnShowCardOverTimeNoticeJob" method="doTask"  cron="0/5 * * * * ?"/>
+    </task:scheduled-tasks>
+    <!-- 金花超时自动压分（最低分） -->
+    <task:scheduled-tasks scheduler="scheduler">
+    	<task:scheduled ref="jhNoOperationOverTimeNoticeJob" method="doTask"  cron="0/30 * * * * ?"/>
     </task:scheduled-tasks>
      
 </beans>

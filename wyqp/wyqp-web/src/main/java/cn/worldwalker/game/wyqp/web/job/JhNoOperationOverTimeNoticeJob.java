@@ -13,7 +13,9 @@ import org.springframework.stereotype.Component;
 import cn.worldwalker.game.wyqp.common.channel.ChannelContainer;
 import cn.worldwalker.game.wyqp.common.constant.Constant;
 import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
+import cn.worldwalker.game.wyqp.common.domain.jh.JhMsg;
 import cn.worldwalker.game.wyqp.common.domain.jh.JhPlayerInfo;
+import cn.worldwalker.game.wyqp.common.domain.jh.JhRequest;
 import cn.worldwalker.game.wyqp.common.domain.jh.JhRoomInfo;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
@@ -32,7 +34,7 @@ public class JhNoOperationOverTimeNoticeJob {
 	@Autowired
 	private JhGameService jhGameService;
 	
-	private long noOperationTimeLimit = 2*60*1000;
+	private long noOperationTimeLimit = 1*60*1000;
 	
 	public void doTask(){
 		String ip = Constant.localIp;
@@ -69,15 +71,38 @@ public class JhNoOperationOverTimeNoticeJob {
 				if (System.currentTimeMillis() - time < noOperationTimeLimit) {
 					continue;
 				}
-				/**超过120秒没有操作，自动弃牌*/
+				JhRequest request = new JhRequest();
+				JhMsg msg = new JhMsg();
+				msg.setRoomId(roomId);
+				msg.setPlayerId(playerId);
+				msg.setCurStakeScore(getStakeScore(jhRoomInfo));
+				request.setMsg(msg);
+				/**超过60秒没有操作，自动压分*/
 				UserInfo userInfo = new UserInfo();
 				userInfo.setRoomId(roomId);
 				userInfo.setPlayerId(playerId);
-				jhGameService.discardCards(null, null, userInfo);
+				jhGameService.stake(null, request, userInfo);
 			} catch (Exception e) {
 				log.error("roomId:" + entry.getKey(), e);
 			}
 		}
 		
+	}
+	
+	public Integer getStakeScore(JhRoomInfo roomInfo){
+		Integer curStakeScore = 1;
+		Integer prePlayerStatus = roomInfo.getPrePlayerStatus();
+		Integer prePlayerStakeScore = roomInfo.getPrePlayerStakeScore();
+		if (prePlayerStakeScore != null) {
+			/**前一个玩家未看牌*/
+			if (JhPlayerStatusEnum.notWatch.status.equals(prePlayerStatus)) {
+				curStakeScore = prePlayerStakeScore;
+			}else{/**前一个玩家已看牌*/
+				curStakeScore = prePlayerStakeScore/2;
+			}
+		}else{
+			curStakeScore = 1;
+		}
+		return curStakeScore;
 	}
 }

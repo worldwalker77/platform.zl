@@ -81,14 +81,14 @@ public class NnGameService extends BaseGameService{
 		/**如果玩家点击准备的时候房间已经在游戏中状态，说明可能是点击关闭结算窗口操作，并且刚好10秒倒计时已经发牌了，产生了并发，避免玩家状态乱了，这里需要做控制*/
 		if (roomInfo.getRoomBankerType().equals(NnRoomBankerTypeEnum.robBanker.type)) {
 			if (roomInfo.getStatus().equals(NnRoomStatusEnum.inRob.status)) {
-				result.setMsgType(request.getMsgType());
+				result.setMsgType(MsgTypeEnum.ready.msgType);
 				data.put("playerId", userInfo.getPlayerId());
 				channelContainer.sendTextMsgByPlayerIds(result, playerId);
 				return;
 			}
 		}else{
 			if (roomInfo.getStatus().equals(NnRoomStatusEnum.inStakeScore.status)) {
-				result.setMsgType(request.getMsgType());
+				result.setMsgType(MsgTypeEnum.ready.msgType);
 				data.put("playerId", userInfo.getPlayerId());
 				channelContainer.sendTextMsgByPlayerIds(result, playerId);
 				return;
@@ -337,7 +337,6 @@ public class NnGameService extends BaseGameService{
 		result.setGameType(GameTypeEnum.nn.gameType);
 		Map<String, Object> data = new HashMap<String, Object>();
 		result.setData(data);
-		NnMsg msg = (NnMsg)request.getMsg();
 		Integer playerId = userInfo.getPlayerId();
 		Integer roomId = userInfo.getRoomId();
 		NnRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, NnRoomInfo.class);
@@ -555,6 +554,11 @@ public class NnGameService extends BaseGameService{
 		
 		/**设置下一局的庄家id（抢庄的不设置）*/
 		setRoomBankerId(roomInfo);
+		/**将各种定时标记删除*/
+		redisOperationService.delNotReadyIpRoomIdTime(roomInfo.getRoomId());
+		redisOperationService.delNnRobIpRoomIdTime(roomInfo.getRoomId());
+		redisOperationService.delNnNotStakeScoreIpRoomIdTime(roomInfo.getRoomId());
+		redisOperationService.delNnShowCardIpRoomIdTime(roomInfo.getRoomId());
 		
 	}
 	

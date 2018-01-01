@@ -17,6 +17,7 @@ public class GameInfoMemoryContainer {
 	public static Map<String, String> nnRobIpRoomIdTimeMap = new ConcurrentHashMap<String, String>();
 	public static Map<String, String> nnShowCardIpRoomIdTimeMap = new ConcurrentHashMap<String, String>();
 	public static Map<String, String> notReadyIpRoomIdTimeMap = new ConcurrentHashMap<String, String>();
+	public static Map<String, String> nnNotStakeScoreIpRoomIdTimeMap = new ConcurrentHashMap<String, String>();
 	public static Map<String, String> jhNoOperationIpPlayerIdRoomIdTimeMap = new ConcurrentHashMap<String, String>();
 	public static Map<String, Integer> ipConnectCountMap = new ConcurrentHashMap<String, Integer>();
 	public static Stack<String> roomCardOperationFailList = new Stack<String>();
