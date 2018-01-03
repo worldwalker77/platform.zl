@@ -19,9 +19,12 @@ import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.result.Result;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
-import cn.worldwalker.game.wyqp.common.utils.IPUtil;
 import cn.worldwalker.game.wyqp.nn.enums.NnRoomStatusEnum;
-
+/**
+ * 牛牛
+ * @author lenovo
+ *
+ */
 @Component(value="nnRobBankerOverTimeNoticeJob")
 public class NnRobBankerOverTimeNoticeJob {
 	

@@ -14,7 +14,11 @@ import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 
-
+/**
+ * 房间如果10分钟没有更新，则删除房间信息
+ * @author lenovo
+ *
+ */
 public class RoomInfoCleanJob /**extends SingleServerJobByRedis*/ {
 	@Autowired
 	private RedisOperationService redisOperationService;
@@ -25,7 +29,7 @@ public class RoomInfoCleanJob /**extends SingleServerJobByRedis*/ {
 		
 		List<RedisRelaModel> list = redisOperationService.getAllRoomIdGameTypeUpdateTime();
 		for(RedisRelaModel model : list){
-			if (System.currentTimeMillis() - model.getUpdateTime() > 2*60*60*1000) {
+			if (System.currentTimeMillis() - model.getUpdateTime() > 10*60*1000) {
 				BaseRoomInfo roomInfo = null;
 				if (GameTypeEnum.nn.gameType.equals(model.getGameType()) ) {
 					roomInfo = redisOperationService.getRoomInfoByRoomId(model.getRoomId(), NnRoomInfo.class);

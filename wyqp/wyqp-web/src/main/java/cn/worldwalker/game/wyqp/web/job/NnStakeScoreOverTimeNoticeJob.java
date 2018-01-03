@@ -63,14 +63,16 @@ public class NnStakeScoreOverTimeNoticeJob {
 				List<NnPlayerInfo> playerList = nnRoomInfo.getPlayerList();
 				for(NnPlayerInfo player : playerList){
 					if (player.getStatus() < NnPlayerStatusEnum.stakeScore.status) {
-						UserInfo userInfo = new UserInfo();
-						userInfo.setPlayerId(player.getPlayerId());
-						userInfo.setRoomId(roomId);
-						NnRequest request = new NnRequest();
-						NnMsg msg = new NnMsg();
-						msg.setStakeScore(1);
-						request.setMsg(msg);
-						nnGameService.stakeScore(null, request, userInfo);
+						if (!player.getPlayerId().equals(nnRoomInfo.getRoomBankerId())) {
+							UserInfo userInfo = new UserInfo();
+							userInfo.setPlayerId(player.getPlayerId());
+							userInfo.setRoomId(roomId);
+							NnRequest request = new NnRequest();
+							NnMsg msg = new NnMsg();
+							msg.setStakeScore(3);
+							request.setMsg(msg);
+							nnGameService.stakeScore(null, request, userInfo);
+						}
 					}
 				}
 				redisOperationService.delNnNotStakeScoreIpRoomIdTime(roomId);

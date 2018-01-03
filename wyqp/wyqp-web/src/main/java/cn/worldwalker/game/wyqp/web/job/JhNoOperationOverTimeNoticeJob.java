@@ -22,6 +22,11 @@ import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.jh.enums.JhPlayerStatusEnum;
 import cn.worldwalker.game.wyqp.jh.service.JhGameService;
 
+/**
+ * 金花玩家60s没操作，自动压最低分
+ * @author lenovo
+ *
+ */
 @Component(value="jhNoOperationOverTimeNoticeJob")
 public class JhNoOperationOverTimeNoticeJob {
 	

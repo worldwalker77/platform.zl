@@ -22,12 +22,12 @@ http://www.springframework.org/schema/task/spring-task-3.0.xsd
 	
 	<task:scheduler id="scheduler" pool-size="3"/>  
 	
-    <task:scheduled-tasks scheduler="scheduler">
+    <!-- <task:scheduled-tasks scheduler="scheduler">
     	<task:scheduled ref="offlinePlayerCleanJob" method="doTask" cron="0 0/2 * * * ?"/>
-    </task:scheduled-tasks>
+    </task:scheduled-tasks> -->
     
     <task:scheduled-tasks scheduler="scheduler">
-    	<task:scheduled ref="roomInfoCleanJob" method="doTask" cron="0 0 6 * * ?"/>
+    	<task:scheduled ref="roomInfoCleanJob" method="doTask" cron="0 0/2 * * * ?"/>
     </task:scheduled-tasks>
     
     <task:scheduled-tasks scheduler="scheduler">

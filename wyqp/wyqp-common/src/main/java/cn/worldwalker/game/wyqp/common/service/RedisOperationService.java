@@ -165,56 +165,41 @@ public class RedisOperationService {
 	
 	/**offline playerId->roomId,gameType 映射*/
 	public void setOfflinePlayerIdRoomIdGameTypeTime(Integer playerId, Integer roomId, Integer gameType, Date time){
-		if (gameInfoStorageType == 0 ) {
-			jedisTemplate.hset(Constant.offlinePlayerIdRoomIdGameTypeTimeMap, String.valueOf(playerId), roomId + "_" + gameType + "_" + time.getTime());
-		}else{
-			GameInfoMemoryContainer.offlinePlayerIdRoomIdGameTypeTimeMap.put(String.valueOf(playerId), roomId + "_" + gameType + "_" + time.getTime());
-		}
+//		if (gameInfoStorageType == 0 ) {
+//			jedisTemplate.hset(Constant.offlinePlayerIdRoomIdGameTypeTimeMap, String.valueOf(playerId), roomId + "_" + gameType + "_" + time.getTime());
+//		}else{
+//			GameInfoMemoryContainer.offlinePlayerIdRoomIdGameTypeTimeMap.put(String.valueOf(playerId), roomId + "_" + gameType + "_" + time.getTime());
+//		}
 		
 	}
 	
 	public void hdelOfflinePlayerIdRoomIdGameTypeTime(Integer playerId){
-		if (gameInfoStorageType == 0 ) {
-			jedisTemplate.hdel(Constant.offlinePlayerIdRoomIdGameTypeTimeMap, String.valueOf(playerId));
-		}else{
-			GameInfoMemoryContainer.offlinePlayerIdRoomIdGameTypeTimeMap.remove(String.valueOf(playerId));
-		}
+//		if (gameInfoStorageType == 0 ) {
+//			jedisTemplate.hdel(Constant.offlinePlayerIdRoomIdGameTypeTimeMap, String.valueOf(playerId));
+//		}else{
+//			GameInfoMemoryContainer.offlinePlayerIdRoomIdGameTypeTimeMap.remove(String.valueOf(playerId));
+//		}
 		
-	}
-	
-	public RedisRelaModel getRoomIdGameTypeTimeByOfflinePlayerId(Integer playerId){
-		String str = null;
-		if (gameInfoStorageType == 0 ) {
-			str = jedisTemplate.hget(Constant.offlinePlayerIdRoomIdGameTypeTimeMap, String.valueOf(playerId));
-		}else{
-			str = GameInfoMemoryContainer.offlinePlayerIdRoomIdGameTypeTimeMap.get(String.valueOf(playerId));
-		}
-		
-		if (StringUtils.isBlank(str)) {
-			return null;
-		}
-		String[] arr = str.split("_");
-		return new RedisRelaModel(playerId, Integer.valueOf(arr[0]), Integer.valueOf(arr[1]), Long.valueOf(arr[2]));
 	}
 	
 	public List<RedisRelaModel> getAllOfflinePlayerIdRoomIdGameTypeTime(){
-		Map<String, String> map = new HashMap<String, String>();
-		if (gameInfoStorageType == 0 ) {
-			map = jedisTemplate.hgetAll(Constant.offlinePlayerIdRoomIdGameTypeTimeMap);
-		}else{
-			map.putAll(GameInfoMemoryContainer.offlinePlayerIdRoomIdGameTypeTimeMap);
-		}
-		if (map == null) {
-			return null;
-		}
+//		Map<String, String> map = new HashMap<String, String>();
+//		if (gameInfoStorageType == 0 ) {
+//			map = jedisTemplate.hgetAll(Constant.offlinePlayerIdRoomIdGameTypeTimeMap);
+//		}else{
+//			map.putAll(GameInfoMemoryContainer.offlinePlayerIdRoomIdGameTypeTimeMap);
+//		}
+//		if (map == null) {
+//			return null;
+//		}
 		List<RedisRelaModel> list = new ArrayList<RedisRelaModel>();
-		Set<Entry<String, String>> set = map.entrySet();
-		for(Entry<String, String> entry : set){
-			String key = entry.getKey();
-			String value = entry.getValue();
-			String[] arr = value.split("_");
-			list.add(new RedisRelaModel(Integer.valueOf(key), Integer.valueOf(arr[0]), Integer.valueOf(arr[1]), Long.valueOf(arr[2])));
-		}
+//		Set<Entry<String, String>> set = map.entrySet();
+//		for(Entry<String, String> entry : set){
+//			String key = entry.getKey();
+//			String value = entry.getValue();
+//			String[] arr = value.split("_");
+//			list.add(new RedisRelaModel(Integer.valueOf(key), Integer.valueOf(arr[0]), Integer.valueOf(arr[1]), Long.valueOf(arr[2])));
+//		}
 		return list;
 	}
 	

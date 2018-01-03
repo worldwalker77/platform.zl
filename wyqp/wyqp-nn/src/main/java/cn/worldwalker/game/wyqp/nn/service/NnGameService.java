@@ -162,6 +162,9 @@ public class NnGameService extends BaseGameService{
 				result.setMsgType(MsgTypeEnum.readyStake.msgType);
 				data.put("roomBankerId", roomInfo.getRoomBankerId());
 				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+				/**设置压分倒计时标记*/
+				redisOperationService.setNnNotStakeScoreIpRoomIdTime(roomId);
+				
 			}
 			
 			return;
@@ -251,6 +254,8 @@ public class NnGameService extends BaseGameService{
 			data.put("roomBankerId", roomInfo.getRoomBankerId());
 			data.put("curGame", roomInfo.getCurGame());
 			channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+			/**设置压分倒计时标记*/
+			redisOperationService.setNnNotStakeScoreIpRoomIdTime(roomId);
 			return ;
 		}
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
@@ -322,6 +327,8 @@ public class NnGameService extends BaseGameService{
 				/**给每个玩家返回自己的牌及牌型*/
 				channelContainer.sendTextMsgByPlayerIds(result, player.getPlayerId());
 			}
+			/**设置明牌倒计时标记*/
+			redisOperationService.setNnShowCardIpRoomIdTime(roomId);
 			return ;
 		}
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
