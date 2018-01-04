@@ -1,14 +1,18 @@
 package cn.worldwalker.game.wyqp.nn.cards;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import org.springframework.util.CollectionUtils;
 
 import cn.worldwalker.game.wyqp.common.domain.base.BasePlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.Card;
-import cn.worldwalker.game.wyqp.common.exception.BusinessException;
-import cn.worldwalker.game.wyqp.common.exception.ExceptionEnum;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnPlayerInfo;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
+import cn.worldwalker.game.wyqp.common.enums.PlayerStatusEnum;
 import cn.worldwalker.game.wyqp.nn.enums.NnCardTypeEnum;
 
 public class NnCardRule {
@@ -318,5 +322,63 @@ public class NnCardRule {
 			return -1;
 		}
 	}
+	/**
+	 * 随机概率压分处理
+	 * @param roomInfo
+	 */
+	public static Map<Integer, Integer> getRandomStakeScore(NnRoomInfo roomInfo){
+		
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		/**当前第几局*/
+		Integer curGame = roomInfo.getCurGame();
+		/**第一局先计算好需要随机压分的局索引*/
+		if (curGame == 1) {
+			roomInfo.setRandomStakeScoreGameIndexList(genRandomNumInRange(curGame, roomInfo.getTotalGames() + 1, 1));
+		}
+		List<Integer> randomStakeScoreGameIndexList = roomInfo.getRandomStakeScoreGameIndexList();
+		/**如果当前局需要出现随机压分，则随机给一个用户分配随机压分值*/
+		if (randomStakeScoreGameIndexList.contains(curGame)) {
+			List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
+			int size = playerList.size();
+			Integer playerIndex = genRandomNumInRange(0, size, 1).get(0);
+			Integer playerId = playerList.get(playerIndex).getPlayerId();
+			map.put(playerId, 1);
+		}
+		return map;
+	}
+	
+	//从x-y中的数中随机找出num个不同的数，返回给integer的动态数组中  
+    public static ArrayList<Integer> genRandomNumInRange(int x, int y, int num)  
+        {   
+            //创建一个integer的动态数组  
+            ArrayList<Integer> a = new ArrayList<Integer>();  
+            if (y - x < num ) {
+				return a;
+			}
+            int index = 0;  
+            //往数组里面逐一加取到不重复的元素  
+            while(index < num)  
+            {  
+            //产生x-y的随机数  
+                Random r = new Random();  
+                int temp = r.nextInt(y-x)+x ;  
+            //设置是否重复的标记变量为false  
+                boolean flag = false;  
+                for(int i =0; i<index;i++)  
+                {  
+                    if(temp == a.get(i))  
+                    {  
+                        flag = true;  
+                        break;  
+                    }  
+                }  
+                if(flag==false)  
+                {  
+                    a.add(temp);  
+                    index++;  
+                }  
+            }  
+            return a;  
+        }  
 	
 }

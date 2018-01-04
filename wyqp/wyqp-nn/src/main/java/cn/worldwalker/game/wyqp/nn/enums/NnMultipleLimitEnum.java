@@ -2,9 +2,9 @@ package cn.worldwalker.game.wyqp.nn.enums;
 
 public enum NnMultipleLimitEnum {
 	
-	notReady(1,3, "3倍封顶"),
-	ready(2,5, "5倍封顶"),
-	notRob(3,100, "不封顶");
+	multiple_3(1,3, "3倍封顶"),
+	multiple_5(2,5, "5倍封顶"),
+	multiple_10000(3,10000, "不封顶");
 	
 	public Integer index;
 	public Integer multiple;

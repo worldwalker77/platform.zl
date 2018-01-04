@@ -161,6 +161,8 @@ public class NnGameService extends BaseGameService{
 			}else{/**如果是非抢庄类型，则通知玩家谁是庄家并准备压分*/
 				result.setMsgType(MsgTypeEnum.readyStake.msgType);
 				data.put("roomBankerId", roomInfo.getRoomBankerId());
+				
+				data.put("stakeScoreList", roomInfo.getRoomBankerId());
 				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 				/**设置压分倒计时标记*/
 				redisOperationService.setNnNotStakeScoreIpRoomIdTime(roomId);
@@ -182,6 +184,11 @@ public class NnGameService extends BaseGameService{
 			channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 			return;
 		}
+	}
+	
+	private List<Integer> getStakeSocreList(Integer buttomScoreType){
+		
+		return  null;
 	}
 	
 	/**
@@ -451,6 +458,10 @@ public class NnGameService extends BaseGameService{
 				if (NnCardRule.cardTypeCompare(player, roomBankerPlayer) > 0) {
 					
 					Integer cardTypeMultiple = NnCardTypeEnum.getNnCardTypeEnum(player.getCardType()).multiple;
+					/**如果是抢庄类型，则需要计算抢庄时候的倍数*/
+					if (roomInfo.getRoomBankerType().equals(NnRoomBankerTypeEnum.robBanker.type)) {
+						cardTypeMultiple = cardTypeMultiple*roomInfo.getRobMultiple();
+					}
 					Integer settedMultiple = roomInfo.getMultipleLimit();
 					Integer multiple = cardTypeMultiple;
 					if (cardTypeMultiple > settedMultiple) {

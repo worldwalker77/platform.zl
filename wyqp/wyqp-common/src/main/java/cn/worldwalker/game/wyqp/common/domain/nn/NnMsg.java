@@ -12,6 +12,18 @@ public class NnMsg extends BaseMsg{
 	
 	private Integer multipleLimit;
 	
+	/**底分类型 1:1/2/3/4 2:2/4/8/10 3:3/6/9/12*/
+	private Integer buttomScoreType;
+	
+	
+	public Integer getButtomScoreType() {
+		return buttomScoreType;
+	}
+
+	public void setButtomScoreType(Integer buttomScoreType) {
+		this.buttomScoreType = buttomScoreType;
+	}
+
 	public Integer getRoomBankerType() {
 		return roomBankerType;
 	}
