@@ -126,6 +126,7 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.delTeaHouseUser.msgType, MsgTypeEnum.delTeaHouseUser);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.entryTeaHouseTable.msgType, MsgTypeEnum.entryTeaHouseTable);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.joinTeaHouse.msgType, MsgTypeEnum.joinTeaHouse);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.entryTeaHouse.msgType, MsgTypeEnum.entryTeaHouse);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.queryTeaHouseTablePlayerList.msgType, MsgTypeEnum.queryTeaHouseTablePlayerList);
 		
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.delFromTeaHouse.msgType, MsgTypeEnum.delFromTeaHouse);
