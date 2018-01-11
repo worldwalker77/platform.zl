@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.springframework.util.CollectionUtils;
-
+import cn.worldwalker.game.wyqp.common.constant.Constant;
 import cn.worldwalker.game.wyqp.common.domain.base.BasePlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.Card;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
-import cn.worldwalker.game.wyqp.common.enums.PlayerStatusEnum;
+import cn.worldwalker.game.wyqp.nn.enums.NnButtomScoreTypeEnum;
 import cn.worldwalker.game.wyqp.nn.enums.NnCardTypeEnum;
 
 public class NnCardRule {
@@ -323,17 +322,18 @@ public class NnCardRule {
 		}
 	}
 	/**
-	 * 随机概率压分处理
+	 * 随机概率压分处理,需要随机的给某个玩家分配较大的压分
 	 * @param roomInfo
 	 */
-	public static Map<Integer, Integer> getRandomStakeScore(NnRoomInfo roomInfo){
+	public static Map<Integer, Integer> getRandomPlayerIdStakeScoreMap(NnRoomInfo roomInfo){
 		
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		/**当前第几局*/
 		Integer curGame = roomInfo.getCurGame();
 		/**第一局先计算好需要随机压分的局索引*/
 		if (curGame == 1) {
-			roomInfo.setRandomStakeScoreGameIndexList(genRandomNumInRange(curGame, roomInfo.getTotalGames() + 1, 1));
+			Integer num = Constant.nnRandomStakeScoreProbability*roomInfo.getTotalGames()/100 + Constant.nnRandomStakeScoreProbability*roomInfo.getTotalGames()%100 > 0 ? 1:0;
+			roomInfo.setRandomStakeScoreGameIndexList(genRandomNumInRange(curGame, roomInfo.getTotalGames() + 1, num));
 		}
 		List<Integer> randomStakeScoreGameIndexList = roomInfo.getRandomStakeScoreGameIndexList();
 		/**如果当前局需要出现随机压分，则随机给一个用户分配随机压分值*/
@@ -342,7 +342,13 @@ public class NnCardRule {
 			int size = playerList.size();
 			Integer playerIndex = genRandomNumInRange(0, size, 1).get(0);
 			Integer playerId = playerList.get(playerIndex).getPlayerId();
-			map.put(playerId, 1);
+			/**如果随机出来的玩家是庄家，则取庄家的下一位*/
+			if (playerId.equals(roomInfo.getRoomBankerId())) {
+				playerId = playerList.get((playerIndex + 1)%size).getPlayerId();
+			}
+			
+			map.put(playerId, NnButtomScoreTypeEnum.getNnButtomScoreTypeEnum(roomInfo.getButtomScoreType()).randomScore);
+			roomInfo.setRandomPlayerIdStakeScoreMap(map);
 		}
 		return map;
 	}

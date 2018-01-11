@@ -108,5 +108,8 @@ public class Constant {
 	
 	/**playerId与tea_house_num的映射*/
 	public final static String playerIdTeaHouseNumMap = curCompany + "_player_id_tea_house_num_map";
+	
+	/**牛牛随机压分概率*/
+	public final static Integer nnRandomStakeScoreProbability = Integer.valueOf(CustomizedPropertyConfigurer.getContextProperty("nn.random.stake.socre.probability"));
 
 }

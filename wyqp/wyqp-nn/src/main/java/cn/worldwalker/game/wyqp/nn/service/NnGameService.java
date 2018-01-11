@@ -32,6 +32,7 @@ import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import cn.worldwalker.game.wyqp.nn.cards.NnCardResource;
 import cn.worldwalker.game.wyqp.nn.cards.NnCardRule;
+import cn.worldwalker.game.wyqp.nn.enums.NnButtomScoreTypeEnum;
 import cn.worldwalker.game.wyqp.nn.enums.NnCardTypeEnum;
 import cn.worldwalker.game.wyqp.nn.enums.NnMultipleLimitEnum;
 import cn.worldwalker.game.wyqp.nn.enums.NnPlayerStatusEnum;
@@ -161,14 +162,32 @@ public class NnGameService extends BaseGameService{
 			}else{/**如果是非抢庄类型，则通知玩家谁是庄家并准备压分*/
 				result.setMsgType(MsgTypeEnum.readyStake.msgType);
 				data.put("roomBankerId", roomInfo.getRoomBankerId());
-				
-				data.put("stakeScoreList", roomInfo.getRoomBankerId());
-				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+				Integer[] playerArr = GameUtil.getPlayerIdArr(playerList);
+				String[] scoreArr = NnButtomScoreTypeEnum.getNnButtomScoreTypeEnum(roomInfo.getButtomScoreType()).value.split("_");
+				List<Integer> stakeScoreList = new ArrayList<Integer>();
+				for(String socre : scoreArr){
+					stakeScoreList.add(Integer.valueOf(socre));
+				}
+				Map<Integer, Integer> map = NnCardRule.getRandomPlayerIdStakeScoreMap(roomInfo);
+				if (map.size() > 0) {
+					for(Integer tempPlayerId : playerArr){
+						if (map.containsKey(tempPlayerId)) {
+							List<Integer> randomStakeScoreList = new ArrayList<Integer>();
+							randomStakeScoreList.addAll(stakeScoreList);
+							randomStakeScoreList.add(map.get(tempPlayerId));
+							data.put("stakeScoreList", randomStakeScoreList);
+						}else{
+							data.put("stakeScoreList", stakeScoreList);
+						}
+						channelContainer.sendTextMsgByPlayerIds(result, tempPlayerId);
+					}
+				}else{
+					data.put("stakeScoreList", stakeScoreList);
+					channelContainer.sendTextMsgByPlayerIds(result, playerArr);
+				}
 				/**设置压分倒计时标记*/
 				redisOperationService.setNnNotStakeScoreIpRoomIdTime(roomId);
-				
 			}
-			
 			return;
 		}
 		roomInfo.setUpdateTime(new Date());
@@ -184,11 +203,6 @@ public class NnGameService extends BaseGameService{
 			channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 			return;
 		}
-	}
-	
-	private List<Integer> getStakeSocreList(Integer buttomScoreType){
-		
-		return  null;
 	}
 	
 	/**
@@ -260,7 +274,30 @@ public class NnGameService extends BaseGameService{
 			result.setMsgType(MsgTypeEnum.readyStake.msgType);
 			data.put("roomBankerId", roomInfo.getRoomBankerId());
 			data.put("curGame", roomInfo.getCurGame());
-			channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+			
+			Integer[] playerArr = GameUtil.getPlayerIdArr(playerList);
+			String[] scoreArr = NnButtomScoreTypeEnum.getNnButtomScoreTypeEnum(roomInfo.getButtomScoreType()).value.split("_");
+			List<Integer> stakeScoreList = new ArrayList<Integer>();
+			for(String socre : scoreArr){
+				stakeScoreList.add(Integer.valueOf(socre));
+			}
+			Map<Integer, Integer> map = NnCardRule.getRandomPlayerIdStakeScoreMap(roomInfo);
+			if (map.size() > 0) {
+				for(Integer tempPlayerId : playerArr){
+					if (map.containsKey(tempPlayerId)) {
+						List<Integer> randomStakeScoreList = new ArrayList<Integer>();
+						randomStakeScoreList.addAll(stakeScoreList);
+						randomStakeScoreList.add(map.get(tempPlayerId));
+						data.put("stakeScoreList", randomStakeScoreList);
+					}else{
+						data.put("stakeScoreList", stakeScoreList);
+					}
+					channelContainer.sendTextMsgByPlayerIds(result, tempPlayerId);
+				}
+			}else{
+				data.put("stakeScoreList", stakeScoreList);
+				channelContainer.sendTextMsgByPlayerIds(result, playerArr);
+			}
 			/**设置压分倒计时标记*/
 			redisOperationService.setNnNotStakeScoreIpRoomIdTime(roomId);
 			return ;
