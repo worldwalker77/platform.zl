@@ -73,7 +73,7 @@
     </insert>  
      
     <select id="getUserRecord"  parameterType = "cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel" resultMap="userRecordResultMap">
-	    select room_id,create_time, record_info, remark from t_user_record 
+	    select tea_house_num,table_num,room_id,create_time, record_info, remark from t_user_record 
 	    where player_id = #{playerId} and game_type = #{gameType} order by create_time desc limit 20
 	</select>
 	
