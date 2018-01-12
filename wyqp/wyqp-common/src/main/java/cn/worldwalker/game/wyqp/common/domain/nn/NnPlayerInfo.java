@@ -16,7 +16,17 @@ public class NnPlayerInfo extends BasePlayerInfo{
 	private List<Card> robFourCardList;
 	/**抢庄的时候第五张牌*/
 	private Card fifthCard;
+	/**抢庄的时候选择的倍数*/
+	private Integer robMultiple = 0;
 	
+	public Integer getRobMultiple() {
+		return robMultiple;
+	}
+
+	public void setRobMultiple(Integer robMultiple) {
+		this.robMultiple = robMultiple;
+	}
+
 	public Integer getStakeScore() {
 		return stakeScore;
 	}

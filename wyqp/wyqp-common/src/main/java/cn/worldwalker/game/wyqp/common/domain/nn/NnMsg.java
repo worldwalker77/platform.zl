@@ -15,7 +15,17 @@ public class NnMsg extends BaseMsg{
 	/**底分类型 1:1/2/3/4 2:2/4/8/10 3:3/6/9/12*/
 	private Integer buttomScoreType;
 	
+	/**抢庄的时候选择的倍数*/
+	private Integer robMultiple;
 	
+	public Integer getRobMultiple() {
+		return robMultiple;
+	}
+
+	public void setRobMultiple(Integer robMultiple) {
+		this.robMultiple = robMultiple;
+	}
+
 	public Integer getButtomScoreType() {
 		return buttomScoreType;
 	}

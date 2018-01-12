@@ -1,6 +1,7 @@
 package cn.worldwalker.game.wyqp.web.job;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -13,13 +14,19 @@ import org.springframework.stereotype.Component;
 
 import cn.worldwalker.game.wyqp.common.channel.ChannelContainer;
 import cn.worldwalker.game.wyqp.common.constant.Constant;
+import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnMsg;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnPlayerInfo;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnRequest;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.result.Result;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
+import cn.worldwalker.game.wyqp.nn.enums.NnPlayerStatusEnum;
 import cn.worldwalker.game.wyqp.nn.enums.NnRoomStatusEnum;
+import cn.worldwalker.game.wyqp.nn.service.NnGameService;
 /**
  * 牛牛
  * @author lenovo
@@ -34,6 +41,8 @@ public class NnRobBankerOverTimeNoticeJob {
 	public RedisOperationService redisOperationService;
 	@Autowired
 	private ChannelContainer channelContainer;
+	@Autowired
+	private NnGameService nnGameService;
 	
 	public void doTask(){
 		String ip = Constant.localIp;
@@ -60,20 +69,39 @@ public class NnRobBankerOverTimeNoticeJob {
 				if (System.currentTimeMillis() - time < 10000) {
 					continue;
 				}
+				Integer robBankerId = null;
 				if (nnRoomInfo.getCurGame() == 1) {
-					nnRoomInfo.setRoomBankerId(nnRoomInfo.getRoomOwnerId());
+					robBankerId = nnRoomInfo.getRoomOwnerId();
 				}else{
-					nnRoomInfo.setRoomBankerId(nnRoomInfo.getCurWinnerId());
+					robBankerId = nnRoomInfo.getCurWinnerId();
 				}
-				nnRoomInfo.setStatus(NnRoomStatusEnum.inStakeScore.status);
-				redisOperationService.setRoomIdRoomInfo(roomId, nnRoomInfo);
-				Result result = new Result();
-				result.setGameType(GameTypeEnum.nn.gameType);
-				Map<String, Object> data = new HashMap<String, Object>();
-				result.setData(data);
-				result.setMsgType(MsgTypeEnum.readyStake.msgType);
-				data.put("roomBankerId", nnRoomInfo.getRoomBankerId());
-				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(nnRoomInfo.getPlayerList()));
+				List<NnPlayerInfo> playerList = nnRoomInfo.getPlayerList();
+				NnRequest request = new NnRequest();
+				NnMsg msg = new NnMsg();
+				request.setMsg(msg);
+				UserInfo userInfo = new UserInfo();
+				userInfo.setRoomId(roomId);
+				/**模拟抢庄流程，robBankerId抢庄，其他玩家不抢*/
+				for(NnPlayerInfo player : playerList){
+					userInfo.setPlayerId(player.getPlayerId());
+					if (player.getPlayerId().equals(robBankerId)) {
+						msg.setIsRobBanker(NnPlayerStatusEnum.rob.status);
+						msg.setRobMultiple(1);
+					}else{
+						msg.setIsRobBanker(NnPlayerStatusEnum.notRob.status);
+						msg.setRobMultiple(0);
+					}
+					nnGameService.robBanker(null, request, userInfo);
+				}
+//				nnRoomInfo.setStatus(NnRoomStatusEnum.inStakeScore.status);
+//				redisOperationService.setRoomIdRoomInfo(roomId, nnRoomInfo);
+//				Result result = new Result();
+//				result.setGameType(GameTypeEnum.nn.gameType);
+//				Map<String, Object> data = new HashMap<String, Object>();
+//				result.setData(data);
+//				result.setMsgType(MsgTypeEnum.readyStake.msgType);
+//				data.put("roomBankerId", nnRoomInfo.getRoomBankerId());
+//				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(nnRoomInfo.getPlayerList()));
 			} catch (Exception e) {
 				log.error("roomId:" + entry.getKey(), e);
 			}

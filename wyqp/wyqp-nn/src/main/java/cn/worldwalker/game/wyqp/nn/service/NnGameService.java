@@ -55,6 +55,7 @@ public class NnGameService extends BaseGameService{
 			roomInfo.setRoomBankerId(msg.getPlayerId());
 		}
 		roomInfo.setMultipleLimit(NnMultipleLimitEnum.getNnMultipleLimitEnum(msg.getMultipleLimit()).multiple);
+		roomInfo.setButtomScoreType(msg.getButtomScoreType());
 		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
 		NnPlayerInfo player = new NnPlayerInfo();
 		playerList.add(player);
@@ -140,7 +141,7 @@ public class NnGameService extends BaseGameService{
 			}
 			
 			roomInfo.setUpdateTime(new Date());
-			redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+			
 			/**删除未准备10秒计时器*/
 			redisOperationService.delNotReadyIpRoomIdTime(roomId);
 			
@@ -150,6 +151,7 @@ public class NnGameService extends BaseGameService{
 			data.put("curGame", roomInfo.getCurGame());
 			/**如果是抢庄类型，则给每个玩家返回四张牌，并通知准备抢庄.同时开启后台定时任务计数*/
 			if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
+				redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 				/**开启后台定时任务计数*/
 				redisOperationService.setNnRobIpRoomIdTime(roomId);
 				result.setMsgType(MsgTypeEnum.readyRobBanker.msgType);
@@ -169,6 +171,7 @@ public class NnGameService extends BaseGameService{
 					stakeScoreList.add(Integer.valueOf(socre));
 				}
 				Map<Integer, Integer> map = NnCardRule.getRandomPlayerIdStakeScoreMap(roomInfo);
+				redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 				if (map.size() > 0) {
 					for(Integer tempPlayerId : playerArr){
 						if (map.containsKey(tempPlayerId)) {
@@ -231,6 +234,7 @@ public class NnGameService extends BaseGameService{
 				/**设置状态为已抢庄*/
 				player.setStatus(msg.getIsRobBanker());
 				player.setRobBankerTime(System.currentTimeMillis());
+				player.setRobMultiple(msg.getRobMultiple());
 			}
 			if (NnPlayerStatusEnum.notRob.status.equals(player.getStatus()) || NnPlayerStatusEnum.rob.status.equals(player.getStatus())) {
 				robCount++;
@@ -266,15 +270,17 @@ public class NnGameService extends BaseGameService{
 				}else{
 					roomInfo.setRoomBankerId(roomInfo.getRoomOwnerId());
 				}
-			}else{
+				/**如果都没有抢庄，则设置庄家的倍数为1*/
+				roomInfo.setRobMultiple(1);
+			}else{/**如果有人抢庄*/
 				roomInfo.setRoomBankerId(bankerPlayer.getPlayerId());
+				roomInfo.setRobMultiple(bankerPlayer.getRobMultiple());
 			}
-			roomInfo.setStatus(NnRoomStatusEnum.inStakeScore.status);
-			redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 			result.setMsgType(MsgTypeEnum.readyStake.msgType);
 			data.put("roomBankerId", roomInfo.getRoomBankerId());
 			data.put("curGame", roomInfo.getCurGame());
-			
+			data.put("playerId", msg.getPlayerId());
+			data.put("robMultiple", msg.getRobMultiple());
 			Integer[] playerArr = GameUtil.getPlayerIdArr(playerList);
 			String[] scoreArr = NnButtomScoreTypeEnum.getNnButtomScoreTypeEnum(roomInfo.getButtomScoreType()).value.split("_");
 			List<Integer> stakeScoreList = new ArrayList<Integer>();
@@ -282,6 +288,8 @@ public class NnGameService extends BaseGameService{
 				stakeScoreList.add(Integer.valueOf(socre));
 			}
 			Map<Integer, Integer> map = NnCardRule.getRandomPlayerIdStakeScoreMap(roomInfo);
+			roomInfo.setStatus(NnRoomStatusEnum.inStakeScore.status);
+			redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 			if (map.size() > 0) {
 				for(Integer tempPlayerId : playerArr){
 					if (map.containsKey(tempPlayerId)) {
@@ -306,6 +314,7 @@ public class NnGameService extends BaseGameService{
 		result.setMsgType(MsgTypeEnum.robBanker.msgType);
 		data.put("playerId", playerId);
 		data.put("isRobBanker", msg.getIsRobBanker());
+		data.put("robMultiple", msg.getRobMultiple());
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 	}
 	
