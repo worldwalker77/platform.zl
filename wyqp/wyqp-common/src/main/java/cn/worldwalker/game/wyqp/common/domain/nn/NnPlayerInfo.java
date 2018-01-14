@@ -18,7 +18,77 @@ public class NnPlayerInfo extends BasePlayerInfo{
 	private Card fifthCard;
 	/**抢庄的时候选择的倍数*/
 	private Integer robMultiple = 0;
+	/**庄次数*/
+	private Integer bankerCount = 0;
+	/**五小牛次数*/
+	private Integer fiveSmallNiuCount = 0;
+	/**炸弹牛次数*/
+	private Integer bombNiuCount = 0;
+	/**金牛次数*/
+	private Integer goldNiuCount = 0;
+	/**牛牛次数*/
+	private Integer niuNiuCount = 0;
+	/**有牛次数*/
+	private Integer youNiuCount = 0;
+	/**没牛次数*/
+	private Integer wuNiuCount = 0;
 	
+	public Integer getBankerCount() {
+		return bankerCount;
+	}
+
+	public void setBankerCount(Integer bankerCount) {
+		this.bankerCount = bankerCount;
+	}
+
+	public Integer getFiveSmallNiuCount() {
+		return fiveSmallNiuCount;
+	}
+
+	public void setFiveSmallNiuCount(Integer fiveSmallNiuCount) {
+		this.fiveSmallNiuCount = fiveSmallNiuCount;
+	}
+
+	public Integer getBombNiuCount() {
+		return bombNiuCount;
+	}
+
+	public void setBombNiuCount(Integer bombNiuCount) {
+		this.bombNiuCount = bombNiuCount;
+	}
+
+	public Integer getGoldNiuCount() {
+		return goldNiuCount;
+	}
+
+	public void setGoldNiuCount(Integer goldNiuCount) {
+		this.goldNiuCount = goldNiuCount;
+	}
+
+	public Integer getNiuNiuCount() {
+		return niuNiuCount;
+	}
+
+	public void setNiuNiuCount(Integer niuNiuCount) {
+		this.niuNiuCount = niuNiuCount;
+	}
+
+	public Integer getYouNiuCount() {
+		return youNiuCount;
+	}
+
+	public void setYouNiuCount(Integer youNiuCount) {
+		this.youNiuCount = youNiuCount;
+	}
+
+	public Integer getWuNiuCount() {
+		return wuNiuCount;
+	}
+
+	public void setWuNiuCount(Integer wuNiuCount) {
+		this.wuNiuCount = wuNiuCount;
+	}
+
 	public Integer getRobMultiple() {
 		return robMultiple;
 	}

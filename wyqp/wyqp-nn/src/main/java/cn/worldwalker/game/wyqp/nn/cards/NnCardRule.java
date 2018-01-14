@@ -41,7 +41,7 @@ public class NnCardRule {
 	 * @param cardList
 	 * @return
 	 */
-	public static Integer calculateCardType(List<Card> cardList, List<Card> nnCardList, List<Card> robFourCardList, Card fifthCard){
+	public static Integer calculateCardType(NnPlayerInfo player, List<Card> cardList, List<Card> nnCardList, List<Card> robFourCardList, Card fifthCard){
 		for(int i = 0; i < 4; i++){
 			Card card = new Card();
 			cardCopy(cardList.get(i), card);
@@ -52,14 +52,17 @@ public class NnCardRule {
 		rankSinglePlayerCards(cardList);
 		/**炸弹牛*/
 		if (isBombNiu(cardList)) {
+			player.setBombNiuCount(player.getBombNiuCount() + 1);
 			return NnCardTypeEnum.BOMB_NIU.cardType;
 		}
 		/**五小*/
 		if (isFiveSmallNiu(cardList)) {
+			player.setFiveSmallNiuCount(player.getFiveSmallNiuCount() + 1);
 			return NnCardTypeEnum.FIVE_SMALL_NIU.cardType;
 		}
 		/**五花牛*/
 		if (isGoldNiu(cardList)) {
+			player.setGoldNiuCount(player.getGoldNiuCount() + 1);
 			return NnCardTypeEnum.GOLD_NIU.cardType;
 		}
 		
@@ -79,14 +82,17 @@ public class NnCardRule {
 						nnCardList.add(cardList.get(k));
 						/**有牛的情况下，如果是牛牛*/
 						if (isNiuNiu(cardList)) {
+							player.setNiuNiuCount(player.getNiuNiuCount() + 1);
 							return NnCardTypeEnum.NIU_NIU.cardType;
 						}
+						player.setYouNiuCount(player.getYouNiuCount() + 1);
 						return getNiuNum(cardList, i, j, k);
 					}
 				}
 			}
 		}
 		/**无牛*/
+		player.setWuNiuCount(player.getWuNiuCount() + 1);
 		return NnCardTypeEnum.NO_NIU.cardType;
 	}
 	

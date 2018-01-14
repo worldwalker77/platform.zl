@@ -112,7 +112,7 @@ public class NnGameService extends BaseGameService{
 			}
 		}
 		
-		/**如果已经准备的人数据大于1并且等于房间内所有玩家的数目，则开始发牌*/
+		/**如果已经准备的人数据大于1并且等于房间内所有玩家的数目，抢庄类型，发4张牌，非抢庄则通知压分*/
 		if (readyCount > 1 && readyCount == size) {
 			/**开始发牌时将房间内当前局数+1*/
 			roomInfo.setCurGame(roomInfo.getCurGame() + 1);
@@ -125,7 +125,7 @@ public class NnGameService extends BaseGameService{
 				List<Card> nnCardList = new ArrayList<Card>();
 				List<Card> robFourCardList = new ArrayList<Card>();
 				Card fifthCard = new Card();
-				player.setCardType(NnCardRule.calculateCardType(cardList, nnCardList, robFourCardList, fifthCard));
+				player.setCardType(NnCardRule.calculateCardType(player, cardList, nnCardList, robFourCardList, fifthCard));
 				player.setCardList(cardList);
 				player.setNnCardList(nnCardList);
 				player.setRobFourCardList(robFourCardList);
@@ -152,7 +152,7 @@ public class NnGameService extends BaseGameService{
 			/**如果是抢庄类型，则给每个玩家返回四张牌，并通知准备抢庄.同时开启后台定时任务计数*/
 			if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
 				redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
-				/**开启后台定时任务计数*/
+				/**开启自动抢庄定时任务*/
 				redisOperationService.setNnRobIpRoomIdTime(roomId);
 				result.setMsgType(MsgTypeEnum.readyRobBanker.msgType);
 				for(int i = 0; i < size; i++ ){
@@ -247,7 +247,8 @@ public class NnGameService extends BaseGameService{
 		
 		/**如果都抢完庄(玩家总数减去观察者玩家数),则通知玩家庄家并开始压分*/
 		if (robCount > 1 && robCount == (size - observerCount)) {
-			
+			/**如果都抢完庄，则删除自动抢庄定时任务标记*/
+			redisOperationService.delNnRobIpRoomIdTime(roomId);
 			/**计算是谁抢到庄**/
 			NnPlayerInfo bankerPlayer = playerList.get(0);
 			for(int i = 1; i < size; i++){
@@ -353,6 +354,8 @@ public class NnGameService extends BaseGameService{
 		
 		/**如果都压完分(除去庄家和观察者的数量),则发牌*/
 		if (stakeScoreCount == (size - observerCount - 1)) {
+			/**删除自动压分标记*/
+			redisOperationService.delNnNotStakeScoreIpRoomIdTime(roomId);
 			roomInfo.setStatus(NnRoomStatusEnum.inGame.status);
 			redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 			/**都压完分，先给所有玩家返回最后一个压分信息，延迟一会再发牌*/
@@ -432,6 +435,8 @@ public class NnGameService extends BaseGameService{
 		}
 		/**如果所有的玩家都已经翻牌（除去观察者数量），则计算得分**/
 		if (showCardNum == (size - observerCount)) {
+			/**删除翻牌计数*/
+			redisOperationService.delNnShowCardIpRoomIdTime(roomId);
 			try {
 				calculateScoreAndRoomBanker(roomInfo);
 			} catch (Exception e) {
@@ -454,6 +459,14 @@ public class NnGameService extends BaseGameService{
 				newPlayer.setMaxCardType(player.getMaxCardType());
 				newPlayer.setWinTimes(player.getWinTimes());
 				newPlayer.setLoseTimes(player.getLoseTimes());
+				
+				newPlayer.setBankerCount(player.getBankerCount());
+				newPlayer.setBombNiuCount(player.getBombNiuCount());
+				newPlayer.setFiveSmallNiuCount(player.getFiveSmallNiuCount());
+				newPlayer.setGoldNiuCount(player.getGoldNiuCount());
+				newPlayer.setNiuNiuCount(player.getNiuNiuCount());
+				newPlayer.setYouNiuCount(player.getYouNiuCount());
+				newPlayer.setWuNiuCount(player.getWuNiuCount());
 				newRoomInfo.getPlayerList().add(newPlayer);
 			}
 			
@@ -494,6 +507,8 @@ public class NnGameService extends BaseGameService{
 				break;
 			}
 		}
+		/**设置庄家次数*/
+		roomBankerPlayer.setBankerCount(roomBankerPlayer.getBankerCount() + 1);
 		/**将其他玩家的牌依次与庄家进行比较，计算各自得当前局分及总得分，最大牌型，并计算下一次庄家是谁*/
 		for(NnPlayerInfo player : playerList){
 			/**观察者的不算 add by liujinfengnew */
@@ -572,6 +587,8 @@ public class NnGameService extends BaseGameService{
 		roomInfo.setCurWinnerId(curWinnerId);
 		/**如果当前局数小于总局数，则设置为当前局结束*/
 		if (roomInfo.getCurGame() < roomInfo.getTotalGames()) {
+			/**设置下一局的庄家id（抢庄的不设置）*/
+			setRoomBankerId(roomInfo);
 			roomInfo.setStatus(NnRoomStatusEnum.curGameOver.status);
 		}else{/**如果当前局数等于总局数，则设置为一圈结束*/
 			roomInfo.setStatus(NnRoomStatusEnum.totalGameOver.status);
@@ -616,8 +633,6 @@ public class NnGameService extends BaseGameService{
 			}
 		}
 		
-		/**设置下一局的庄家id（抢庄的不设置）*/
-		setRoomBankerId(roomInfo);
 		/**将各种定时标记删除*/
 		redisOperationService.delNotReadyIpRoomIdTime(roomInfo.getRoomId());
 		redisOperationService.delNnRobIpRoomIdTime(roomInfo.getRoomId());
@@ -829,6 +844,14 @@ public class NnGameService extends BaseGameService{
 					newPlayer.setMaxCardType(player.getMaxCardType());
 					newPlayer.setWinTimes(player.getWinTimes());
 					newPlayer.setLoseTimes(player.getLoseTimes());
+					
+					newPlayer.setBankerCount(player.getBankerCount());
+					newPlayer.setBombNiuCount(player.getBombNiuCount());
+					newPlayer.setFiveSmallNiuCount(player.getFiveSmallNiuCount());
+					newPlayer.setGoldNiuCount(player.getGoldNiuCount());
+					newPlayer.setNiuNiuCount(player.getNiuNiuCount());
+					newPlayer.setYouNiuCount(player.getYouNiuCount());
+					newPlayer.setWuNiuCount(player.getWuNiuCount());
 					break;
 				default:
 					break;
