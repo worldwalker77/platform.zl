@@ -139,6 +139,7 @@ public class CommonGameService extends BaseGameService{
 					nnMsg.setRoomBankerType(resModel.getRoomBankerType());
 					nnMsg.setMultipleLimit(resModel.getMultipleLimit());
 					nnMsg.setPayType(resModel.getPayType());
+					nnMsg.setButtomScoreType(resModel.getButtomScoreType());
 					request.setMsg(nnMsg);
 					nnGameService.createRoom(ctx, request, userInfo);
 					break;

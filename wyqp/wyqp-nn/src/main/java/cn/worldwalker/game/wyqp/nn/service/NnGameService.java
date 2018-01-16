@@ -100,6 +100,7 @@ public class NnGameService extends BaseGameService{
 		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
 		/**玩家已经准备计数*/
 		int readyCount = 0;
+		int observerCount = 0;
 		int size = playerList.size();
 		for(int i = 0; i < size; i++){
 			NnPlayerInfo player = playerList.get(i);
@@ -110,10 +111,13 @@ public class NnGameService extends BaseGameService{
 			if (NnPlayerStatusEnum.ready.status.equals(player.getStatus())) {
 				readyCount++;
 			}
+			if (NnPlayerStatusEnum.observer.status.equals(player.getStatus())) {
+				observerCount++;
+			}
 		}
 		
 		/**如果已经准备的人数据大于1并且等于房间内所有玩家的数目，抢庄类型，发4张牌，非抢庄则通知压分*/
-		if (readyCount > 1 && readyCount == size) {
+		if (readyCount > 1 && readyCount == (size - observerCount)) {
 			/**开始发牌时将房间内当前局数+1*/
 			roomInfo.setCurGame(roomInfo.getCurGame() + 1);
 			/**发牌*/
@@ -801,17 +805,23 @@ public class NnGameService extends BaseGameService{
 					break;
 				case inStakeScore:
 					newPlayer.setStakeScore(player.getStakeScore());
+					/**如果是刷新玩家本人*/
 					if (playerId.equals(player.getPlayerId())) {
 						if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
-							if (NnPlayerStatusEnum.stakeScore.status.equals(player.getStatus())) {
-								List<Card> list = player.getRobFourCardList();
-								list.add(player.getFifthCard());
-								newPlayer.setCardList(list);
-							}else{
-								newPlayer.setCardList(player.getRobFourCardList());
+							String[] scoreArr = NnButtomScoreTypeEnum.getNnButtomScoreTypeEnum(roomInfo.getButtomScoreType()).value.split("_");
+							List<Integer> stakeScoreList = new ArrayList<Integer>();
+								for(String socre : scoreArr){
+								stakeScoreList.add(Integer.valueOf(socre));
 							}
-						}else{
-							newPlayer.setCardList(player.getCardList());
+							newPlayer.setCardList(player.getRobFourCardList());
+							newPlayer.setStakeScoreList(stakeScoreList);
+						}else{/**非抢庄类型*/
+							String[] scoreArr = NnButtomScoreTypeEnum.getNnButtomScoreTypeEnum(roomInfo.getButtomScoreType()).value.split("_");
+							List<Integer> stakeScoreList = new ArrayList<Integer>();
+							for(String socre : scoreArr){
+								stakeScoreList.add(Integer.valueOf(socre));
+							}
+							newPlayer.setStakeScoreList(stakeScoreList);
 						}
 					}
 					break;

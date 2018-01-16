@@ -19,6 +19,7 @@
 		<result column="multiple_limit" property="multipleLimit"/>
 		<result column="pay_type" property="payType"/>
 		<result column="tea_house_owner_word" property="teaHouseOwnerWord"/>
+		<result column="buttom_score_type" property="buttomScoreType"/>
 	</resultMap>
 	
 	<insert id="insertTeaHouseUser" parameterType="teaHouseModel">  
@@ -75,6 +76,7 @@
 		     					room_banker_type,
 		     					multiple_limit,
 		     					pay_type,
+		     					buttom_score_type,
 		     					create_time,
 		     					update_time
 	     					) 
@@ -84,6 +86,7 @@
 		     					#{roomBankerType},
 		     					#{multipleLimit},
 		     					#{payType},
+		     					#{buttomScoreType},
 		     					now(),
 		     					now()
 		     				)    
@@ -118,7 +121,7 @@
 	</select>
 	<select id="getPlayerTeaHouseList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
 	    select a.tea_house_id,a.tea_house_name,a.tea_house_num,a.create_time,
-	    b.game_type,b.total_game,b.room_banker_type,b.multiple_limit,b.pay_type
+	    b.game_type,b.total_game,b.room_banker_type,b.multiple_limit,b.pay_type,b.buttom_score_type
 	    from t_tea_house a left join t_tea_house_type b
 	    on a.tea_house_type_id = b.tea_house_type_id
 	    where a.player_id = #{playerId}
@@ -126,7 +129,7 @@
 	</select>
 	
 	<select id="getPlayerJoinedTeaHouseList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
-	    select a.tea_house_num,a.status,c.game_type,c.total_game,c.room_banker_type,c.multiple_limit,c.pay_type
+	    select a.tea_house_num,a.status,c.game_type,c.total_game,c.room_banker_type,c.multiple_limit,c.pay_type,c.buttom_score_type
 	    from t_tea_house_user a 
 	    left join t_tea_house b on a.tea_house_num = b.tea_house_num
 	    left join t_tea_house_type c on b.tea_house_type_id = c.tea_house_type_id
@@ -156,6 +159,7 @@
 		<if test="roomBankerType != null"> and room_banker_type=#{roomBankerType}</if>
 		<if test="multipleLimit != null"> and multiple_limit=#{multipleLimit}</if>
 		<if test="payType != null"> and pay_type=#{payType}</if>
+		<if test="buttomScoreType != null"> and buttom_score_type=#{buttomScoreType}</if>
 	</select>
 	
 	<select id="getTeaHouseUserByCondition"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">

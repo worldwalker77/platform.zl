@@ -52,6 +52,7 @@ import cn.worldwalker.game.wyqp.common.roomlocks.RoomLockContainer;
 import cn.worldwalker.game.wyqp.common.rpc.WeiXinRpc;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.IPUtil;
+import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.DateUtils;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.HttpUtil;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.MapUtils;
@@ -233,7 +234,7 @@ public abstract class BaseGameService {
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, request.getGameType(), new Date());
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 		redisOperationService.setPlayerIdRoomIdGameType(userInfo.getPlayerId(), roomId, request.getGameType());
-		
+		redisOperationService.setTeaHouseNumTableNumRoomId(roomInfo.getTeaHouseNum(), roomInfo.getTableNum(), roomId);
 		/**设置返回信息*/
 		result = new Result();
 		result.setMsgType(MsgTypeEnum.createRoom.msgType);
@@ -308,16 +309,32 @@ public abstract class BaseGameService {
 		/***/
 		BasePlayerInfo lastPlayerInfo = (BasePlayerInfo)playerList.get(playerList.size() - 2);
 		playerInfo.setOrder(lastPlayerInfo.getOrder() + 1);
-		/**加入房间的时候，需要判断当前房间的状态，确定新加入的玩家应该是什么状态*/
-		if (roomInfo.getStatus().equals(RoomStatusEnum.justBegin.status) ) {//刚开始准备
+		if (roomInfo.getGameType().equals(GameTypeEnum.nn.gameType)) {
+			/**加入房间的时候，需要判断当前房间的状态，确定新加入的玩家应该是什么状态*/
+			if (roomInfo.getStatus().equals(RoomStatusEnum.justBegin.status) ) {//刚开始准备
+				playerInfo.setStatus(PlayerStatusEnum.notReady.status);
+			}else if(roomInfo.getStatus().equals(5) ){//小局结束nn是5
+				playerInfo.setStatus(PlayerStatusEnum.notReady.status);
+			}else if(roomInfo.getStatus().equals(6) ){//一圈结束nn是6
+				throw new BusinessException(ExceptionEnum.TOTAL_GAME_OVER);
+			}else{//其他状态
+				playerInfo.setStatus(PlayerStatusEnum.observer.status);
+			}
+		}else if(roomInfo.getGameType().equals(GameTypeEnum.jh.gameType)){
+			/**加入房间的时候，需要判断当前房间的状态，确定新加入的玩家应该是什么状态*/
+			if (roomInfo.getStatus().equals(RoomStatusEnum.justBegin.status) ) {//刚开始准备
+				playerInfo.setStatus(PlayerStatusEnum.notReady.status);
+			}else if(roomInfo.getStatus().equals(RoomStatusEnum.curGameOver.status) ){//小局结束
+				playerInfo.setStatus(PlayerStatusEnum.notReady.status);
+			}else if(roomInfo.getStatus().equals(RoomStatusEnum.totalGameOver.status) ){//一圈结束
+				throw new BusinessException(ExceptionEnum.TOTAL_GAME_OVER);
+			}else{//其他状态
+				playerInfo.setStatus(PlayerStatusEnum.observer.status);
+			}
+		}else{
 			playerInfo.setStatus(PlayerStatusEnum.notReady.status);
-		}else if(roomInfo.getStatus().equals(RoomStatusEnum.curGameOver.status) ){//小局结束
-			playerInfo.setStatus(PlayerStatusEnum.notReady.status);
-		}else if(roomInfo.getStatus().equals(RoomStatusEnum.totalGameOver.status) ){//一圈结束
-			throw new BusinessException(ExceptionEnum.TOTAL_GAME_OVER);
-		}else{//其他状态
-			playerInfo.setStatus(PlayerStatusEnum.observer.status);
 		}
+		
 		
 		playerInfo.setOnlineStatus(OnlineStatusEnum.online.status);
 		playerInfo.setRoomCardNum(10);
@@ -351,6 +368,7 @@ public abstract class BaseGameService {
 	}
 	
 	public void refreshRoomForAllPlayer(BaseRoomInfo roomInfo){
+		System.out.println("============roomInfo:" + JsonUtil.toJson(roomInfo));
 		Result result = new Result();
 		result.setGameType(roomInfo.getGameType());
 		result.setMsgType(MsgTypeEnum.refreshRoom.msgType);
@@ -366,6 +384,7 @@ public abstract class BaseGameService {
 			List<BaseRoomInfo> roomInfoList = doRefreshRoom(null, null, userInfo);
 			BaseRoomInfo returnRoomInfo = roomInfoList.get(1);
 			result.setData(returnRoomInfo);
+			System.out.println("=========playerId:"+ playerInfo.getPlayerId());
 			/**返回给当前玩家刷新信息*/
 			channelContainer.sendTextMsgByPlayerIds(result, playerInfo.getPlayerId());
 		}
@@ -1056,8 +1075,10 @@ public abstract class BaseGameService {
 				NnMsg nnMsg = (NnMsg)msg;
 				teaHouseModel.setRoomBankerType(nnMsg.getRoomBankerType());
 				teaHouseModel.setMultipleLimit(nnMsg.getMultipleLimit());
+				teaHouseModel.setButtomScoreType(nnMsg.getButtomScoreType());
 				data.put("roomBankerType", nnMsg.getRoomBankerType());
 				data.put("multipleLimit", nnMsg.getMultipleLimit());
+				data.put("buttomScoreType", nnMsg.getButtomScoreType());
 				break;
 			case mj:
 				break;

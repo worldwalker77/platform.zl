@@ -32,7 +32,17 @@ public class NnPlayerInfo extends BasePlayerInfo{
 	private Integer youNiuCount = 0;
 	/**没牛次数*/
 	private Integer wuNiuCount = 0;
+	/**压分列表*/
+	private List<Integer> stakeScoreList;
 	
+	public List<Integer> getStakeScoreList() {
+		return stakeScoreList;
+	}
+
+	public void setStakeScoreList(List<Integer> stakeScoreList) {
+		this.stakeScoreList = stakeScoreList;
+	}
+
 	public Integer getBankerCount() {
 		return bankerCount;
 	}

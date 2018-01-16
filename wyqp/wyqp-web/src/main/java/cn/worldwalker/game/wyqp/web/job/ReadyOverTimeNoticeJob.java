@@ -124,7 +124,8 @@ public class ReadyOverTimeNoticeJob {
 		/**将没有准备的人自动调用准备接口*/
 		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
 		for(NnPlayerInfo player : playerList){
-			if (!player.getStatus().equals(NnPlayerStatusEnum.ready.status)) {
+			/**除观察者外，没有准备的自动准备*/
+			if (!player.getStatus().equals(NnPlayerStatusEnum.ready.status) && player.getStatus() > NnPlayerStatusEnum.observer.status) {
 				UserInfo userInfo = new UserInfo();
 				userInfo.setPlayerId(player.getPlayerId());
 				userInfo.setRoomId(roomId);

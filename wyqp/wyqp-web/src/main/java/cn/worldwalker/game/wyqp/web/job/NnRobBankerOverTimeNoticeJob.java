@@ -83,6 +83,10 @@ public class NnRobBankerOverTimeNoticeJob {
 				userInfo.setRoomId(roomId);
 				/**模拟抢庄流程，robBankerId抢庄，其他玩家不抢*/
 				for(NnPlayerInfo player : playerList){
+					/**玩家状态小于已准备，则说明是观察者*/
+					if (player.getStatus() < NnPlayerStatusEnum.ready.status) {
+						continue;
+					}
 					userInfo.setPlayerId(player.getPlayerId());
 					if (player.getPlayerId().equals(robBankerId)) {
 						msg.setIsRobBanker(NnPlayerStatusEnum.rob.status);

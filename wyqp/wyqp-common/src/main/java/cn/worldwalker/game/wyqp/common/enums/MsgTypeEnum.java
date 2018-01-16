@@ -33,7 +33,8 @@ public enum MsgTypeEnum {
 	checkBindProxy(28, "校验是否绑定代理"),
 	unifiedOrder(29, "微信预支付前统一下单接口"),
 //	notReadyTimer(30, "未准备玩家计时器"),
-	
+	sitDown(31, "坐下"),
+	observerEntry(32, "观察者进入消息"),
 	/**茶楼相关*/
 	
 	tuhaoBoard(50, "土豪榜"),

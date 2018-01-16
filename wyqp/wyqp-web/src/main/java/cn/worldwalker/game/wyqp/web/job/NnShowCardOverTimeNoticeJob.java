@@ -18,6 +18,7 @@ import cn.worldwalker.game.wyqp.common.domain.nn.NnPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
 import cn.worldwalker.game.wyqp.nn.enums.NnPlayerStatusEnum;
+import cn.worldwalker.game.wyqp.nn.enums.NnRoomBankerTypeEnum;
 import cn.worldwalker.game.wyqp.nn.enums.NnRoomStatusEnum;
 import cn.worldwalker.game.wyqp.nn.service.NnGameService;
 
@@ -65,6 +66,24 @@ public class NnShowCardOverTimeNoticeJob {
 				}
 				List<NnPlayerInfo> playerList = nnRoomInfo.getPlayerList();
 				for(NnPlayerInfo player : playerList){
+					/**如果是庄家*/
+					if (nnRoomInfo.getRoomBankerId().equals(player.getPlayerId())) {
+						if (nnRoomInfo.getRoomBankerType().equals(NnRoomBankerTypeEnum.robBanker.type)) {
+							if (player.getStatus() < NnPlayerStatusEnum.rob.status) {
+								continue;
+							}
+						}else{
+							if (player.getStatus() < NnPlayerStatusEnum.ready.status) {
+								continue;
+							}
+						}
+					}else{/**如果不是庄家*/
+						/**玩家状态小于已压分，则说明是观察者*/
+						if (player.getStatus() < NnPlayerStatusEnum.stakeScore.status) {
+							continue;
+						}
+					}
+					
 					if (player.getStatus() < NnPlayerStatusEnum.showCard.status) {
 						UserInfo userInfo = new UserInfo();
 						userInfo.setPlayerId(player.getPlayerId());

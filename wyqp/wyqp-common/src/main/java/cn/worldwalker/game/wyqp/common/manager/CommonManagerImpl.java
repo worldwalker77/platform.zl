@@ -353,6 +353,7 @@ public class CommonManagerImpl implements CommonManager{
 				typeModel.setRoomBankerType(model.getRoomBankerType());
 				typeModel.setMultipleLimit(model.getMultipleLimit());
 				typeModel.setPayType(model.getPayType());
+				typeModel.setButtomScoreType(model.getButtomScoreType());
 				break;
 			case mj:
 				break;
@@ -373,14 +374,6 @@ public class CommonManagerImpl implements CommonManager{
 		teaHouseModel.setNickName(model.getNickName());
 		/**此种类型茶楼id存在*/
 		if (resModel != null) {
-			/**查询玩家是否存在此种类型的茶楼，如果存在则提示不能创建*/
-//			TeaHouseModel tempModel = new TeaHouseModel();
-//			tempModel.setPlayerId(model.getPlayerId());
-//			tempModel.setTeaHouseTypeId(resModel.getTeaHouseTypeId());
-//			List<TeaHouseModel> list = teaHouseDao.getPlayerTeaHouseList(tempModel);
-//			if (CollectionUtils.isNotEmpty(list)) {
-//				throw new BusinessException(ExceptionEnum.PLAYER_TEA_HOUSE_TYPE_EXIST.index, ExceptionEnum.PLAYER_TEA_HOUSE_TYPE_EXIST.description + ",茶楼号为:" + list.get(0).getTeaHouseNum());
-//			}
 			teaHouseModel.setTeaHouseTypeId(resModel.getTeaHouseTypeId());
 			teaHouseDao.insertTeaHouse(teaHouseModel);
 			
