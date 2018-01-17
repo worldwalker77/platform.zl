@@ -33,6 +33,7 @@ public enum ExceptionEnum {
     ALREADY_EXIST_IN_TEA_HOUSE_NUM(27, "你已经在茶楼中，请从我的茶楼列表进入"),
     NO_PERMISSION(28, "无权限"),
     TEA_HOUSE_NOT_EXIST(29, "茶楼号不存在"),
+    CAN_NOT_REMOVE_SELF(30, "楼主或店小二不能移除自己，如果想移除，请通过删除或退出茶楼功能"),
     /**斗牛100-199*/
     
     /**斗牛200-299*/

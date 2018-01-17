@@ -1096,9 +1096,7 @@ public abstract class BaseGameService {
 		redisOperationService.setPlayerIdTeaHouseNum(playerId, teaHouseNum);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
-	public static void main(String[] args) {
-		System.out.println(System.currentTimeMillis());
-	}
+	
 	public void queryPlayerTeaHouseList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
 		result.setGameType(request.getGameType());
@@ -1116,17 +1114,6 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	
-	public void delTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
-		Result result = new Result();
-		Map<String, Object> data = new HashMap<String, Object>();
-		result.setData(data);
-		result.setGameType(request.getGameType());
-		result.setMsgType(MsgTypeEnum.delTeaHouse.msgType);
-		BaseMsg msg = request.getMsg();
-		Integer playerId = msg.getPlayerId();
-		commonManager.delTeaHouse(msg.getTeaHouseNum(),playerId);
-		channelContainer.sendTextMsgByPlayerIds(result, playerId);
-	}
 	/**
 	 * 从茶楼列表进入茶楼
 	 * @param ctx
@@ -1141,7 +1128,7 @@ public abstract class BaseGameService {
 		Integer playerId = msg.getPlayerId();
 		Integer teaHouseNum = msg.getTeaHouseNum();
 		/**设置茶楼类型信息*/
-		result.setData(commonManager.getTeaHouseTypeByTeaHouseNum(teaHouseNum));
+		result.setData(commonManager.getTeaHouseTypeByTeaHouseNum(teaHouseNum,playerId));
 		/**设置玩家id与茶楼号的关系，记忆下次直接进入茶楼*/
 		redisOperationService.setPlayerIdTeaHouseNum(playerId, teaHouseNum);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
@@ -1160,7 +1147,8 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.joinTeaHouse.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
-		if (!commonManager.isTeaHouseExist(msg.getTeaHouseNum())) {
+		TeaHouseModel model = commonManager.getTeaHouseByTeaHouseNum(msg.getTeaHouseNum());
+		if (model == null) {
 			throw new BusinessException(ExceptionEnum.TEA_HOUSE_NOT_EXIST);
 		}
 		boolean isIn = commonManager.isPlayerInTeaHouse(msg.getTeaHouseNum(), playerId);
@@ -1169,20 +1157,16 @@ public abstract class BaseGameService {
 			entryTeaHouse(ctx, request, userInfo);
 			return;
 		}
-		commonManager.joinTeaHouse(msg.getTeaHouseNum(), playerId, userInfo.getNickName());
-		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+		/**如果茶楼需要审核*/
+		if (model.getIsNeedAudit() > 0) {
+			commonManager.joinTeaHouse(msg.getTeaHouseNum(), playerId, userInfo.getNickName(), 0);
+			channelContainer.sendTextMsgByPlayerIds(result, playerId);
+		}else{/**如果不需要审核*/
+			commonManager.joinTeaHouse(msg.getTeaHouseNum(), playerId, userInfo.getNickName(), 1);
+			entryTeaHouse(ctx, request, userInfo);
+		}
 	}
-	public void auditEntryTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
-		Result result = new Result();
-		Map<String, Object> data = new HashMap<String, Object>();
-		result.setData(data);
-		result.setGameType(request.getGameType());
-		result.setMsgType(MsgTypeEnum.auditEntryTeaHouse.msgType);
-		BaseMsg msg = request.getMsg();
-		Integer playerId = msg.getPlayerId();
-		commonManager.auditEntryTeaHouse(msg.getTeaHouseNum(), msg.getOtherPlayerId(), msg.getStatus());
-		channelContainer.sendTextMsgByPlayerIds(result, playerId);
-	}
+	
 	public void queryTeaHousePlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
 		result.setGameType(request.getGameType());
@@ -1192,58 +1176,7 @@ public abstract class BaseGameService {
 		result.setData(commonManager.queryTeaHousePlayerList(msg.getTeaHouseNum()));
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
-	/**
-	 * 楼主将玩家移除茶楼
-	 * @param ctx
-	 * @param request
-	 * @param userInfo
-	 */
-	public void delTeaHouseUser(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
-		Result result = new Result();
-		Map<String, Object> data = new HashMap<String, Object>();
-		result.setData(data);
-		result.setGameType(request.getGameType());
-		result.setMsgType(MsgTypeEnum.delTeaHouseUser.msgType);
-		BaseMsg msg = request.getMsg();
-		Integer playerId = msg.getPlayerId();
-		commonManager.delTeaHouseUser(msg.getTeaHouseNum(), msg.getOtherPlayerId(), playerId);
-		channelContainer.sendTextMsgByPlayerIds(result, playerId);
-	}
-	/**
-	 * 退出已经加入的茶楼
-	 * @param ctx
-	 * @param request
-	 * @param userInfo
-	 */
-	public void delFromTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
-		Result result = new Result();
-		Map<String, Object> data = new HashMap<String, Object>();
-		result.setData(data);
-		result.setGameType(request.getGameType());
-		result.setMsgType(MsgTypeEnum.delFromTeaHouse.msgType);
-		BaseMsg msg = request.getMsg();
-		Integer playerId = msg.getPlayerId();
-		commonManager.delFromTeaHouse(msg.getTeaHouseNum(), playerId);
-		channelContainer.sendTextMsgByPlayerIds(result, playerId);
-	}
-	/**
-	 * 退出茶楼到大厅
-	 * @param ctx
-	 * @param request
-	 * @param userInfo
-	 */
-	public void exitTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
-		Result result = new Result();
-		Map<String, Object> data = new HashMap<String, Object>();
-		result.setData(data);
-		result.setGameType(request.getGameType());
-		result.setMsgType(MsgTypeEnum.exitTeaHouse.msgType);
-		BaseMsg msg = request.getMsg();
-		Integer playerId = msg.getPlayerId();
-		/**退出茶楼需要删除playerId与茶楼号的对应关系，去掉记忆*/
-		redisOperationService.hdelPlayerIdTeaHouseNum(playerId);
-		channelContainer.sendTextMsgByPlayerIds(result, playerId);
-	}
+	
 	public void queryTeaHouseTablePlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
 		Map<Integer, Object> data = new HashMap<Integer, Object>();
@@ -1274,18 +1207,36 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	
-	public void teaHouseRecord(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+	public void queryTableDetail(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
-		Map<String, Object> data = new HashMap<String, Object>();
+		Map<Integer, Object> data = new HashMap<Integer, Object>();
 		result.setData(data);
 		result.setGameType(request.getGameType());
-		result.setMsgType(MsgTypeEnum.teaHouseRecord.msgType);
+		result.setMsgType(MsgTypeEnum.queryTableDetail.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
-		List<UserRecordModel> list = commonManager.getTeaHouseRecord(msg.getTeaHouseNum());
-		result.setData(list);
+		Integer teaHouseNum = msg.getTeaHouseNum();
+		Integer tableNum = msg.getTableNum();
+		Integer roomId = redisOperationService.getRoomIdByTeaHouseNumTableNum(teaHouseNum, tableNum);
+		List<Map<String, Object>> returnList = new ArrayList<Map<String, Object>>(); 
+		if (roomId != null) {
+			BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
+			List playerList = roomInfo.getPlayerList();
+			int size = playerList.size();
+			for(int i = 0; i < size; i++){
+				Map<String, Object> map = new HashMap<String, Object>();
+				BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(i);
+				map.put("playerId", playerInfo.getPlayerId());
+				map.put("nickName", playerInfo.getNickName());
+				map.put("headImgUrl", playerInfo.getHeadImgUrl());
+				returnList.add(map);
+			}
+		}
+		data.put(tableNum, returnList);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
+	
+	
 	public void myTeaHouseRecord(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -1296,28 +1247,6 @@ public abstract class BaseGameService {
 		Integer playerId = msg.getPlayerId();
 		List<UserRecordModel> list = commonManager.getMyTeaHouseRecord(msg.getTeaHouseNum(),playerId);
 		result.setData(list);
-		channelContainer.sendTextMsgByPlayerIds(result, playerId);
-	}
-	
-	public void queryNeedAuditPlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
-		Result result = new Result();
-		result.setGameType(request.getGameType());
-		result.setMsgType(MsgTypeEnum.queryNeedAuditPlayerList.msgType);
-		BaseMsg msg = request.getMsg();
-		Integer playerId = msg.getPlayerId();
-		result.setData(commonManager.queryNeedAuditPlayerList(msg.getTeaHouseNum(), playerId));
-		channelContainer.sendTextMsgByPlayerIds(result, playerId);
-	}
-	
-	public void teaHouseConfig(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
-		Result result = new Result();
-		Map<String, Object> data = new HashMap<String, Object>();
-		result.setData(data);
-		result.setGameType(request.getGameType());
-		result.setMsgType(MsgTypeEnum.teaHouseConfig.msgType);
-		BaseMsg msg = request.getMsg();
-		Integer playerId = msg.getPlayerId();
-		commonManager.updateTeaHouseByCondition(msg.getTeaHouseNum(), playerId, msg.getTeaHouseOwnerWord());
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	
@@ -1360,6 +1289,175 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.openRoomList.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	/**
+	 * 查询需要审核的玩家列表（楼主和店小二才有权限）
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void queryNeedAuditPlayerList(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.queryNeedAuditPlayerList.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		result.setData(commonManager.queryNeedAuditPlayerList(msg.getTeaHouseNum(), playerId));
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	/**
+	 * 审核同意/拒绝（楼主和店小二才有权限）
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void auditEntryTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.auditEntryTeaHouse.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		commonManager.auditEntryTeaHouse(msg.getTeaHouseNum(),msg.getPlayerId(), msg.getOtherPlayerId(), msg.getStatus());
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	/**
+	 * 楼主将玩家移除茶楼（楼主和店小二才有权限，但是不能移除自己）
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void delTeaHouseUser(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.delTeaHouseUser.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		commonManager.delTeaHouseUser(msg.getTeaHouseNum(), msg.getOtherPlayerId(), playerId);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	/**
+	 * 删除茶楼（楼主才有权限）
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void delTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		commonManager.delTeaHouse(msg.getTeaHouseNum(),playerId);
+		Result result = new Result();
+		result.setGameType(request.getGameType());
+		/**如果删除的茶楼是当前玩家进入的茶楼，则删除茶楼后需要退出到大厅*/
+		Integer hasEntryTeaHouseNum = redisOperationService.getTeaHouseNumByPlayerId(playerId);
+		if (msg.getTeaHouseNum().equals(hasEntryTeaHouseNum)) {
+			result.setMsgType(MsgTypeEnum.entryHall.msgType);
+			redisOperationService.hdelPlayerIdTeaHouseNum(playerId);
+		}else{/**如果删除的茶楼不是当前玩家进入的茶楼*/
+			result.setMsgType(MsgTypeEnum.delFromTeaHouse.msgType);
+		}
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	/**
+	 * 退出已经加入的茶楼
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void delFromTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		result.setGameType(request.getGameType());
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		commonManager.delFromTeaHouse(msg.getTeaHouseNum(), playerId);
+		/**如果退出的茶楼是当前玩家进入的茶楼，则退出茶楼后需要退出到大厅*/
+		Integer hasEntryTeaHouseNum = redisOperationService.getTeaHouseNumByPlayerId(playerId);
+		if (msg.getTeaHouseNum().equals(hasEntryTeaHouseNum)) {
+			result.setMsgType(MsgTypeEnum.entryHall.msgType);
+			redisOperationService.hdelPlayerIdTeaHouseNum(playerId);
+		}else{/**如果退出的茶楼不是当前玩家进入的茶楼*/
+			result.setMsgType(MsgTypeEnum.delFromTeaHouse.msgType);
+		}
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+		
+	}
+	/**
+	 * 茶楼设置（楼主和店小二才有权限）
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void teaHouseConfig(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.teaHouseConfig.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		commonManager.teaHouseConfig(msg.getTeaHouseNum(), playerId, msg.getTeaHouseOwnerWord(),msg.getIsNeedAudit());
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	/**
+	 * 设置/取消店小二（楼主才有权限）
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void setDianXiaoer(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.setDianXiaoer.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		Integer otherPlayerId = msg.getOtherPlayerId();
+		commonManager.setDianXiaoer(msg.getTeaHouseNum(), playerId, otherPlayerId, msg.getIsDianXiaoer());
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	/**
+	 * 退出茶楼到大厅
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void exitTeaHouse(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.exitTeaHouse.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		/**退出茶楼需要删除playerId与茶楼号的对应关系，去掉记忆*/
+		redisOperationService.hdelPlayerIdTeaHouseNum(playerId);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	/**
+	 * 茶楼战绩（楼主和店小二才有权限）
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void teaHouseRecord(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.teaHouseRecord.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		List<UserRecordModel> list = commonManager.getTeaHouseRecord(msg.getTeaHouseNum(), playerId);
+		result.setData(list);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 }

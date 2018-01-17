@@ -396,6 +396,9 @@ public class CommonManagerImpl implements CommonManager{
 	
 	@Override
 	public void delTeaHouse(Integer teaHouseNum, Integer playerId) {
+		if (!isTeaHouseOwner(teaHouseNum, playerId)) {
+			throw new BusinessException(ExceptionEnum.NO_PERMISSION);
+		}
 		TeaHouseModel teaHouseModel = new TeaHouseModel();
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
 		teaHouseDao.deleteTeaHouseUserByCondition(teaHouseModel);
@@ -405,25 +408,31 @@ public class CommonManagerImpl implements CommonManager{
 	}
 	
 	@Override
-	public void joinTeaHouse(Integer teaHouseNum, Integer playerId,String nickName) {
+	public void joinTeaHouse(Integer teaHouseNum, Integer playerId,String nickName, Integer status) {
 		TeaHouseModel teaHouseModel = new TeaHouseModel();
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
 		teaHouseModel.setPlayerId(playerId);
-		if (teaHouseDao.getTeaHouseUserByCondition(teaHouseModel) != null) {
-			throw new BusinessException(ExceptionEnum.ALREADY_EXIST_IN_TEA_HOUSE_NUM);
-		}
 		teaHouseModel.setNickName(nickName);
-		teaHouseModel.setStatus(0);
+		teaHouseModel.setStatus(status);
 		teaHouseDao.insertTeaHouseUser(teaHouseModel);
 	}
 	
 	@Override
-	public void auditEntryTeaHouse(Integer teaHouseNum, Integer playerId, Integer status) {
+	public void auditEntryTeaHouse(Integer teaHouseNum, Integer playerId, Integer otherPlayerId, Integer status) {
+		if (!hasPermission(teaHouseNum, playerId)) {
+			throw new BusinessException(ExceptionEnum.NO_PERMISSION);
+		}
 		TeaHouseModel teaHouseModel = new TeaHouseModel();
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
-		teaHouseModel.setPlayerId(playerId);
-		teaHouseModel.setStatus(status);
-		teaHouseDao.auditTeaHouseUser(teaHouseModel);
+		teaHouseModel.setPlayerId(otherPlayerId);
+		/**同意*/
+		if (status == 1) {
+			teaHouseModel.setStatus(status);
+			teaHouseDao.auditTeaHouseUser(teaHouseModel);
+		}else if(status == 0){/**拒绝的话就删除记录*/
+			teaHouseDao.deleteTeaHouseUserByCondition(teaHouseModel);
+		}
+		
 	}
 	
 	@Override
@@ -438,17 +447,61 @@ public class CommonManagerImpl implements CommonManager{
 		TeaHouseModel teaHouseModel = new TeaHouseModel();
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
 		teaHouseModel.setPlayerId(playerId);
-		if (teaHouseDao.getTeaHouseByCondition(teaHouseModel) == null) {
+		if (!hasPermission(teaHouseNum, playerId)) {
 			throw new BusinessException(ExceptionEnum.NO_PERMISSION);
+		}
+		/**不能将自己移除茶楼*/
+		if (playerId.equals(otherPlayerId)) {
+			throw new BusinessException(ExceptionEnum.CAN_NOT_REMOVE_SELF);
 		}
 		teaHouseModel.setPlayerId(otherPlayerId);
 		teaHouseDao.deleteTeaHouseUserByCondition(teaHouseModel);
 	}
-	@Override
-	public TeaHouseModel getTeaHouseTypeByTeaHouseNum(Integer teaHouseNum) {
+	private boolean hasPermission(Integer teaHouseNum, Integer playerId){
 		TeaHouseModel teaHouseModel = new TeaHouseModel();
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
-		return teaHouseDao.getTeaHouseTypeByTeaHouseNum(teaHouseModel);
+		teaHouseModel.setPlayerId(playerId);
+		if (teaHouseDao.getTeaHouseByCondition(teaHouseModel) != null) {
+			return true;
+		}
+		TeaHouseModel res = teaHouseDao.getTeaHouseUserByCondition(teaHouseModel);
+		if (res.getIsDianXiaoer() > 0) {
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean isDianXiaoer(Integer teaHouseNum, Integer playerId){
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		teaHouseModel.setPlayerId(playerId);
+		TeaHouseModel res = teaHouseDao.getTeaHouseUserByCondition(teaHouseModel);
+		if (res.getIsDianXiaoer() > 0) {
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean isTeaHouseOwner(Integer teaHouseNum, Integer playerId){
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		teaHouseModel.setPlayerId(playerId);
+		teaHouseModel = teaHouseDao.getTeaHouseByCondition(teaHouseModel);
+		if (teaHouseModel != null) {
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public TeaHouseModel getTeaHouseTypeByTeaHouseNum(Integer teaHouseNum, Integer playerId) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		TeaHouseModel res = teaHouseDao.getTeaHouseTypeByTeaHouseNum(teaHouseModel);
+		teaHouseModel.setPlayerId(playerId);
+		teaHouseModel = teaHouseDao.getTeaHouseUserByCondition(teaHouseModel);
+		res.setIsDianXiaoer(teaHouseModel.getIsDianXiaoer());
+		return res;
 	}
 	@Override
 	public void delFromTeaHouse(Integer teaHouseNum, Integer playerId) {
@@ -465,7 +518,10 @@ public class CommonManagerImpl implements CommonManager{
 		return teaHouseDao.getPlayerJoinedTeaHouseList(teaHouseModel);
 	}
 	@Override
-	public List<UserRecordModel> getTeaHouseRecord(Integer teaHouseNum) {
+	public List<UserRecordModel> getTeaHouseRecord(Integer teaHouseNum,Integer playerId) {
+		if (!hasPermission(teaHouseNum, playerId)) {
+			throw new BusinessException(ExceptionEnum.NO_PERMISSION);
+		}
 		UserRecordModel model = new UserRecordModel();
 		model.setTeaHouseNum(teaHouseNum);
 		List<UserRecordModel> list = userRecordDao.getTeaHouseRecord(model);
@@ -498,11 +554,14 @@ public class CommonManagerImpl implements CommonManager{
 		return true;
 	}
 	@Override
-	public void updateTeaHouseByCondition(Integer teaHouseNum, Integer playerId, String teaHouseOwnerWord) {
+	public void teaHouseConfig(Integer teaHouseNum, Integer playerId, String teaHouseOwnerWord, Integer isNeedAudit) {
+		if (!hasPermission(teaHouseNum, playerId)) {
+			throw new BusinessException(ExceptionEnum.NO_PERMISSION);
+		}
 		TeaHouseModel teaHouseModel = new TeaHouseModel();
-		teaHouseModel.setPlayerId(playerId);
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
 		teaHouseModel.setTeaHouseOwnerWord(teaHouseOwnerWord);
+		teaHouseModel.setIsNeedAudit(isNeedAudit);
 		teaHouseDao.updateTeaHouseByCondition(teaHouseModel);
 	}
 	@Override
@@ -526,10 +585,31 @@ public class CommonManagerImpl implements CommonManager{
 	}
 	@Override
 	public List<TeaHouseModel> queryNeedAuditPlayerList(Integer teaHouseNum, Integer playerId) {
+		if (!hasPermission(teaHouseNum, playerId)) {
+			throw new BusinessException(ExceptionEnum.NO_PERMISSION);
+		}
 		TeaHouseModel teaHouseModel = new TeaHouseModel();
 		teaHouseModel.setTeaHouseNum(teaHouseNum);
-		teaHouseModel.setPlayerId(playerId);
 		return teaHouseDao.getNeedAuditPlayerList(teaHouseModel);
+	}
+	@Override
+	public TeaHouseModel getTeaHouseByTeaHouseNum(Integer teaHouseNum) {
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		return teaHouseDao.getTeaHouseByTeaHouseNum(teaHouseModel);
+	}
+	@Override
+	public void setDianXiaoer(Integer teaHouseNum, Integer playerId,
+			Integer otherPlayerId, Integer isDianXiaoer) {
+		if (!isTeaHouseOwner(teaHouseNum, otherPlayerId)) {
+			throw new BusinessException(ExceptionEnum.NO_PERMISSION);
+		}
+		TeaHouseModel teaHouseModel = new TeaHouseModel();
+		teaHouseModel.setTeaHouseNum(teaHouseNum);
+		teaHouseModel.setPlayerId(otherPlayerId);
+		teaHouseModel.setIsDianXiaoer(isDianXiaoer);
+		teaHouseDao.updateTeaHouseUserByCondition(teaHouseModel);
+		
 	}
 	
 }

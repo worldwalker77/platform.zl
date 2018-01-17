@@ -29,7 +29,21 @@ public class BaseMsg {
 	private Integer tableNum;
 	private Integer status;
 	private String teaHouseOwnerWord;
+	private Integer isNeedAudit;
+	private Integer isDianXiaoer;
 	
+	public Integer getIsDianXiaoer() {
+		return isDianXiaoer;
+	}
+	public void setIsDianXiaoer(Integer isDianXiaoer) {
+		this.isDianXiaoer = isDianXiaoer;
+	}
+	public Integer getIsNeedAudit() {
+		return isNeedAudit;
+	}
+	public void setIsNeedAudit(Integer isNeedAudit) {
+		this.isNeedAudit = isNeedAudit;
+	}
 	public String getTeaHouseOwnerWord() {
 		return teaHouseOwnerWord;
 	}

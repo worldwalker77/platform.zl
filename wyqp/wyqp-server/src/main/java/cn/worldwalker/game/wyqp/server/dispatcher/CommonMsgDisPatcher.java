@@ -89,6 +89,9 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case queryTeaHouseTablePlayerList:
 				commonGameService.queryTeaHouseTablePlayerList(ctx, request, userInfo);
 				break;
+			case queryTableDetail:
+				commonGameService.queryTableDetail(ctx, request, userInfo);
+				break;
 			case delFromTeaHouse:
 				commonGameService.delFromTeaHouse(ctx, request, userInfo);
 				break;
@@ -111,6 +114,9 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 				
 			case teaHouseConfig:
 				commonGameService.teaHouseConfig(ctx, request, userInfo);
+				break;
+			case setDianXiaoer:
+				commonGameService.setDianXiaoer(ctx, request, userInfo);
 				break;
 			case teaHouseBigWinner:
 				commonGameService.teaHouseBigWinner(ctx, request, userInfo);

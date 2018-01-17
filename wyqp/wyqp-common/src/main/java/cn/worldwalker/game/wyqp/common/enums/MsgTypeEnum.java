@@ -59,6 +59,8 @@ public enum MsgTypeEnum {
 	exitTeaHouse(95, "退出进入的茶楼"),
 	teaHouseConfig(96, "茶楼设置"),
 	teaHouseBigWinner(97, "茶楼大赢家"),
+	setDianXiaoer(98, "设置店小二"),
+	queryTableDetail(99, "查询茶楼某个牌桌详情"),
 	
 	/**斗牛特有100-199*/
 	readyRobBanker(100, "准备抢庄"),

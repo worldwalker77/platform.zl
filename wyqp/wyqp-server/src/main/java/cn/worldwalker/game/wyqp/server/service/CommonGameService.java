@@ -121,7 +121,7 @@ public class CommonGameService extends BaseGameService{
 			msg.setRoomId(roomId);
 			commonEntryRoom(ctx, request, userInfo);
 		}else{
-			TeaHouseModel resModel = commonManager.getTeaHouseTypeByTeaHouseNum(teaHouseNum);
+			TeaHouseModel resModel = commonManager.getTeaHouseTypeByTeaHouseNum(teaHouseNum,msg.getPlayerId());
 			if (resModel == null) {
 				throw new BusinessException(ExceptionEnum.TEA_HOUSE_NUM_ERROR);
 			}

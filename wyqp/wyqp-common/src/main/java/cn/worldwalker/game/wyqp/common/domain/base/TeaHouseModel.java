@@ -18,6 +18,22 @@ public class TeaHouseModel{
 	/**底分类型 1:1/2/3/4 2:2/4/8/10 3:3/6/9/12*/
 	private Integer buttomScoreType;
 	
+	private Integer isNeedAudit;
+	
+	private Integer isDianXiaoer = 0;
+	
+	public Integer getIsDianXiaoer() {
+		return isDianXiaoer;
+	}
+	public void setIsDianXiaoer(Integer isDianXiaoer) {
+		this.isDianXiaoer = isDianXiaoer;
+	}
+	public Integer getIsNeedAudit() {
+		return isNeedAudit;
+	}
+	public void setIsNeedAudit(Integer isNeedAudit) {
+		this.isNeedAudit = isNeedAudit;
+	}
 	public Integer getButtomScoreType() {
 		return buttomScoreType;
 	}

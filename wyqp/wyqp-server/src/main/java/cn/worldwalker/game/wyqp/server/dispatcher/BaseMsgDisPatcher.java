@@ -128,6 +128,7 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.joinTeaHouse.msgType, MsgTypeEnum.joinTeaHouse);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.entryTeaHouse.msgType, MsgTypeEnum.entryTeaHouse);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.queryTeaHouseTablePlayerList.msgType, MsgTypeEnum.queryTeaHouseTablePlayerList);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.queryTableDetail.msgType, MsgTypeEnum.queryTableDetail);
 		
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.delFromTeaHouse.msgType, MsgTypeEnum.delFromTeaHouse);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.queryNeedAuditPlayerList.msgType, MsgTypeEnum.queryNeedAuditPlayerList);
@@ -137,6 +138,7 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.exitTeaHouse.msgType, MsgTypeEnum.exitTeaHouse);
 		
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.teaHouseConfig.msgType, MsgTypeEnum.teaHouseConfig);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.setDianXiaoer.msgType, MsgTypeEnum.setDianXiaoer);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.teaHouseBigWinner.msgType, MsgTypeEnum.teaHouseBigWinner);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.tuhaoBoard.msgType, MsgTypeEnum.tuhaoBoard);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.paishenBoard.msgType, MsgTypeEnum.paishenBoard);

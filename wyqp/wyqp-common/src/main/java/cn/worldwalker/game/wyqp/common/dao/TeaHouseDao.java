@@ -21,5 +21,7 @@ public interface TeaHouseDao {
 	public List<TeaHouseModel> getPlayerJoinedTeaHouseList(TeaHouseModel teaHouseModel);
 	public Integer updateTeaHouseByCondition(TeaHouseModel teaHouseModel);
 	public List<TeaHouseModel> getNeedAuditPlayerList(TeaHouseModel teaHouseModel);
+	public TeaHouseModel getTeaHouseByTeaHouseNum(TeaHouseModel teaHouseModel);
+	public Integer updateTeaHouseUserByCondition(TeaHouseModel teaHouseModel);
 	
 }

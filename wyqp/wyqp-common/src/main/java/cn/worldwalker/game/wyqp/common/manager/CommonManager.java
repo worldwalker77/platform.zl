@@ -58,22 +58,26 @@ public interface CommonManager {
 	public void createTeaHouse(TeaHouseModel teaHouseModel);
 	public List<TeaHouseModel> queryPlayerTeaHouseList(Integer playerId);
 	public void delTeaHouse(Integer teaHouseNum, Integer playerId);
-	public void joinTeaHouse(Integer teaHouseNum, Integer playerId, String nickName);
-	public void auditEntryTeaHouse(Integer teaHouseNum, Integer playerId, Integer status);
+	public void joinTeaHouse(Integer teaHouseNum, Integer playerId,String nickName, Integer status);
+	public void auditEntryTeaHouse(Integer teaHouseNum, Integer playerId, Integer otherPlayerId, Integer status);
 	public List<TeaHouseModel> queryTeaHousePlayerList(Integer teaHouseNum);
-	public TeaHouseModel getTeaHouseTypeByTeaHouseNum(Integer teaHouseNum);
+	public TeaHouseModel getTeaHouseTypeByTeaHouseNum(Integer teaHouseNum, Integer playerId);
 	public void delTeaHouseUser(Integer teaHouseNum, Integer otherPlayerId, Integer playerId);
 	public void delFromTeaHouse(Integer teaHouseNum, Integer playerId);
 	public List<TeaHouseModel> queryPlayerJoinedTeaHouseList(Integer teaHouseNum);
-	public List<UserRecordModel> getTeaHouseRecord(Integer teaHouseNum);
+	public List<UserRecordModel> getTeaHouseRecord(Integer teaHouseNum,Integer playerId);
 	public List<UserRecordModel> getMyTeaHouseRecord(Integer teaHouseNum, Integer playerId);
 	public boolean isPlayerInTeaHouse(Integer teaHouseNum, Integer playerId);
 	public boolean isTeaHouseExist(Integer teaHouseNum);
-	public void updateTeaHouseByCondition(Integer teaHouseNum, Integer playerId, String teaHouseOwnerWord);
+	public void teaHouseConfig(Integer teaHouseNum, Integer playerId, String teaHouseOwnerWord, Integer isNeedAudit);
+	
+	public void setDianXiaoer(Integer teaHouseNum, Integer playerId, Integer otherPlayerId, Integer isDianXiaoer);
 	
 	public List<UserRecordModel> getTeaHouseBigWinner(Integer teaHouseNum);
 	public List<UserRecordModel> getPaishenBoard();
 	
 	public List<TeaHouseModel> queryNeedAuditPlayerList(Integer teaHouseNum, Integer playerId);
+	
+	public TeaHouseModel getTeaHouseByTeaHouseNum(Integer teaHouseNum);
 	
 }
