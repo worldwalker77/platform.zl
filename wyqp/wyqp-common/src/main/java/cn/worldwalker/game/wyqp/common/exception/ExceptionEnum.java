@@ -34,6 +34,7 @@ public enum ExceptionEnum {
     NO_PERMISSION(28, "无权限"),
     TEA_HOUSE_NOT_EXIST(29, "茶楼号不存在"),
     CAN_NOT_REMOVE_SELF(30, "楼主或店小二不能移除自己，如果想移除，请通过删除或退出茶楼功能"),
+    SYSTEM_UPGRADE(31, "系统正在升级，开放时间请听代理通知"),
     /**斗牛100-199*/
     
     /**斗牛200-299*/

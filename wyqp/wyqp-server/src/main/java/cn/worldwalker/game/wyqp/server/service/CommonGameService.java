@@ -14,7 +14,9 @@ import cn.worldwalker.game.wyqp.common.domain.base.RedisRelaModel;
 import cn.worldwalker.game.wyqp.common.domain.base.TeaHouseModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.domain.jh.JhMsg;
+import cn.worldwalker.game.wyqp.common.domain.jh.JhRoomInfo;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnMsg;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.exception.BusinessException;
@@ -183,7 +185,15 @@ public class CommonGameService extends BaseGameService{
 
 	@Override
 	public BaseRoomInfo getRoomInfo(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
-		return null;
+		Integer roomId = userInfo.getRoomId();
+		RedisRelaModel model = redisOperationService.getGameTypeUpdateTimeByRoomId(roomId);
+		BaseRoomInfo roomInfo = null;
+		if (model.getGameType().equals(GameTypeEnum.nn.gameType)) {
+			roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, NnRoomInfo.class);
+		}else if(model.getGameType().equals(GameTypeEnum.jh.gameType)){
+			roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, JhRoomInfo.class);
+		}
+		return roomInfo;
 	}
 
 

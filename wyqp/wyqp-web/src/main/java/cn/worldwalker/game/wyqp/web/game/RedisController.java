@@ -34,6 +34,8 @@ public class RedisController {
 							response.setValue(GameInfoMemoryContainer.logFuse);
 						}else if("loginFuse".equals(request.getKey())){
 							response.setValue(GameInfoMemoryContainer.loginFuse);
+						}else if("createRoomFuse".equals(request.getKey())){
+							response.setValue(GameInfoMemoryContainer.createRoomFuse);
 						}else{
 							response.setDes("no such operation");
 						}
@@ -50,6 +52,9 @@ public class RedisController {
 						}else if("loginFuse".equals(request.getKey())){
 							GameInfoMemoryContainer.loginFuse = String.valueOf(request.getValue());
 							response.setValue(GameInfoMemoryContainer.loginFuse);
+						}else if("createRoomFuse".equals(request.getKey())){
+							GameInfoMemoryContainer.createRoomFuse = String.valueOf(request.getValue());
+							response.setValue(GameInfoMemoryContainer.createRoomFuse);
 						}else{
 							response.setDes("no such operation");
 						}

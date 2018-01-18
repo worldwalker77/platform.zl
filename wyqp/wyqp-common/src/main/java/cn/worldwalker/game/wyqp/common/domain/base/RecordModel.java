@@ -5,6 +5,14 @@ public class RecordModel {
 	private Integer score;
 	private String nickName;
 	private String headImgUrl;
+	private String ip;
+	
+	public String getIp() {
+		return ip;
+	}
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
 	public Integer getPlayerId() {
 		return playerId;
 	}

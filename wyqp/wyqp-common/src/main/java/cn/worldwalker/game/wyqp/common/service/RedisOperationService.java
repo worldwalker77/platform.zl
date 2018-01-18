@@ -469,33 +469,6 @@ public class RedisOperationService {
 		return JsonUtil.toObject(failInfoStr, RoomCardOperationFailInfo.class);
 	}
 	
-	
-	public boolean isLogFuseOpen(){
-		String logInfoFuseValue = "0";
-		if (gameInfoStorageType == 0 ) {
-			logInfoFuseValue = jedisTemplate.get(Constant.logInfoFuse);
-		}else{
-			logInfoFuseValue = GameInfoMemoryContainer.logFuse;
-		}
-		if ("1".equals(logInfoFuseValue)) {
-			return true;
-		}
-		return false;
-	}
-	
-	public boolean isLoginFuseOpen(){
-		String loginFuseValue = "0";
-		if (gameInfoStorageType == 0 ) {
-			loginFuseValue = jedisTemplate.get(Constant.loginFuse);
-		}else{
-			loginFuseValue = GameInfoMemoryContainer.loginFuse;
-		}
-		if ("1".equals(loginFuseValue)) {
-			return true;
-		}
-		return false;
-	}
-	
 	/**茶楼号+牌桌号->roomId 映射*/
 	public void setTeaHouseNumTableNumRoomId(Integer teaHouseNum, Integer tableNum, Integer roomId){
 		if (gameInfoStorageType == 0 ) {
@@ -557,6 +530,46 @@ public class RedisOperationService {
 			GameInfoMemoryContainer.playerIdTeaHouseNumMap.remove(String.valueOf(playerId));
 		}
 		
+	}
+	
+	
+	public boolean isLogFuseOpen(){
+		String logFuseValue = "0";
+		if (gameInfoStorageType == 0 ) {
+			logFuseValue = jedisTemplate.get(Constant.logFuse);
+		}else{
+			logFuseValue = GameInfoMemoryContainer.logFuse;
+		}
+		if ("1".equals(logFuseValue)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isLoginFuseOpen(){
+		String loginFuseValue = "0";
+		if (gameInfoStorageType == 0 ) {
+			loginFuseValue = jedisTemplate.get(Constant.loginFuse);
+		}else{
+			loginFuseValue = GameInfoMemoryContainer.loginFuse;
+		}
+		if ("1".equals(loginFuseValue)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isCreateRoomFuseOpen(){
+		String createRoomFuseValue = "0";
+		if (gameInfoStorageType == 0 ) {
+			createRoomFuseValue = jedisTemplate.get(Constant.createRoomFuse);
+		}else{
+			createRoomFuseValue = GameInfoMemoryContainer.createRoomFuse;
+		}
+		if ("1".equals(createRoomFuseValue)) {
+			return true;
+		}
+		return false;
 	}
 	
 }

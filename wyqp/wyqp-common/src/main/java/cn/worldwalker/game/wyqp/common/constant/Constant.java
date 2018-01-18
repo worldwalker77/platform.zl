@@ -21,9 +21,11 @@ public class Constant {
 	public final static String roomCardOperationFailList = curCompany + "_room_card_operation_fail_list";
 	
 	/**请求和返回信息日志打印开关*/
-	public final static String logInfoFuse = curCompany + "_log_info_fuse";
+	public final static String logFuse = curCompany + "_log_fuse";
 	/**登录切换开关*/
 	public final static String loginFuse = curCompany + "_login_fuse";
+	/**创建房间切换开关，主要是为了升级的时候，先停止玩家创建房间，再升级*/
+	public final static String createRoomFuse = curCompany + "_create_room_fuse";
 	
 	/**本机ip地址*/
 	public final static String localIp = CustomizedPropertyConfigurer.getContextProperty("local.ip");
