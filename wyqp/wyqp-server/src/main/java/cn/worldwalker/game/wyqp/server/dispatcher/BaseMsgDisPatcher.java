@@ -143,6 +143,7 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.tuhaoBoard.msgType, MsgTypeEnum.tuhaoBoard);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.paishenBoard.msgType, MsgTypeEnum.paishenBoard);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.openRoomList.msgType, MsgTypeEnum.openRoomList);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.queryAllPlayerRelatedTeaHouse.msgType, MsgTypeEnum.queryAllPlayerRelatedTeaHouse);
 		
 	}
 }

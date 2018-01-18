@@ -54,6 +54,7 @@
 		     					tea_house_type_id, 
 		     					tea_house_num, 
 		     					player_id,
+		     					nick_name,
 		     					tea_house_owner_word,
 		     					create_time,
 		     					update_time
@@ -62,6 +63,7 @@
 		     					#{teaHouseTypeId}, 
 		     					#{teaHouseNum},
 		     					#{playerId},
+		     					#{nickName},
 		     					#{teaHouseOwnerWord},
 		     					now(),
 		     					now()
@@ -120,22 +122,25 @@
 	    select player_id,nick_name,create_time,is_dian_xiaoer
 	    from t_tea_house_user
 	    where tea_house_num = #{teaHouseNum} and status=1
+	    limit 100
 	</select>
 	<select id="getPlayerTeaHouseList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
-	    select a.tea_house_id,a.tea_house_name,a.tea_house_num,a.create_time,
+	    select a.tea_house_id,a.tea_house_name,a.tea_house_num,a.create_time,a.player_id,a.nick_name,
 	    b.game_type,b.total_game,b.room_banker_type,b.multiple_limit,b.pay_type,b.buttom_score_type
 	    from t_tea_house a left join t_tea_house_type b
 	    on a.tea_house_type_id = b.tea_house_type_id
 	    where a.player_id = #{playerId}
 	    <if test="teaHouseTypeId != null"> and a.tea_house_type_id=#{teaHouseTypeId}</if>
+	    limit 25
 	</select>
 	
 	<select id="getPlayerJoinedTeaHouseList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
-	    select a.tea_house_num,b.player_id,a.status,c.game_type,c.total_game,c.room_banker_type,c.multiple_limit,c.pay_type,c.buttom_score_type
+	    select a.tea_house_num,b.player_id,b.nick_name,a.status,c.game_type,c.total_game,c.room_banker_type,c.multiple_limit,c.pay_type,c.buttom_score_type
 	    from t_tea_house_user a 
 	    left join t_tea_house b on a.tea_house_num = b.tea_house_num
 	    left join t_tea_house_type c on b.tea_house_type_id = c.tea_house_type_id
 	    where a.player_id = #{playerId} and a.status = 1
+	    limit 25
 	</select>
 	
 	<select id="getNeedAuditPlayerList"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
@@ -143,6 +148,7 @@
 	    from t_tea_house a left join t_tea_house_user b
 	    on a.tea_house_num = b.tea_house_num
 	    where a.tea_house_num = #{teaHouseNum} and b.status = 0
+	    limit 25
 	</select>
 	
 	<select id="getTeaHouseTypeByTeaHouseNum"  parameterType = "teaHouseModel" resultMap="teaHouseModelResultMap">
@@ -195,7 +201,7 @@
 	</select>
 	
 	<select id="updateTeaHouseUserByCondition"  parameterType = "teaHouseModel" >
-	    update t_tea_house
+	    update t_tea_house_user
 	    set is_dian_xiaoer = #{isDianXiaoer}
 	    where 1=1
 	    <if test="teaHouseNum != null"> and tea_house_num=#{teaHouseNum}</if>

@@ -130,6 +130,9 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case openRoomList:
 				commonGameService.openRoomList(ctx, request, userInfo);
 				break;
+			case queryAllPlayerRelatedTeaHouse:
+				commonGameService.queryAllPlayerRelatedTeaHouse(ctx, request, userInfo);
+				break;
 			default:
 				break;
 			}

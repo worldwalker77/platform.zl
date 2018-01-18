@@ -40,6 +40,7 @@ public enum MsgTypeEnum {
 	tuhaoBoard(50, "土豪榜"),
 	paishenBoard(51, "牌神榜"),
 	openRoomList(52, "已开房"),
+	queryAllPlayerRelatedTeaHouse(53, "大厅中查询玩家相关茶楼列表"),
 	
 	createTeaHouse(80, "创建茶楼"),
 	queryPlayerTeaHouseList(81, "查询玩家茶楼列表"),
