@@ -69,7 +69,6 @@ public class JhCardResource {
 			}
 		}
 		JhCardRule.rankCards(playerCards);
-		System.out.println(JsonUtil.toJson(playerCards));
 		return playerCards;
 	}
 	

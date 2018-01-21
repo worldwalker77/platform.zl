@@ -92,7 +92,6 @@ public class VersionServiceImpl implements VersionService{
 	public static void main(String[] args) {
 		String fileName = "1111.rar";
 		String version = fileName.substring(0, fileName.length() - 4);
-		System.out.println(version);
 	}
 
 	@Override

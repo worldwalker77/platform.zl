@@ -78,7 +78,7 @@ public class Constant {
 	public final static String getTicketUrl = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=ACCESS_TOKEN&type=jsapi";
 	
 	public final static String domain = CustomizedPropertyConfigurer.getContextProperty("domain");
-	public final static String staticNginxRoot = CustomizedPropertyConfigurer.getContextProperty("static.nginx.root");
+	public final static String staticNginxRoot = CustomizedPropertyConfigurer.getContextProperty("static.nginx.root");//"C:/Users/jinfeng.liu/Desktop/game-yl";//
 	public final static String weixinHeadimgFolder = CustomizedPropertyConfigurer.getContextProperty("weixin.headimg.folder");
 	public final static String h5GameStaticFolder = CustomizedPropertyConfigurer.getContextProperty("h5.game.static.folder");
 	

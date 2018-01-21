@@ -60,7 +60,6 @@ public class WxController {
         Map<String, Object> ret = new HashMap<String, Object>();
         String appId = Constant.APPID; // 必填，公众号的唯一标识
 //        String requestUrl = request.getRequestURL().toString();
-        System.out.println(url);
         String timestamp = Long.toString(System.currentTimeMillis() / 1000); // 必填，生成签名的时间戳
         String nonceStr = UUID.randomUUID().toString(); // 必填，生成签名的随机串
         

@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -379,7 +381,6 @@ public abstract class BaseGameService {
 	}
 	
 	public void refreshRoomForAllPlayer(BaseRoomInfo roomInfo){
-		System.out.println("============roomInfo:" + JsonUtil.toJson(roomInfo));
 		Result result = new Result();
 		result.setGameType(roomInfo.getGameType());
 		result.setMsgType(MsgTypeEnum.refreshRoom.msgType);
@@ -395,7 +396,6 @@ public abstract class BaseGameService {
 			List<BaseRoomInfo> roomInfoList = doRefreshRoom(null, null, userInfo);
 			BaseRoomInfo returnRoomInfo = roomInfoList.get(1);
 			result.setData(returnRoomInfo);
-			System.out.println("=========playerId:"+ playerInfo.getPlayerId());
 			/**返回给当前玩家刷新信息*/
 			channelContainer.sendTextMsgByPlayerIds(result, playerInfo.getPlayerId());
 		}
@@ -1133,21 +1133,19 @@ public abstract class BaseGameService {
 		Integer playerId = request.getMsg().getPlayerId();
 		List<TeaHouseModel> playerTeaHouseList = commonManager.queryPlayerTeaHouseList(playerId);
 		List<TeaHouseModel> playerJoinedTeaHouseList = commonManager.queryPlayerJoinedTeaHouseList(playerId);
-		int size = playerJoinedTeaHouseList.size();
-		List<Integer> needRemoveList = new ArrayList<Integer>();
+		Map<Integer, TeaHouseModel> map = new HashMap<Integer, TeaHouseModel>();
 		for(TeaHouseModel teaHouseModel : playerTeaHouseList){
-			for(int i = 0; i < size; i++){
-				TeaHouseModel joinedTeaHouseModel = playerJoinedTeaHouseList.get(i);
-				if (teaHouseModel.getTeaHouseNum().equals(joinedTeaHouseModel.getTeaHouseNum())) {
-					needRemoveList.add(i);
-				}
-			}
+			map.put(teaHouseModel.getTeaHouseNum(), teaHouseModel);
 		}
-		for(Integer index : needRemoveList){
-			playerJoinedTeaHouseList.remove(index);
+		for(TeaHouseModel teaHouseModel : playerJoinedTeaHouseList){
+			map.put(teaHouseModel.getTeaHouseNum(), teaHouseModel);
 		}
-		playerTeaHouseList.addAll(playerJoinedTeaHouseList);
-		result.setData(playerTeaHouseList);
+		List<TeaHouseModel> resList = new ArrayList<TeaHouseModel>();
+		Set<Entry<Integer, TeaHouseModel>> set = map.entrySet();
+		for(Entry<Integer, TeaHouseModel> en : set){
+			resList.add(en.getValue());
+		}
+		result.setData(resList);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	
@@ -1274,6 +1272,7 @@ public abstract class BaseGameService {
 		Integer roomId = redisOperationService.getRoomIdByTeaHouseNumTableNum(teaHouseNum, tableNum);
 		List<RecordModel> returnList = new ArrayList<RecordModel>(); 
 		if (roomId != null) {
+			userInfo.setRoomId(roomId);
 			BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
 			List playerList = roomInfo.getPlayerList();
 			int size = playerList.size();

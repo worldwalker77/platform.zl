@@ -111,6 +111,5 @@ public class CardResource {
 	
 	public static void main(String[] args) {
 	//	genCardResource();
-		System.out.println(JsonUtil.toJson(dealCards(4)));
 	}
 }

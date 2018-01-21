@@ -204,7 +204,7 @@ public class NnGameService extends BaseGameService{
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 		
 		/**如果准备的玩家数为2，则启动计时器，并返回消息告诉前端开始10秒计时*/
-		if (readyCount == 2) {
+		if (readyCount == 1 && (size - observerCount) > 1) {
 			redisOperationService.setNotReadyIpRoomIdTime(roomId);
 			result.setMsgType(MsgTypeEnum.notReadyTimer.msgType);
 			channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));

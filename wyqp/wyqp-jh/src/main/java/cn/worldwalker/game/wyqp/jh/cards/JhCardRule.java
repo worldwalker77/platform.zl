@@ -144,7 +144,6 @@ public class JhCardRule {
 			probilityPlayer.setWinProbabilityGameIndexList(needProbabilityGameIndexList(curGame, totalGames + 1, needProbabilityGamesCount));
 		}
 		List<Integer> winProbabilityGameIndexList = probilityPlayer.getWinProbabilityGameIndexList();
-		System.out.println(JsonUtil.toJson(winProbabilityGameIndexList));
 		if (CollectionUtils.isEmpty(winProbabilityGameIndexList)) {
 			return;
 		}

@@ -70,7 +70,6 @@ public class NnCardResource {
 			}
 		}
 		NnCardRule.rankCards(playerCards);
-		System.out.println(JsonUtil.toJson(playerCards));
 		return playerCards;
 	}
 	
@@ -92,7 +91,6 @@ public class NnCardResource {
 				playerCards.get(j).add(card);
 			}
 		}
-		System.out.println(JsonUtil.toJson(playerCards));
 		return playerCards;
 	}
 	

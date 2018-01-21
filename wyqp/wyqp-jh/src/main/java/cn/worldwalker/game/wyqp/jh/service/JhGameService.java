@@ -84,7 +84,7 @@ public class JhGameService extends BaseGameService{
 		/**玩家已经准备计数*/
 		int readyCount = 0;
 		/**观察者玩家计数  addby liujinfengnew*/
-//		int observerCount = 0;
+		int observerCount = 0;
 		int size = playerList.size();
 		for(int i = 0; i < size; i++){
 			JhPlayerInfo player = playerList.get(i);
@@ -95,12 +95,12 @@ public class JhGameService extends BaseGameService{
 			if (JhPlayerStatusEnum.ready.status.equals(player.getStatus())) {
 				readyCount++;
 			}
-//			if (JhPlayerStatusEnum.observer.status.equals(player.getStatus())) {
-//				observerCount++;
-//			}
+			if (JhPlayerStatusEnum.observer.status.equals(player.getStatus())) {
+				observerCount++;
+			}
 		}
 		
-		if (readyCount > 1 && readyCount == size) {
+		if (readyCount > 1 && readyCount == (size - observerCount)) {
 			
 			/**开始发牌时将房间内当前局数+1*/
 			roomInfo.setCurGame(roomInfo.getCurGame() + 1);
@@ -150,7 +150,7 @@ public class JhGameService extends BaseGameService{
 		data.put("playerId", userInfo.getPlayerId());
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 		/**如果准备的玩家数为2，则启动计时器，并返回消息告诉前端开始10秒计时*/
-		if (readyCount == 2) {
+		if (readyCount == 1 && (size - observerCount) > 1) {
 			redisOperationService.setNotReadyIpRoomIdTime(roomId);
 			result.setMsgType(MsgTypeEnum.notReadyTimer.msgType);
 			channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));

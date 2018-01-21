@@ -1,7 +1,10 @@
 package cn.worldwalker.game.wyqp.common.utils;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,6 +23,27 @@ public class IPUtil {
 		}
 		return ip;
 	}
+	
+	public static String getLocalIp1(){
+		StringBuilder IFCONFIG=new StringBuilder();  
+		   try {  
+		       for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {  
+		           NetworkInterface intf = en.nextElement();  
+		           for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {  
+		               InetAddress inetAddress = enumIpAddr.nextElement();  
+		               if (!inetAddress.isLoopbackAddress() && !inetAddress.isLinkLocalAddress() && inetAddress.isSiteLocalAddress()) {  
+		               IFCONFIG.append(inetAddress.getHostAddress().toString()+"\n");  
+		               }  
+		  
+		           }  
+		       }  
+		   } catch (SocketException ex) {  
+		   }  
+		   System.out.println(IFCONFIG);
+		   return null;
+	}
+	
+	
 	
     public static String getRemoteIp(HttpServletRequest request ) {
     	String newIP = request.getHeader("J-Forwarded-For");
