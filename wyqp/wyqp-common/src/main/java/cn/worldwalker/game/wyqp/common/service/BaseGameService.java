@@ -92,7 +92,7 @@ public abstract class BaseGameService {
 		UserModel userModel = commonManager.getUserByWxOpenId(weixinUserInfo.getOpneid());
 		if (null == userModel) {
 			userModel = new UserModel();
-			userModel.setNickName(weixinUserInfo.getName());
+			userModel.setNickName(GameUtil.emojiFilter(weixinUserInfo.getName()));
 			userModel.setHeadImgUrl(weixinUserInfo.getHeadImgUrl());
 			userModel.setWxOpenId(weixinUserInfo.getOpneid());
 			userModel.setRoomCardNum(10);

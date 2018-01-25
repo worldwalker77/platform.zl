@@ -134,6 +134,7 @@ public class NnGameService extends BaseGameService{
 				player.setNnCardList(nnCardList);
 				player.setRobFourCardList(robFourCardList);
 				player.setFifthCard(fifthCard);
+				player.setCurScore(0);
 				/**设置每个玩家的解散房间状态为不同意解散，后面大结算返回大厅的时候回根据此状态判断是否解散房间*/
 				player.setDissolveStatus(DissolveStatusEnum.disagree.status);
 			}
@@ -520,12 +521,13 @@ public class NnGameService extends BaseGameService{
 				continue;
 			}
 			if (!roomInfo.getRoomBankerId().equals(player.getPlayerId())) {
+				/**如果闲家的牌大于庄家*/
 				if (NnCardRule.cardTypeCompare(player, roomBankerPlayer) > 0) {
 					
 					Integer cardTypeMultiple = NnCardTypeEnum.getNnCardTypeEnum(player.getCardType()).multiple;
 					/**如果是抢庄类型，则需要计算抢庄时候的倍数*/
 					if (roomInfo.getRoomBankerType().equals(NnRoomBankerTypeEnum.robBanker.type)) {
-						cardTypeMultiple = cardTypeMultiple*roomInfo.getRobMultiple();
+						cardTypeMultiple = cardTypeMultiple*roomBankerPlayer.getRobMultiple();
 					}
 					Integer settedMultiple = roomInfo.getMultipleLimit();
 					Integer multiple = cardTypeMultiple;
@@ -535,14 +537,18 @@ public class NnGameService extends BaseGameService{
 						multiple = cardTypeMultiple;
 					}
 					Integer winScore = player.getStakeScore()*multiple;
-					player.setCurScore(winScore);
-					player.setTotalScore(player.getTotalScore() + player.getCurScore());
+					player.setCurScore(player.getCurScore() + winScore);
+					player.setTotalScore(player.getTotalScore() + winScore);
 					player.setWinTimes(player.getWinTimes() + 1);
-					roomBankerPlayer.setCurScore(0 - winScore);
-					roomBankerPlayer.setTotalScore(roomBankerPlayer.getTotalScore() + roomBankerPlayer.getCurScore());
+					roomBankerPlayer.setCurScore(roomBankerPlayer.getCurScore() - winScore);
+					roomBankerPlayer.setTotalScore(roomBankerPlayer.getTotalScore() - winScore);
 					roomBankerPlayer.setLoseTimes(roomBankerPlayer.getLoseTimes() + 1);
-				}else{
+				}else{/**如果庄家的牌大于闲家*/
 					Integer cardTypeMultiple = NnCardTypeEnum.getNnCardTypeEnum(roomBankerPlayer.getCardType()).multiple;
+					/**如果是抢庄类型，则需要计算抢庄时候的倍数*/
+					if (roomInfo.getRoomBankerType().equals(NnRoomBankerTypeEnum.robBanker.type)) {
+						cardTypeMultiple = cardTypeMultiple*roomBankerPlayer.getRobMultiple();
+					}
 					Integer settedMultiple = roomInfo.getMultipleLimit();
 					Integer multiple = cardTypeMultiple;
 					if (cardTypeMultiple > settedMultiple) {
@@ -551,11 +557,11 @@ public class NnGameService extends BaseGameService{
 						multiple = cardTypeMultiple;
 					}
 					Integer winScore = player.getStakeScore()*multiple;
-					player.setCurScore(0 - winScore);
-					player.setTotalScore(player.getTotalScore() + player.getCurScore());
+					player.setCurScore(player.getCurScore() - winScore);
+					player.setTotalScore(player.getTotalScore() - winScore);
 					player.setLoseTimes(player.getLoseTimes() + 1);
-					roomBankerPlayer.setCurScore(winScore);
-					roomBankerPlayer.setTotalScore(roomBankerPlayer.getTotalScore() + roomBankerPlayer.getCurScore());
+					roomBankerPlayer.setCurScore(roomBankerPlayer.getCurScore() + winScore);
+					roomBankerPlayer.setTotalScore(roomBankerPlayer.getTotalScore() + winScore);
 					roomBankerPlayer.setWinTimes(roomBankerPlayer.getWinTimes() + 1);
 				}
 			}

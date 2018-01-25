@@ -88,6 +88,7 @@ public class NnShowCardOverTimeNoticeJob {
 						UserInfo userInfo = new UserInfo();
 						userInfo.setPlayerId(player.getPlayerId());
 						userInfo.setRoomId(roomId);
+						log.info("==============自动亮牌============");
 						nnGameService.showCard(null, null, userInfo);
 					}
 				}
@@ -97,5 +98,62 @@ public class NnShowCardOverTimeNoticeJob {
 			}
 		}
 		
+	}
+	
+	
+	public static void main(String[] args) {
+		NnRoomInfo roomInfo = new NnRoomInfo();
+		roomInfo.setRoomId(147155);
+		roomInfo.setRoomBankerId(20006);
+		roomInfo.setRoomBankerType(3);
+		roomInfo.setCurGame(5);
+		roomInfo.setGameType(1);
+		roomInfo.setTotalGames(10);
+		roomInfo.setPayType(1);
+		roomInfo.setMultipleLimit(10000);
+		roomInfo.setStatus(3);
+		
+		NnPlayerInfo player1 = new NnPlayerInfo();
+		player1.setPlayerId(20000);
+		player1.setNickName("有基没汤");
+		player1.setStatus(4);
+		NnPlayerInfo player2 = new NnPlayerInfo();
+		player2.setPlayerId(20006);
+		player2.setNickName("worldwalker");
+		player2.setStatus(4);
+		NnPlayerInfo player3 = new NnPlayerInfo();
+		player3.setPlayerId(20000);
+		player3.setNickName("有基没汤");
+		player3.setStatus(0);
+		roomInfo.getPlayerList().add(player1);
+		roomInfo.getPlayerList().add(player2);
+		roomInfo.getPlayerList().add(player3);
+		
+		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
+		for(NnPlayerInfo player : playerList){
+			/**如果是庄家*/
+			if (roomInfo.getRoomBankerId().equals(player.getPlayerId())) {
+				if (roomInfo.getRoomBankerType().equals(NnRoomBankerTypeEnum.robBanker.type)) {
+					if (player.getStatus() < NnPlayerStatusEnum.rob.status) {
+						continue;
+					}
+				}else{
+					if (player.getStatus() < NnPlayerStatusEnum.ready.status) {
+						continue;
+					}
+				}
+			}else{/**如果不是庄家*/
+				/**玩家状态小于已压分，则说明是观察者*/
+				if (player.getStatus() < NnPlayerStatusEnum.stakeScore.status) {
+					continue;
+				}
+			}
+			
+			if (player.getStatus() < NnPlayerStatusEnum.showCard.status) {
+				UserInfo userInfo = new UserInfo();
+				userInfo.setPlayerId(player.getPlayerId());
+				log.info("==============自动亮牌============playerId:" + player.getPlayerId());
+			}
+		}
 	}
 }

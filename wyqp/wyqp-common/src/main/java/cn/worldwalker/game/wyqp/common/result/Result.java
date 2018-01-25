@@ -14,7 +14,6 @@ public class Result implements Serializable{
 	private int msgType;
 	private int gameType;
 	private Object data;
-	private long msgId;
 	
 	public Result(int code, String desc, int msgType){
 		this.code = code;
@@ -76,12 +75,4 @@ public class Result implements Serializable{
 		this.gameType = gameType;
 	}
 
-	public long getMsgId() {
-		return msgId;
-	}
-
-	public void setMsgId(long msgId) {
-		this.msgId = msgId;
-	}
-	
 }

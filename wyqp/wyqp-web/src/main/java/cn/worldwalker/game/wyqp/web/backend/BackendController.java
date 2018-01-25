@@ -1,7 +1,9 @@
 package cn.worldwalker.game.wyqp.web.backend;
 
 import java.util.Date;
+import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,13 +55,13 @@ public class BackendController {
 		mv.addObject("mobilePhone", RequestUtil.getUserSession().getMobilePhone());
 		mv.addObject("wechatNum", RequestUtil.getUserSession().getWechatNum());
 		GameQuery gameQuery = new GameQuery();
-		gameQuery.setProxyId(RequestUtil.getProxyId());
-		Result result = backendService.getProxyInfo(gameQuery);
+		gameQuery.setPlayerId(RequestUtil.getUserSession().getPlayerId());
+		Result result = backendService.getUserByCondition(gameQuery);
 		if (result.getCode() == 0) {
-			GameModel gameModel = (GameModel)result.getData();
-			mv.addObject("totalIncome", gameModel.getTotalIncome());
-			mv.addObject("extractAmount", gameModel.getExtractAmount());
-			mv.addObject("remainderAmount", gameModel.getRemainderAmount());
+			List<GameModel> gameModelList = (List<GameModel>)result.getData();
+			if (CollectionUtils.isNotEmpty(gameModelList)) {
+				mv.addObject("roomCardNum", gameModelList.get(0).getRoomCardNum());
+			}
 		}
 		mv.setViewName("backend/proxy/proxyInfo");
 		return mv;

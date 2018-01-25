@@ -45,17 +45,17 @@
 		    </div>
 		    <div class="weui-cell__ft">${wechatNum}</div>
 		  </div>
+		  <div class="weui-cell">
+		    <div class="weui-cell__hd"><img src=""></div>
+		    <div class="weui-cell__bd">
+		      <p>房卡数</p>
+		    </div>
+		    <div class="weui-cell__ft">${roomCardNum}</div>
+		  </div>
 		</div>
 		
 		
 		<div class="weui-cells">
-		  <div class="weui-cell">
-		    <div class="weui-cell__hd"><img src=""></div>
-		    <div class="weui-cell__bd">
-		      <p>累计收益(元)</p>
-		    </div>
-		    <div class="weui-cell__ft">${totalIncome}</div>
-		  </div>
 		  <div class="weui-cell">
 		    <div class="weui-cell__hd"><img src=""></div>
 		    <div class="weui-cell__bd">

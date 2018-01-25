@@ -78,8 +78,8 @@
 	</select>
 	
 	<select id="getTeaHouseRecord"  parameterType = "cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel" resultMap="userRecordResultMap">
-	    select room_id,tea_house_num,table_num, record_info, remark,create_time from t_user_record 
-	    where tea_house_num = #{teaHouseNum} group by room_id order by create_time desc limit 20
+	    select distinct room_id,tea_house_num,table_num, record_info, remark,create_time from t_user_record 
+	    where tea_house_num = #{teaHouseNum} order by create_time desc limit 20
 	</select>
 	
 	<select id="getMyTeaHouseRecord"  parameterType = "cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel" resultMap="userRecordResultMap">

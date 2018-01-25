@@ -70,7 +70,14 @@ public class CommonManagerImpl implements CommonManager{
 	}
 	@Override
 	public void insertUser(UserModel userModel){
-		userDao.insertUser(userModel);
+		try {
+			userDao.insertUser(userModel);
+		} catch (Exception e) {
+			log.error("插入用户信息异常", e);
+			userModel.setNickName(String.valueOf(userModel.getPlayerId()));
+			userDao.insertUser(userModel);
+			
+		}
 	}
 	
 	@Transactional
@@ -601,7 +608,7 @@ public class CommonManagerImpl implements CommonManager{
 	@Override
 	public void setDianXiaoer(Integer teaHouseNum, Integer playerId,
 			Integer otherPlayerId, Integer isDianXiaoer) {
-		if (!isTeaHouseOwner(teaHouseNum, otherPlayerId)) {
+		if (!isTeaHouseOwner(teaHouseNum, playerId)) {
 			throw new BusinessException(ExceptionEnum.NO_PERMISSION);
 		}
 		TeaHouseModel teaHouseModel = new TeaHouseModel();

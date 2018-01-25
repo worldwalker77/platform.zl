@@ -29,7 +29,7 @@ public class RoomInfoCleanJob /**extends SingleServerJobByRedis*/ {
 		
 		List<RedisRelaModel> list = redisOperationService.getAllRoomIdGameTypeUpdateTime();
 		for(RedisRelaModel model : list){
-			if (System.currentTimeMillis() - model.getUpdateTime() > 10*60*1000) {
+			if (System.currentTimeMillis() - model.getUpdateTime() > 5*60*1000) {
 				BaseRoomInfo roomInfo = null;
 				if (GameTypeEnum.nn.gameType.equals(model.getGameType()) ) {
 					roomInfo = redisOperationService.getRoomInfoByRoomId(model.getRoomId(), NnRoomInfo.class);

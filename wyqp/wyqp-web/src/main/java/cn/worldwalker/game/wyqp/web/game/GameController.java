@@ -21,6 +21,7 @@ import cn.worldwalker.game.wyqp.common.manager.CommonManager;
 import cn.worldwalker.game.wyqp.common.result.Result;
 import cn.worldwalker.game.wyqp.common.service.BaseGameService;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
+import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import cn.worldwalker.game.wyqp.nn.service.NnGameService;
 
 @Controller
@@ -42,6 +43,7 @@ public class GameController {
 	@RequestMapping("login")
 	@ResponseBody
 	public Result login(String code,String deviceType,HttpServletResponse response,HttpServletRequest request){
+		log.info("请求 ,登录: code=" + code);
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		Result result = new Result();
 		try {
@@ -56,6 +58,7 @@ public class GameController {
 			result.setCode(1);
 			result.setDesc("系统异常");
 		}
+		log.info("返回 ,登录: " + JsonUtil.toJson(result));
 		return result;
 	}
 	/**
