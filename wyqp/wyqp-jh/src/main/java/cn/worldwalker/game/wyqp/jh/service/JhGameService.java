@@ -588,7 +588,9 @@ public class JhGameService extends BaseGameService{
 		newRoomInfo.setPrePlayerStakeScore(roomInfo.getPrePlayerStakeScore());
 		newRoomInfo.setPrePlayerStatus(roomInfo.getPrePlayerStatus());
 		newRoomInfo.setTotalStakeTimes(roomInfo.getTotalStakeTimes());
-		
+		/**茶楼相关*/
+		newRoomInfo.setTeaHouseNum(roomInfo.getTeaHouseNum());
+		newRoomInfo.setTableNum(roomInfo.getTableNum());
 		for(JhPlayerInfo player : playerList){
 			JhPlayerInfo newPlayer = new JhPlayerInfo();
 			/**玩家信息公共字段*/

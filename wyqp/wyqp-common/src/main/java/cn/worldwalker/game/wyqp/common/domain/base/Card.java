@@ -1,21 +1,24 @@
 package cn.worldwalker.game.wyqp.common.domain.base;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class Card {
 	
 	/**花色*/
 	private Integer cardSuit;
 	/**花色名称*/
-	private String cardSuitName;
+//	private String cardSuitName;
 	/**真实牌值*/
 	private Integer cardValue;
 	/**索引值*/
-	private Integer cardIndex;
+//	private Integer cardIndex;
 	
 	public Card copy(){
 		Card card = new Card();
-		card.setCardIndex(cardIndex);
+//		card.setCardIndex(cardIndex);
 		card.setCardSuit(cardSuit);
-		card.setCardSuitName(cardSuitName);
+//		card.setCardSuitName(cardSuitName);
 		card.setCardValue(cardValue);
 		return card;
 	}
@@ -30,18 +33,6 @@ public class Card {
 	}
 	public void setCardValue(Integer cardValue) {
 		this.cardValue = cardValue;
-	}
-	public Integer getCardIndex() {
-		return cardIndex;
-	}
-	public void setCardIndex(Integer cardIndex) {
-		this.cardIndex = cardIndex;
-	}
-	public String getCardSuitName() {
-		return cardSuitName;
-	}
-	public void setCardSuitName(String cardSuitName) {
-		this.cardSuitName = cardSuitName;
 	}
 	
 }

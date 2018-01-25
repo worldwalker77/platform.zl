@@ -1,7 +1,9 @@
 package cn.worldwalker.game.wyqp.common.domain.nn;
 
-import cn.worldwalker.game.wyqp.common.domain.base.BaseMsg;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import cn.worldwalker.game.wyqp.common.domain.base.BaseMsg;
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class NnMsg extends BaseMsg{
 	
 	private Integer roomBankerType;

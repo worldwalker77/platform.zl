@@ -2,9 +2,11 @@ package cn.worldwalker.game.wyqp.common.domain.nn;
 
 import java.util.List;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 import cn.worldwalker.game.wyqp.common.domain.base.BasePlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.Card;
-
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class NnPlayerInfo extends BasePlayerInfo{
 	/**押注分数 1,2,3,4,5*/
 	private Integer stakeScore;

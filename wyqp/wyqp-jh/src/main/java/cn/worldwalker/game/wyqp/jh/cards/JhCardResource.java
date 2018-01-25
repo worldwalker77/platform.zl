@@ -23,10 +23,10 @@ public class JhCardResource {
 		List<Card> cardList = new ArrayList<Card>();
 		for(int i = 0; i < CARD_MAX_VALUE; i++){
 			Card card = new Card();
-			card.setCardIndex(i);
+//			card.setCardIndex(i);
 			CardSuitEnum suitEnum = CardSuitEnum.getCardSuitBySuit(i/13 + 1);
 			card.setCardSuit(suitEnum.suit);
-			card.setCardSuitName(suitEnum.name);
+//			card.setCardSuitName(suitEnum.name);
 			card.setCardValue(i%13 + 2);
 			cardList.add(card);
 		}

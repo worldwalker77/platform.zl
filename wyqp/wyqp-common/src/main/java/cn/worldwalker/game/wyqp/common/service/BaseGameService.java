@@ -1100,6 +1100,7 @@ public abstract class BaseGameService {
 				break;
 			}
 		commonManager.createTeaHouse(teaHouseModel);
+		data.put("gameType", gameType);
 		data.put("teaHouseNum", teaHouseNum);
 		data.put("totalGame", msg.getTotalGames());
 		data.put("payType", msg.getPayType());

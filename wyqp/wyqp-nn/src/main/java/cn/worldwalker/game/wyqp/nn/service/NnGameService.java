@@ -783,7 +783,9 @@ public class NnGameService extends BaseGameService{
 		newRoomInfo.setCurGame(roomInfo.getCurGame());
 		newRoomInfo.setPayType(roomInfo.getPayType());
 		newRoomInfo.setMultipleLimit(roomInfo.getMultipleLimit());
-		
+		/**茶楼相关*/
+		newRoomInfo.setTeaHouseNum(roomInfo.getTeaHouseNum());
+		newRoomInfo.setTableNum(roomInfo.getTableNum());
 		for(NnPlayerInfo player : playerList){
 			NnPlayerInfo newPlayer = new NnPlayerInfo();
 			newPlayer.setPlayerId(player.getPlayerId());

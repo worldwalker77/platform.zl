@@ -3,6 +3,8 @@ package cn.worldwalker.game.wyqp.common.domain.base;
 import java.util.Date;
 import java.util.List;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class BaseRoomInfo {
 	/**房间id*/
 	private Integer roomId;

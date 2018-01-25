@@ -45,22 +45,22 @@ public class CardResource {
 		List<Card> cardList = new ArrayList<Card>();
 		for(int i = 0; i < CARD_MAX_VALUE; i++){
 			Card card = new Card();
-			card.setCardIndex(i);
+//			card.setCardIndex(i);
 			if (i <= 35) {
 				card.setCardSuit(MjCardSuitEnum.TONG.suit);
-				card.setCardSuitName(MjCardSuitEnum.TONG.name);
+//				card.setCardSuitName(MjCardSuitEnum.TONG.name);
 				card.setCardValue(i%CARD_LOOP_NINE + 1);
 			}else if(i >= 36 && i <= 71){
 				card.setCardSuit(MjCardSuitEnum.TIAO.suit);
-				card.setCardSuitName(MjCardSuitEnum.TIAO.name);
+//				card.setCardSuitName(MjCardSuitEnum.TIAO.name);
 				card.setCardValue(i%CARD_LOOP_NINE + 1);
 			}else if(i >= 72 && i <= 107){
 				card.setCardSuit(MjCardSuitEnum.WAN.suit);
-				card.setCardSuitName(MjCardSuitEnum.WAN.name);
+//				card.setCardSuitName(MjCardSuitEnum.WAN.name);
 				card.setCardValue(i%CARD_LOOP_NINE + 1);
 			}else{
 				card.setCardSuit(MjCardSuitEnum.FENG.suit);
-				card.setCardSuitName(MjCardSuitEnum.FENG.name);
+//				card.setCardSuitName(MjCardSuitEnum.FENG.name);
 				card.setCardValue((i - 108)%CARD_LOOP_SEVEN + 1);
 			}
 			

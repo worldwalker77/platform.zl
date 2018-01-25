@@ -2,6 +2,8 @@ package cn.worldwalker.game.wyqp.common.domain.base;
 
 import java.util.List;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class BaseMsg {
 	
 	private Integer roomId;

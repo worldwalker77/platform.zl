@@ -1,7 +1,9 @@
 package cn.worldwalker.game.wyqp.common.domain.jh;
 
-import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class JhRequest extends BaseRequest{
 	
 	private JhMsg msg = new JhMsg();

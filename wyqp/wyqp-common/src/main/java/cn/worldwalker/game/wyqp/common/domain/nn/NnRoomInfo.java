@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class NnRoomInfo  extends BaseRoomInfo{
 	
 	private Integer roomBankerType;

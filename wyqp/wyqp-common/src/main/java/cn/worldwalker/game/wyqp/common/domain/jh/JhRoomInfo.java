@@ -3,8 +3,10 @@ package cn.worldwalker.game.wyqp.common.domain.jh;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class JhRoomInfo  extends BaseRoomInfo{
 	
 	/**底注*/

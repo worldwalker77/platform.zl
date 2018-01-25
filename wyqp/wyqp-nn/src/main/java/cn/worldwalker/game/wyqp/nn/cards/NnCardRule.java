@@ -97,9 +97,9 @@ public class NnCardRule {
 	}
 	
 	public static void cardCopy(Card srcCard, Card tarCard){
-		tarCard.setCardIndex(srcCard.getCardIndex());
+//		tarCard.setCardIndex(srcCard.getCardIndex());
 		tarCard.setCardSuit(srcCard.getCardSuit());
-		tarCard.setCardSuitName(srcCard.getCardSuitName());
+//		tarCard.setCardSuitName(srcCard.getCardSuitName());
 		tarCard.setCardValue(srcCard.getCardValue());
 	}
 	
