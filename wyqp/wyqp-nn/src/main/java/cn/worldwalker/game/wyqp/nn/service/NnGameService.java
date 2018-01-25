@@ -800,6 +800,9 @@ public class NnGameService extends BaseGameService{
 			}else{
 				newPlayer.setOnlineStatus(player.getOnlineStatus());
 			}
+			if (NnPlayerStatusEnum.observer.status.equals(player.getStatus())) {
+				continue;
+			}
 			switch (roomStatusEnum) {
 				case justBegin:
 					break;
@@ -846,6 +849,9 @@ public class NnGameService extends BaseGameService{
 					}
 					break;
 				case curGameOver:
+					if (NnPlayerStatusEnum.notReady.status.equals(player.getStatus())) {
+						continue;
+					}
 					newPlayer.setCurScore(player.getCurScore());
 					if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
 						List<Card> list = player.getRobFourCardList();

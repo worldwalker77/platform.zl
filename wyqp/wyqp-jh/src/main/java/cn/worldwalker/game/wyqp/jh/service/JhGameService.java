@@ -616,6 +616,9 @@ public class JhGameService extends BaseGameService{
 			}else{
 				newPlayer.setOnlineStatus(player.getOnlineStatus());
 			}
+			if (JhPlayerStatusEnum.observer.status.equals(player.getStatus())) {
+				continue;
+			}
 			switch (roomStatusEnum) {
 				case justBegin:
 					break;
