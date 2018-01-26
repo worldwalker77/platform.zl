@@ -120,6 +120,8 @@ public class NnGameService extends BaseGameService{
 		if (readyCount > 1 && readyCount == (size - observerCount)) {
 			/**开始发牌时将房间内当前局数+1*/
 			roomInfo.setCurGame(roomInfo.getCurGame() + 1);
+			/**计算庄家*/
+			setRoomBankerId(roomInfo);
 			/**发牌*/
 			List<List<Card>> playerCards = NnCardResource.dealCardsWithOutRank(size);
 			/**为每个玩家设置牌及牌型*/
@@ -378,8 +380,10 @@ public class NnGameService extends BaseGameService{
 				/**如果是看牌抢庄类型，则拿到第五张牌，再和前四张牌一起返回*/
 				if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
 					List<Card> list = player.getRobFourCardList();
-					list.add(player.getFifthCard());
-					data.put("cardList", list);
+					List<Card> list1 = new ArrayList<Card>();
+					list1.addAll(list);
+					list1.add(player.getFifthCard());
+					data.put("cardList", list1);
 				}else{
 					data.put("cardList", player.getCardList());
 				}
@@ -422,8 +426,10 @@ public class NnGameService extends BaseGameService{
 				player.setStatus(NnPlayerStatusEnum.showCard.status);
 				if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
 					List<Card> list = player.getRobFourCardList();
-					list.add(player.getFifthCard());
-					cardList = list;
+					List<Card> list1 = new ArrayList<Card>();
+					list1.addAll(list);
+					list1.add(player.getFifthCard());
+					cardList = list1;
 				}else{
 					cardList = player.getCardList();
 				}
@@ -597,8 +603,6 @@ public class NnGameService extends BaseGameService{
 		roomInfo.setCurWinnerId(curWinnerId);
 		/**如果当前局数小于总局数，则设置为当前局结束*/
 		if (roomInfo.getCurGame() < roomInfo.getTotalGames()) {
-			/**设置下一局的庄家id（抢庄的不设置）*/
-			setRoomBankerId(roomInfo);
 			roomInfo.setStatus(NnRoomStatusEnum.curGameOver.status);
 		}else{/**如果当前局数等于总局数，则设置为一圈结束*/
 			roomInfo.setStatus(NnRoomStatusEnum.totalGameOver.status);
@@ -716,29 +720,13 @@ public class NnGameService extends BaseGameService{
 	
 	
 	private static void setRoomBankerId(NnRoomInfo roomInfo){
-		
 		NnRoomBankerTypeEnum typeEnum = NnRoomBankerTypeEnum.getNnRoomBankerTypeEnum(roomInfo.getRoomBankerType());
 		
 		switch (typeEnum) {
 			case inTurnBanker:
 				/**如果房间中庄家id为null则说明房间是刚创建的，直接设置房主为庄家*/
-				if (roomInfo.getRoomBankerId() == null) {
-					roomInfo.setRoomBankerId(roomInfo.getRoomOwnerId());
-				}else{
-					List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
-					int size = playerList.size();
-					for(int i = 0; i < size; i++){
-						NnPlayerInfo player = playerList.get(i);
-						if (player.getPlayerId().equals(roomInfo.getRoomBankerId())) {
-							if (i == size - 1) {
-								roomInfo.setRoomBankerId((playerList.get(0)).getPlayerId());
-								break;
-							}else{
-								roomInfo.setRoomBankerId((playerList.get(i + 1)).getPlayerId());
-								break;
-							}
-						}
-					}
+				if (roomInfo.getCurGame() > 1) {
+					roomInfo.setRoomBankerId(GameUtil.getNextOperatePlayerIdByRoomBankerId(roomInfo.getPlayerList(), roomInfo.getRoomBankerId()));
 				}
 				break;
 			case overLordBanker:
@@ -842,8 +830,10 @@ public class NnGameService extends BaseGameService{
 					if (playerId.equals(player.getPlayerId()) || NnPlayerStatusEnum.showCard.status.equals(player.getStatus())) {
 						if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
 							List<Card> list = player.getRobFourCardList();
-							list.add(player.getFifthCard());
-							newPlayer.setCardList(list);
+							List<Card> list1 = new ArrayList<Card>();
+							list1.addAll(list);
+							list1.add(player.getFifthCard());
+							newPlayer.setCardList(list1);
 						}else{
 							newPlayer.setCardList(player.getCardList());
 						}
@@ -857,8 +847,10 @@ public class NnGameService extends BaseGameService{
 					newPlayer.setCurScore(player.getCurScore());
 					if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
 						List<Card> list = player.getRobFourCardList();
-						list.add(player.getFifthCard());
-						newPlayer.setCardList(list);
+						List<Card> list1 = new ArrayList<Card>();
+						list1.addAll(list);
+						list1.add(player.getFifthCard());
+						newPlayer.setCardList(list1);
 					}else{
 						newPlayer.setCardList(player.getCardList());
 					}
