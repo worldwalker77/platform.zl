@@ -89,10 +89,11 @@ public abstract class BaseGameService {
 		if (null == weixinUserInfo) {
 			throw new BusinessException(ExceptionEnum.QUERY_WEIXIN_USER_INFO_FAIL);
 		}
+		weixinUserInfo.setName(GameUtil.emojiFilter(weixinUserInfo.getName()));
 		UserModel userModel = commonManager.getUserByWxOpenId(weixinUserInfo.getOpneid());
 		if (null == userModel) {
 			userModel = new UserModel();
-			userModel.setNickName(GameUtil.emojiFilter(weixinUserInfo.getName()));
+			userModel.setNickName(weixinUserInfo.getName());
 			userModel.setHeadImgUrl(weixinUserInfo.getHeadImgUrl());
 			userModel.setWxOpenId(weixinUserInfo.getOpneid());
 			userModel.setRoomCardNum(10);
@@ -105,7 +106,11 @@ public abstract class BaseGameService {
 			roomId = redisRelaModel.getRoomId();
 		}
 		Integer teaHouseNum = redisOperationService.getTeaHouseNumByPlayerId(userModel.getPlayerId());
-		
+		/**如果此茶楼已经被删除了，则需要删除标记位*/
+		if (!commonManager.isTeaHouseExist(teaHouseNum)) {
+			teaHouseNum = null;
+			redisOperationService.hdelPlayerIdTeaHouseNum(userModel.getPlayerId());
+		}
 		UserInfo userInfo = new UserInfo();
 		userInfo.setPlayerId(userModel.getPlayerId());
 		userInfo.setRoomId(roomId);
