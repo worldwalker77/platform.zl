@@ -106,10 +106,12 @@ public abstract class BaseGameService {
 			roomId = redisRelaModel.getRoomId();
 		}
 		Integer teaHouseNum = redisOperationService.getTeaHouseNumByPlayerId(userModel.getPlayerId());
-		/**如果此茶楼已经被删除了，则需要删除标记位*/
-		if (!commonManager.isTeaHouseExist(teaHouseNum)) {
-			teaHouseNum = null;
-			redisOperationService.hdelPlayerIdTeaHouseNum(userModel.getPlayerId());
+		if (teaHouseNum != null) {
+			/**如果此茶楼已经被删除了，则需要删除标记位*/
+			if (!commonManager.isTeaHouseExist(teaHouseNum)) {
+				teaHouseNum = null;
+				redisOperationService.hdelPlayerIdTeaHouseNum(userModel.getPlayerId());
+			}
 		}
 		UserInfo userInfo = new UserInfo();
 		userInfo.setPlayerId(userModel.getPlayerId());
