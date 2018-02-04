@@ -2,6 +2,7 @@ package cn.worldwalker.game.wyqp.common.service;
 
 import java.util.Map;
 import java.util.Stack;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameInfoMemoryContainer {
@@ -24,5 +25,6 @@ public class GameInfoMemoryContainer {
 	public static Stack<String> roomCardOperationFailList = new Stack<String>();
 	public static Map<String, String> teaHouseNumTableNumRoomIdMap = new ConcurrentHashMap<String, String>();
 	public static Map<String, String> playerIdTeaHouseNumMap = new ConcurrentHashMap<String, String>();
+	public static Map<Integer, Vector<Integer>> teaHouseNumPlayerIdVectorMap = new ConcurrentHashMap<Integer, Vector<Integer>>();
 	
 }

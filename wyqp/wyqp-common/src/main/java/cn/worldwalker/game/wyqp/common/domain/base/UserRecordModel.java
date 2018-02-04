@@ -39,6 +39,17 @@ public class UserRecordModel {
 	
 	private Integer totalScore;
 	
+	private Integer winCount;
+	
+	
+	public Integer getWinCount() {
+		return winCount;
+	}
+
+	public void setWinCount(Integer winCount) {
+		this.winCount = winCount;
+	}
+
 	public Integer getTotalScore() {
 		return totalScore;
 	}

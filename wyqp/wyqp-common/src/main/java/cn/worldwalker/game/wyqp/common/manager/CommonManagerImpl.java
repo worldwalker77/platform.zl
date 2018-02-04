@@ -185,7 +185,7 @@ public class CommonManagerImpl implements CommonManager{
 		for(int i = 0; i < size; i++){
 			BasePlayerInfo player = (BasePlayerInfo)playerList.get(i);
 			RecordModel recordModel = new RecordModel();
-			recordModel.setHeadImgUrl(player.getHeadImgUrl());
+//			recordModel.setHeadImgUrl(player.getHeadImgUrl());
 			recordModel.setNickName(player.getNickName());
 			recordModel.setPlayerId(player.getPlayerId());
 			recordModel.setScore(player.getTotalScore());
@@ -200,7 +200,7 @@ public class CommonManagerImpl implements CommonManager{
 			model.setGameType(roomInfo.getGameType());
 			model.setPlayerId(player.getPlayerId());
 			model.setNickName(player.getNickName());
-			model.setHeadImgUrl(player.getHeadImgUrl());
+//			model.setHeadImgUrl(player.getHeadImgUrl());
 			model.setRoomId(roomInfo.getRoomId());
 			model.setPayType(roomInfo.getPayType());
 			model.setTotalGames(roomInfo.getTotalGames());

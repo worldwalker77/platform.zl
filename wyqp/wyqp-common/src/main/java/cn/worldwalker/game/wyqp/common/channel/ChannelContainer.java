@@ -67,6 +67,22 @@ public class ChannelContainer {
 		}
 	}
 	
+	public void sendTextMsgByPlayerIds(Result result, List<Integer> playerIds){
+		if (redisOperationService.isLogFuseOpen() && result.getMsgType() != MsgTypeEnum.heartBeat.msgType) {
+			log.info("返回 ," + MsgTypeEnum.getMsgTypeEnumByType(result.getMsgType()).desc + ": " + JsonUtil.toJson(result));
+		}
+		for(Integer playerId : playerIds){
+			Channel channel = getChannel(playerId);
+			if (null != channel) {
+				try {
+					channel.writeAndFlush(new TextWebSocketFrame(JsonUtil.toJson(result)));
+				} catch (Exception e) {
+					log.error("sendTextMsgByPlayerId error, playerId: " + playerId + ", result : " + JsonUtil.toJson(result), e);
+				}
+			}
+		}
+	}
+	
 	public void sendTextMsgToAllPlayer(Result result){
 		if (redisOperationService.isLogFuseOpen()) {
 			log.info("返回 ：" + JsonUtil.toJson(result));
@@ -103,7 +119,6 @@ public class ChannelContainer {
 		return sessionMap;
 	}
 	
-	
 	public void removeSession(ChannelHandlerContext ctx){
 		if (sessionMap.isEmpty()) {
 			return;
@@ -118,6 +133,10 @@ public class ChannelContainer {
 		}
 		if (playerId != null) {
 			sessionMap.remove(playerId);
+			Integer teaHouseNum = redisOperationService.getTeaHouseNumByPlayerId(playerId);
+			if (teaHouseNum != null) {
+				redisOperationService.delTeaHouseNumPlayerId(teaHouseNum, playerId);
+			}
 			RedisRelaModel redisRelaModel = redisOperationService.getRoomIdGameTypeByPlayerId(playerId);
 			System.out.println("====>>>removeSession,玩家断线，redisRelaModel:" + JsonUtil.toJson(redisRelaModel));
 			/**如果此掉线的playerId有房间信息*/

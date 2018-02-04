@@ -672,6 +672,16 @@ public class JedisTemplate {
 			}
 		});
 	}
+	
+	public Boolean srem(final String key, final String member) {
+		return execute(new JedisAction<Boolean>() {
+
+			@Override
+			public Boolean action(Jedis jedis) {
+				return jedis.srem(key, member) == 1 ? true : false;
+			}
+		});
+	}
 
 	public Set<String> smembers(final String key) {
 		return execute(new JedisAction<Set<String>>() {

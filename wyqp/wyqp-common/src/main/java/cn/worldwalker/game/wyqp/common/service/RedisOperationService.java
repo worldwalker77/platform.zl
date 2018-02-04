@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Vector;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -530,6 +533,57 @@ public class RedisOperationService {
 			GameInfoMemoryContainer.playerIdTeaHouseNumMap.remove(String.valueOf(playerId));
 		}
 		
+	}
+	
+	/**茶楼号和房间列表关系*/
+	public static Lock lock = new ReentrantLock();
+	public void setTeaHouseNumPlayerId(Integer teaHouseNum, Integer playerId){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.sadd(Constant.teaHouseNumPlayerIdSet + teaHouseNum, String.valueOf(playerId));
+		}else{
+			Vector<Integer> ve = GameInfoMemoryContainer.teaHouseNumPlayerIdVectorMap.get(teaHouseNum);
+			if (ve == null) {
+				lock.lock();
+				try {
+					ve = new Vector<Integer>();
+					GameInfoMemoryContainer.teaHouseNumPlayerIdVectorMap.put(teaHouseNum, ve);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}finally{
+					lock.unlock();
+				}
+			}
+			ve.add(playerId);
+		}
+	}
+	
+	public List<Integer> getPlayerIdsByTeaHouseNum(Integer teaHouseNum){
+		List<Integer> list = new ArrayList<Integer>();
+		if (gameInfoStorageType == 0 ) {
+			Set<String> set = jedisTemplate.smembers(Constant.teaHouseNumPlayerIdSet + teaHouseNum);
+			if (!CollectionUtils.isEmpty(set)) {
+				for(String temp : set){
+					list.add(Integer.valueOf(temp));
+				}
+			}
+		}else{
+			Vector<Integer> vec = GameInfoMemoryContainer.teaHouseNumPlayerIdVectorMap.get(teaHouseNum);
+			if (!CollectionUtils.isEmpty(vec)) {
+				list.addAll(vec);
+			}
+		}
+		return list;
+	}
+	
+	public void delTeaHouseNumPlayerId(Integer teaHouseNum, Integer playerId){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.srem(Constant.teaHouseNumPlayerIdSet + teaHouseNum, String.valueOf(playerId));
+		}else{
+			Vector<Integer> vec = GameInfoMemoryContainer.teaHouseNumPlayerIdVectorMap.get(teaHouseNum);
+			if (!CollectionUtils.isEmpty(vec)) {
+				vec.remove(playerId);
+			}
+		}
 	}
 	
 	

@@ -18,6 +18,7 @@
 		<result column="remark" property="remark"/>
 		<result column="create_time" property="createTime"/>
 		<result column="total_score" property="totalScore"/>
+		<result column="win_count" property="winCount"/>
 	</resultMap>
 	
 	 <insert id="insertRecord" parameterType="cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel">  
@@ -88,11 +89,11 @@
 	</select>
 	
 	<select id="getTeaHouseBigWinner"  parameterType = "cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel" resultMap="userRecordResultMap">
-	    select player_id,nick_name,head_img_url,sum(score) as total_score
+ 		select player_id,nick_name,sum(case when score > 0 then 1 else 0 end) as win_count
 	    from t_user_record 
 	    where tea_house_num = #{teaHouseNum}
-	    group by player_id
-	    order by total_score desc limit 20
+	    group by player_id,nick_name
+	    order by win_count desc limit 20
 	</select>
 	
 	<select id="getPaishenBoard"  parameterType = "cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel" resultMap="userRecordResultMap">

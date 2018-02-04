@@ -113,5 +113,7 @@ public class Constant {
 	
 	/**牛牛随机压分概率*/
 	public final static Integer nnRandomStakeScoreProbability = Integer.valueOf(CustomizedPropertyConfigurer.getContextProperty("nn.random.stake.socre.probability"));
-
+	
+	/**clubId与roomId关系映射*/
+	public final static String teaHouseNumPlayerIdSet = curCompany + "_tea_house_num_player_id_set_";
 }

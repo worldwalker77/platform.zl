@@ -388,6 +388,7 @@ public class NnGameService extends BaseGameService{
 					data.put("cardList", player.getCardList());
 				}
 				data.put("cardType", player.getCardType());
+				data.put("nnCardList", player.getNnCardList());
 				data.put("playerId", player.getPlayerId());
 				/**给每个玩家返回自己的牌及牌型*/
 				channelContainer.sendTextMsgByPlayerIds(result, player.getPlayerId());
