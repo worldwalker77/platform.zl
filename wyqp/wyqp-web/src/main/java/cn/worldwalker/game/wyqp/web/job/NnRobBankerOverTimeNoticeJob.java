@@ -66,7 +66,7 @@ public class NnRobBankerOverTimeNoticeJob {
 					redisOperationService.delNnRobIpRoomIdTime(roomId);
 					continue;
 				}
-				if (System.currentTimeMillis() - time < 10000) {
+				if (System.currentTimeMillis() - time < 5000) {
 					continue;
 				}
 				Integer robBankerId = null;

@@ -184,13 +184,14 @@ public abstract class BaseGameService {
 			throw new BusinessException(ExceptionEnum.ALREADY_IN_ROOM.index, ExceptionEnum.ALREADY_IN_ROOM.description + ",房间号：" + redisRelaModel.getRoomId());
 		}
 		/**校验房卡数量是否足够*/
-		//TODO
+		Integer teaHouseNum = redisOperationService.getTeaHouseNumByPlayerId(playerId);
+		Integer teaHouseOwnerId = null;
 		if (redisOperationService.isLoginFuseOpen()) {
 			Integer roomCardCheckPlayerId = playerId;
-			Integer teaHouseNum = redisOperationService.getTeaHouseNumByPlayerId(playerId);
 			/**如果玩家是从茶楼牌桌创建房间的，则只需要扣老板房卡*/
 			if (teaHouseNum != null) {
 				TeaHouseModel teaHouseModel = commonManager.getTeaHouseByTeaHouseNum(teaHouseNum);
+				teaHouseOwnerId = teaHouseModel.getPlayerId();
 				roomCardCheckPlayerId = teaHouseModel.getPlayerId();
 			}
 			commonManager.roomCardCheck(roomCardCheckPlayerId, request.getGameType(), msg.getPayType(), msg.getTotalGames());
@@ -232,6 +233,7 @@ public abstract class BaseGameService {
 		/**茶楼相关参数**/
 		roomInfo.setTeaHouseNum(msg.getTeaHouseNum());
 		roomInfo.setTableNum(msg.getTableNum());
+		roomInfo.setTeaHouseOwnerId(teaHouseOwnerId);
 		
 		List playerList = roomInfo.getPlayerList();
 		BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(0);
@@ -320,9 +322,11 @@ public abstract class BaseGameService {
 			}
 		}
 		if (redisOperationService.isLoginFuseOpen()) {
-			/**如果是aa支付，则校验房卡数量是否足够*/
-			if (PayTypeEnum.AAPay.type.equals(roomInfo.getPayType())) {
-				commonManager.roomCardCheck(userInfo.getPlayerId(), request.getGameType(), roomInfo.getPayType(), roomInfo.getTotalGames());
+			if (roomInfo.getTeaHouseNum() == null) {
+				/**如果是aa支付，则校验房卡数量是否足够*/
+				if (PayTypeEnum.AAPay.type.equals(roomInfo.getPayType())) {
+					commonManager.roomCardCheck(userInfo.getPlayerId(), request.getGameType(), roomInfo.getPayType(), roomInfo.getTotalGames());
+				}
 			}
 		}
 		List playerList = roomInfo.getPlayerList();

@@ -260,15 +260,19 @@ public class NnGameService extends BaseGameService{
 			NnPlayerInfo bankerPlayer = playerList.get(0);
 			for(int i = 1; i < size; i++){
 				NnPlayerInfo player = playerList.get(i);
+				/**当前玩家已抢庄*/
 				if (NnPlayerStatusEnum.rob.status.equals(player.getStatus())) {
 					if (!NnPlayerStatusEnum.rob.status.equals(bankerPlayer.getStatus())) {
 						bankerPlayer = player;
-					}else{/**两个玩家都抢庄了，则比较抢庄的时间，先抢的先当庄*/
-						if (bankerPlayer.getRobBankerTime() > player.getRobBankerTime()) {
+					}else{/**两个玩家都抢庄了，则先比较谁抢庄倍数大，如果倍数相同，则比较抢庄的时间，先抢的先当庄*/
+						if (player.getRobMultiple() > bankerPlayer.getRobMultiple()) {
 							bankerPlayer = player;
+						}else if(player.getRobMultiple().equals(bankerPlayer.getRobMultiple())){
+							if (bankerPlayer.getRobBankerTime() > player.getRobBankerTime()) {
+								bankerPlayer = player;
+							}
 						}
 					}
-					
 				}
 			}
 			/**如果都没抢庄的话，默认是上个赢家的庄，如果是第一局，则是房主的庄*/
@@ -403,6 +407,48 @@ public class NnGameService extends BaseGameService{
 		data.put("stakeScore", msg.getStakeScore());
 		data.put("isLastStakeScore", 0);
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+	}
+	
+	public void watchCard(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		result.setGameType(GameTypeEnum.nn.gameType);
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		Integer playerId = userInfo.getPlayerId();
+		Integer roomId = userInfo.getRoomId();
+		NnRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, NnRoomInfo.class);
+		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
+		List<Card> cardList = null;
+		List<Card> nnCardList = null;
+		Integer cardType = null;
+		int size = playerList.size();
+		for(int i = 0; i < size; i++){
+			NnPlayerInfo player = playerList.get(i);
+			if (player.getPlayerId().equals(playerId)) {
+				if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
+					List<Card> list = player.getRobFourCardList();
+					List<Card> list1 = new ArrayList<Card>();
+					list1.addAll(list);
+					list1.add(player.getFifthCard());
+					cardList = list1;
+				}else{
+					cardList = player.getCardList();
+				}
+				
+				cardType = player.getCardType();
+				nnCardList = player.getNnCardList();
+			}
+		}
+		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+		result.setMsgType(MsgTypeEnum.watchCard.msgType);
+		data.put("playerId", playerId);
+//		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, playerId));
+		data.put("cardList", cardList);
+		data.put("cardType", cardType);
+		data.put("nnCardList", nnCardList);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+		
+		
 	}
 	
 	public void showCard(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
@@ -628,7 +674,6 @@ public class NnGameService extends BaseGameService{
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				log.info("扣除房卡结束===============");
 			}
 		}else{/**如果不是第一局，则只扣除观察者的房卡 add by liujinfengnew*/
 			if (redisOperationService.isLoginFuseOpen()) {
@@ -683,14 +728,9 @@ public class NnGameService extends BaseGameService{
 				try {
 					List<Integer> palyerIdList = commonManager.deductRoomCard(roomInfo, RoomCardOperationEnum.consumeCard);
 					log.info("palyerIdList:" + JsonUtil.toJson(palyerIdList));
-					for(Integer playerId : palyerIdList){
-						UserModel userM = commonManager.getUserById(playerId);
-					}
-					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				log.info("扣除房卡结束===============");
 			}
 		}
 		

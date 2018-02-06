@@ -42,6 +42,15 @@ public class BaseRoomInfo {
 	/**以下为茶楼相关*/
 	private Integer teaHouseNum;
 	private Integer tableNum;
+	private Integer teaHouseOwnerId;
+	
+	public Integer getTeaHouseOwnerId() {
+		return teaHouseOwnerId;
+	}
+
+	public void setTeaHouseOwnerId(Integer teaHouseOwnerId) {
+		this.teaHouseOwnerId = teaHouseOwnerId;
+	}
 
 	public Integer getPlayerNumLimit() {
 		return playerNumLimit;

@@ -70,6 +70,7 @@ public enum MsgTypeEnum {
 	readyStake(103, "准备压分"),
 	stakeScore(104, "压分"),
 	showCard(105, "亮牌"),
+	watchCard(106, "自己看牌"),
 	
 	/**麻将特有200-299*/
 	playDice(200, "掷色子"),

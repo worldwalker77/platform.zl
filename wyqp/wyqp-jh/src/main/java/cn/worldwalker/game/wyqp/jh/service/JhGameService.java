@@ -502,6 +502,10 @@ public class JhGameService extends BaseGameService{
 		if (!GameUtil.isExistPlayerInRoom(playerId, playerList)) {
 			throw new BusinessException(ExceptionEnum.PLAYER_NOT_IN_ROOM);
 		}
+		/**如果是当前说话人的id，则直接返回提示*/
+		if (!playerId.equals(roomInfo.getCurPlayerId())) {
+			throw new BusinessException(ExceptionEnum.IS_NOT_YOUR_TURN);
+		}
 		/**删除当前玩家120s未操作标记*/
 		redisOperationService.delJhNoOperationIpPlayerIdRoomIdTime(playerId);
 		

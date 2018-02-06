@@ -61,7 +61,7 @@ public class NnShowCardOverTimeNoticeJob {
 					redisOperationService.delNnShowCardIpRoomIdTime(roomId);
 					continue;
 				}
-				if (System.currentTimeMillis() - time < 10000) {
+				if (System.currentTimeMillis() - time < 5000) {
 					continue;
 				}
 				List<NnPlayerInfo> playerList = nnRoomInfo.getPlayerList();

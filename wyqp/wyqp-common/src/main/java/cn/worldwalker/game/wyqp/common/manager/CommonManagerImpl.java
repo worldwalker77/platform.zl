@@ -34,6 +34,7 @@ import cn.worldwalker.game.wyqp.common.domain.base.UserFeedbackModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
+import cn.worldwalker.game.wyqp.common.enums.PayTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.PlayerStatusEnum;
 import cn.worldwalker.game.wyqp.common.enums.RoomCardConsumeEnum;
 import cn.worldwalker.game.wyqp.common.enums.RoomCardOperationEnum;
@@ -84,18 +85,24 @@ public class CommonManagerImpl implements CommonManager{
 	@Override
 	public List<Integer> deductRoomCard(BaseRoomInfo roomInfo, RoomCardOperationEnum operationEnum){
 		List<Integer> playerIList = new ArrayList<Integer>();
-		if (roomInfo.getPayType() == 1) {/**房主付费*/
-			playerIList.add(roomInfo.getRoomOwnerId());
-		}else{/**AA付费*/
-			List playerList = roomInfo.getPlayerList();
-			int size = playerList.size();
-			for(int i = 0; i < size; i++){
-				BasePlayerInfo player = (BasePlayerInfo)playerList.get(i);
-				playerIList.add(player.getPlayerId());
+		Integer payType = roomInfo.getPayType();
+		if (roomInfo.getTeaHouseNum() != null) {
+			playerIList.add(roomInfo.getTeaHouseOwnerId());
+			payType = PayTypeEnum.roomOwnerPay.type;
+		}else{
+			if (roomInfo.getPayType() == 1) {/**房主付费*/
+				playerIList.add(roomInfo.getRoomOwnerId());
+			}else{/**AA付费*/
+				List playerList = roomInfo.getPlayerList();
+				int size = playerList.size();
+				for(int i = 0; i < size; i++){
+					BasePlayerInfo player = (BasePlayerInfo)playerList.get(i);
+					playerIList.add(player.getPlayerId());
+				}
 			}
 		}
 		for(Integer playerId : playerIList){
-			doDeductRoomCard(roomInfo.getGameType(), roomInfo.getPayType(), roomInfo.getTotalGames(), operationEnum, playerId);
+			doDeductRoomCard(roomInfo.getGameType(), payType, roomInfo.getTotalGames(), operationEnum, playerId);
 		}
 		return playerIList;
 	}
@@ -103,21 +110,23 @@ public class CommonManagerImpl implements CommonManager{
 	@Override
 	public List<Integer> deductRoomCardForObserver(BaseRoomInfo roomInfo, RoomCardOperationEnum operationEnum) {
 		List<Integer> playerIList = new ArrayList<Integer>();
-		if (roomInfo.getPayType() == 1) {/**房主付费,则新进来的观察者不需要扣房卡*/
-			return playerIList;
-		}else{/**AA付费*/
-			List playerList = roomInfo.getPlayerList();
-			int size = playerList.size();
-			for(int i = 0; i < size; i++){
-				BasePlayerInfo player = (BasePlayerInfo)playerList.get(i);
-				if (!PlayerStatusEnum.observer.status.equals(player.getStatus())) {
-					continue;
+		if (roomInfo.getTeaHouseNum() == null) {
+			if (roomInfo.getPayType() == 1) {/**房主付费,则新进来的观察者不需要扣房卡*/
+				return playerIList;
+			}else{/**AA付费*/
+				List playerList = roomInfo.getPlayerList();
+				int size = playerList.size();
+				for(int i = 0; i < size; i++){
+					BasePlayerInfo player = (BasePlayerInfo)playerList.get(i);
+					if (!PlayerStatusEnum.observer.status.equals(player.getStatus())) {
+						continue;
+					}
+					playerIList.add(player.getPlayerId());
 				}
-				playerIList.add(player.getPlayerId());
 			}
-		}
-		for(Integer playerId : playerIList){
-			doDeductRoomCard(roomInfo.getGameType(), roomInfo.getPayType(), roomInfo.getTotalGames(), operationEnum, playerId);
+			for(Integer playerId : playerIList){
+				doDeductRoomCard(roomInfo.getGameType(), roomInfo.getPayType(), roomInfo.getTotalGames(), operationEnum, playerId);
+			}
 		}
 		return playerIList;
 	}

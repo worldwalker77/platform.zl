@@ -33,6 +33,9 @@ public class NnMsgDispatcher extends BaseMsgDisPatcher {
 			case stakeScore:
 				nnGameService.stakeScore(ctx, request, userInfo);
 				break;
+			case watchCard:
+				nnGameService.watchCard(ctx, request, userInfo);
+				break;
 			case showCard:
 				nnGameService.showCard(ctx, request, userInfo);
 				break;
