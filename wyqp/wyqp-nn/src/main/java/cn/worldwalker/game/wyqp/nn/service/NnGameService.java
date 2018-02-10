@@ -508,7 +508,6 @@ public class NnGameService extends BaseGameService{
 			newRoomInfo.setRoomOwnerId(roomInfo.getRoomOwnerId());
 			newRoomInfo.setRoomBankerId(roomInfo.getRoomBankerId());
 			newRoomInfo.setUpdateTime(roomInfo.getUpdateTime());
-			newRoomInfo.setRemark(roomInfo.getRemark());
 			for(NnPlayerInfo player : playerList){
 				NnPlayerInfo newPlayer = new NnPlayerInfo();
 				newPlayer.setPlayerId(player.getPlayerId());
@@ -640,8 +639,7 @@ public class NnGameService extends BaseGameService{
 		NnCardTypeEnum zTemp = NnCardTypeEnum.getNnCardTypeEnum(roomBankerPlayer.getCardType());
 		remark += roomBankerPlayer.getNickName() + ":庄家,牌型"+ zTemp.desc+"("+ zTemp.multiple +"倍),抢庄倍数"+roomBankerPlayer.getRobMultiple() +"倍,得分"+ roomBankerPlayer.getCurScore()+System.getProperty("line.separator");
 		remark += "房间封顶倍数：" + roomInfo.getMultipleLimit() + "倍";
-		roomInfo.setRemark(remark);
-//		log.info("第" + roomInfo.getCurGame() + "局得分情况:" + System.getProperty("line.separator") + remark);
+		log.info("茶楼号"+ roomInfo.getTeaHouseNum() + "房间号" + roomInfo.getRoomId() + "第" + roomInfo.getCurGame() + "局得分情况:" + System.getProperty("line.separator") + remark);
 		/**设置房间的总赢家及当前赢家*/
 		Integer totalWinnerId = playerList.get(0).getPlayerId();
 		Integer curWinnerId = playerList.get(0).getPlayerId();
@@ -680,7 +678,6 @@ public class NnGameService extends BaseGameService{
 		/**如果是第一局结束，则扣除房卡;扣除房卡异常不影响游戏进行，会将异常数据放入redis中，由定时任务进行补偿扣除*/
 		if (roomInfo.getCurGame() == 1) {
 			if (redisOperationService.isLoginFuseOpen()) {
-				log.info("扣除房卡开始===============");
 				try {
 					List<Integer> palyerIdList = commonManager.deductRoomCard(roomInfo, RoomCardOperationEnum.consumeCard);
 					log.info("palyerIdList:" + JsonUtil.toJson(palyerIdList));
@@ -695,7 +692,6 @@ public class NnGameService extends BaseGameService{
 			}
 		}else{/**如果不是第一局，则只扣除观察者的房卡 add by liujinfengnew*/
 			if (redisOperationService.isLoginFuseOpen()) {
-				log.info("扣除房卡开始===============");
 				try {
 					List<Integer> palyerIdList = commonManager.deductRoomCardForObserver(roomInfo, RoomCardOperationEnum.consumeCard);
 					log.info("palyerIdList:" + JsonUtil.toJson(palyerIdList));
@@ -707,7 +703,6 @@ public class NnGameService extends BaseGameService{
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				log.info("扣除房卡结束===============");
 			}
 		}
 		
