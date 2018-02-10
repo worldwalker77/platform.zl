@@ -508,6 +508,7 @@ public class NnGameService extends BaseGameService{
 			newRoomInfo.setRoomOwnerId(roomInfo.getRoomOwnerId());
 			newRoomInfo.setRoomBankerId(roomInfo.getRoomBankerId());
 			newRoomInfo.setUpdateTime(roomInfo.getUpdateTime());
+			newRoomInfo.setRemark(roomInfo.getRemark());
 			for(NnPlayerInfo player : playerList){
 				NnPlayerInfo newPlayer = new NnPlayerInfo();
 				newPlayer.setPlayerId(player.getPlayerId());
@@ -556,6 +557,7 @@ public class NnGameService extends BaseGameService{
 	}
 	
 	private void calculateScoreAndRoomBanker(NnRoomInfo roomInfo){
+		String remark = "";
 		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
 		/**找出庄家*/
 		NnPlayerInfo roomBankerPlayer = null;
@@ -567,6 +569,7 @@ public class NnGameService extends BaseGameService{
 		}
 		/**设置庄家次数*/
 		roomBankerPlayer.setBankerCount(roomBankerPlayer.getBankerCount() + 1);
+		
 		/**将其他玩家的牌依次与庄家进行比较，计算各自得当前局分及总得分，最大牌型，并计算下一次庄家是谁*/
 		for(NnPlayerInfo player : playerList){
 			/**观察者的不算 add by liujinfengnew */
@@ -576,8 +579,8 @@ public class NnGameService extends BaseGameService{
 			if (!roomInfo.getRoomBankerId().equals(player.getPlayerId())) {
 				/**如果闲家的牌大于庄家*/
 				if (NnCardRule.cardTypeCompare(player, roomBankerPlayer) > 0) {
-					
-					Integer cardTypeMultiple = NnCardTypeEnum.getNnCardTypeEnum(player.getCardType()).multiple;
+					NnCardTypeEnum tempCardType = NnCardTypeEnum.getNnCardTypeEnum(player.getCardType());
+					Integer cardTypeMultiple = tempCardType.multiple;
 					/**如果是抢庄类型，则需要计算抢庄时候的倍数*/
 					if (roomInfo.getRoomBankerType().equals(NnRoomBankerTypeEnum.robBanker.type)) {
 						cardTypeMultiple = cardTypeMultiple*roomBankerPlayer.getRobMultiple();
@@ -596,8 +599,13 @@ public class NnGameService extends BaseGameService{
 					roomBankerPlayer.setCurScore(roomBankerPlayer.getCurScore() - winScore);
 					roomBankerPlayer.setTotalScore(roomBankerPlayer.getTotalScore() - winScore);
 					roomBankerPlayer.setLoseTimes(roomBankerPlayer.getLoseTimes() + 1);
+					/**测试*/
+					NnCardTypeEnum temp = NnCardTypeEnum.getNnCardTypeEnum(roomBankerPlayer.getCardType());
+					remark += player.getNickName() + ":闲家,压分" + player.getStakeScore()+ ",牌型"+tempCardType.desc+"(" +tempCardType.multiple +"倍),庄家牌型"+ temp.desc+"("+ temp.multiple +"倍),得分"+ player.getStakeScore()+"*"+tempCardType.multiple+"*"+roomBankerPlayer.getRobMultiple()+"="+winScore+System.getProperty("line.separator");
+			
 				}else{/**如果庄家的牌大于闲家*/
-					Integer cardTypeMultiple = NnCardTypeEnum.getNnCardTypeEnum(roomBankerPlayer.getCardType()).multiple;
+					NnCardTypeEnum tempCardType = NnCardTypeEnum.getNnCardTypeEnum(roomBankerPlayer.getCardType());
+					Integer cardTypeMultiple = tempCardType.multiple;
 					/**如果是抢庄类型，则需要计算抢庄时候的倍数*/
 					if (roomInfo.getRoomBankerType().equals(NnRoomBankerTypeEnum.robBanker.type)) {
 						cardTypeMultiple = cardTypeMultiple*roomBankerPlayer.getRobMultiple();
@@ -616,14 +624,24 @@ public class NnGameService extends BaseGameService{
 					roomBankerPlayer.setCurScore(roomBankerPlayer.getCurScore() + winScore);
 					roomBankerPlayer.setTotalScore(roomBankerPlayer.getTotalScore() + winScore);
 					roomBankerPlayer.setWinTimes(roomBankerPlayer.getWinTimes() + 1);
+					
+					/**测试*/
+					NnCardTypeEnum temp = NnCardTypeEnum.getNnCardTypeEnum(player.getCardType());
+					remark += player.getNickName() + ":闲家,压分" + player.getStakeScore()+ ",牌型"+temp.desc+"(" +temp.multiple +"倍),庄家牌型"+ tempCardType.desc+"("+ tempCardType.multiple +"倍),得分-"+ player.getStakeScore()+"*"+tempCardType.multiple+"*"+roomBankerPlayer.getRobMultiple()+"=-"+winScore+System.getProperty("line.separator");
 				}
+				
 			}
 			/**计算各自的最大牌型*/
 			if (player.getCardType() > player.getMaxCardType()) {
 				player.setMaxCardType(player.getCardType());
 			}
 		}
-		
+		/**测试*/
+		NnCardTypeEnum zTemp = NnCardTypeEnum.getNnCardTypeEnum(roomBankerPlayer.getCardType());
+		remark += roomBankerPlayer.getNickName() + ":庄家,牌型"+ zTemp.desc+"("+ zTemp.multiple +"倍),抢庄倍数"+roomBankerPlayer.getRobMultiple() +"倍,得分"+ roomBankerPlayer.getCurScore()+System.getProperty("line.separator");
+		remark += "房间封顶倍数：" + roomInfo.getMultipleLimit() + "倍";
+		roomInfo.setRemark(remark);
+//		log.info("第" + roomInfo.getCurGame() + "局得分情况:" + System.getProperty("line.separator") + remark);
 		/**设置房间的总赢家及当前赢家*/
 		Integer totalWinnerId = playerList.get(0).getPlayerId();
 		Integer curWinnerId = playerList.get(0).getPlayerId();

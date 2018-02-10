@@ -267,7 +267,7 @@ public abstract class BaseGameService {
 		RoomLockContainer.setLockByRoomId(roomId, new ReentrantLock());
 		
 		/**如果是从茶楼创建的房间,通知其他进入茶楼的玩家刷新牌桌列表*/
-		noticeAllTeaHousePlayerTablePlayerNum(playerId, roomInfo.getTeaHouseNum());
+		noticeAllTeaHousePlayerTablePlayerNum(null, roomInfo.getTeaHouseNum());
 	}
 	
 	private void noticeAllTeaHousePlayerTablePlayerNum(Integer playerId, Integer teaHouseNum){
@@ -284,14 +284,27 @@ public abstract class BaseGameService {
 				UserInfo userInfo = new UserInfo();
 				userInfo.setRoomId(roomId);
 				BaseRoomInfo roomInfo = getRoomInfo(null, null, userInfo);
-				tablePlayerNumList.add(roomInfo.getPlayerList().size());
+				List playerList = roomInfo.getPlayerList();
+				int size = playerList.size();
+				int num = 0;
+				for(int i = 0; i < size; i++){
+					BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(i);
+					if (redisOperationService.getRoomIdGameTypeByPlayerId(playerInfo.getPlayerId()) != null) {
+						num++;
+					}
+				}
+				tablePlayerNumList.add(num);
 			}else{
 				tablePlayerNumList.add(0);
 			}
 		}
 		result.setData(tablePlayerNumList);
+		if (playerId != null) {
+			channelContainer.sendTextMsgByPlayerIds(result, playerId);
+			return;
+		}
 		List<Integer> playerIds = redisOperationService.getPlayerIdsByTeaHouseNum(teaHouseNum);
-		playerIds.remove(playerId);
+		log.info("桌牌人数更新的玩家列表：" + JsonUtil.toJson(playerIds));
 		channelContainer.sendTextMsgByPlayerIds(result, playerIds);
 		
 	}
@@ -419,7 +432,7 @@ public abstract class BaseGameService {
 		}
 		
 		/**如果是从茶楼进入的房间,通知其他进入茶楼的玩家刷新牌桌列表*/
-		noticeAllTeaHousePlayerTablePlayerNum(playerId, roomInfo.getTeaHouseNum());
+		noticeAllTeaHousePlayerTablePlayerNum(null, roomInfo.getTeaHouseNum());
 		
 	}
 	
@@ -475,7 +488,7 @@ public abstract class BaseGameService {
 			data.put("roomId", roomId);
 			channelContainer.sendTextMsgByPlayerIds(result, playerId);
 			/**如果是从茶楼创建的房间,通知其他进入茶楼的玩家刷新牌桌列表*/
-			noticeAllTeaHousePlayerTablePlayerNum(playerId, roomInfo.getTeaHouseNum());
+			noticeAllTeaHousePlayerTablePlayerNum(null, roomInfo.getTeaHouseNum());
 			return;
 		}
 		
@@ -500,12 +513,10 @@ public abstract class BaseGameService {
 		if (playerStatus.equals(PlayerStatusEnum.notReady.status) && roomInfo.getStatus().equals(RoomStatusEnum.justBegin.status)) {
 			
 			/**如果在游戏最开始准备阶段退出的是庄家（即房主），则需要设置一个默认的庄家（房主）,当前退出庄家的下家*/
-			if (roomInfo.getRoomBankerId().equals(playerId)) {
+			if (roomInfo.getRoomOwnerId().equals(playerId)) {
 				Integer tempId = GameUtil.getNextPlayerId(playerList, playerId);
 				roomInfo.setRoomOwnerId(tempId);
-				if (request.getGameType().equals(GameTypeEnum.jh.gameType)) {
-					roomInfo.setRoomBankerId(tempId);
-				}
+				roomInfo.setRoomBankerId(tempId);
 			}
 			
 			/**删除玩家*/
@@ -520,6 +531,8 @@ public abstract class BaseGameService {
 			channelContainer.sendTextMsgByPlayerIds(result, playerId);
 			/**其他玩家通知刷新*/
 			refreshRoomForAllPlayer(roomInfo);
+			/**如果是从茶楼创建的房间,通知其他进入茶楼的玩家刷新牌桌列表*/
+			noticeAllTeaHousePlayerTablePlayerNum(playerId, roomInfo.getTeaHouseNum());
 			return;
 		}
 		result.setMsgType(MsgTypeEnum.dissolveRoom.msgType);
@@ -565,7 +578,7 @@ public abstract class BaseGameService {
 			result.setMsgType(MsgTypeEnum.successDissolveRoom.msgType);
 			channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 			/**如果是从茶楼创建的房间,通知其他进入茶楼的玩家刷新牌桌列表*/
-			noticeAllTeaHousePlayerTablePlayerNum(msg.getPlayerId(), roomInfo.getTeaHouseNum());
+			noticeAllTeaHousePlayerTablePlayerNum(null, roomInfo.getTeaHouseNum());
 			return ;
 		}
 		result.setMsgType(MsgTypeEnum.agreeDissolveRoom.msgType);
@@ -640,10 +653,12 @@ public abstract class BaseGameService {
 			/**茶楼相关*/
 			redisOperationService.delRoomIdByTeaHouseNumTableNum(roomInfo.getTeaHouseNum(), roomInfo.getTableNum());
 			/**如果是从茶楼进入的房间,通知其他进入茶楼的玩家刷新牌桌列表*/
-			noticeAllTeaHousePlayerTablePlayerNum(msg.getPlayerId(), roomInfo.getTeaHouseNum());
+			noticeAllTeaHousePlayerTablePlayerNum(null, roomInfo.getTeaHouseNum());
 		}else{/**如果只有部分人确认，则只删除当前玩家的标记*/
 			redisOperationService.hdelOfflinePlayerIdRoomIdGameTypeTime(msg.getPlayerId());
 			redisOperationService.hdelPlayerIdRoomIdGameType(msg.getPlayerId());
+			/**如果是从茶楼进入的房间,通知其他进入茶楼的玩家刷新牌桌列表*/
+			noticeAllTeaHousePlayerTablePlayerNum(msg.getPlayerId(), roomInfo.getTeaHouseNum());
 		}
 		/**通知玩家返回大厅*/
 		result.setMsgType(MsgTypeEnum.delRoomConfirmBeforeReturnHall.msgType);
@@ -1156,6 +1171,8 @@ public abstract class BaseGameService {
 		data.put("playerId", playerId);
 		/**设置playerId与茶楼号的关系，记忆下次进入*/
 		redisOperationService.setPlayerIdTeaHouseNum(playerId, teaHouseNum);
+		/**记录茶楼当前在线的玩家*/
+		redisOperationService.setTeaHouseNumPlayerId(teaHouseNum, playerId);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	
@@ -1304,7 +1321,16 @@ public abstract class BaseGameService {
 			if (roomId != null) {
 				userInfo.setRoomId(roomId);
 				BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
-				tablePlayerNumList.add(roomInfo.getPlayerList().size());
+				List playerList = roomInfo.getPlayerList();
+				int size = playerList.size();
+				int num = 0;
+				for(int i = 0; i < size; i++){
+					BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(i);
+					if (redisOperationService.getRoomIdGameTypeByPlayerId(playerInfo.getPlayerId()) != null) {
+						num++;
+					}
+				}
+				tablePlayerNumList.add(num);
 			}else{
 				tablePlayerNumList.add(0);
 			}

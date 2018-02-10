@@ -26,7 +26,15 @@ public class NnRoomInfo  extends BaseRoomInfo{
 	private List<Integer> randomStakeScoreGameIndexList;
 	/**随机压分玩家id与压分值映射*/
 	private Map<Integer, Integer> randomPlayerIdStakeScoreMap;
+	/**此字段为测试字段*/
+	private String remark;
 	
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 	public Map<Integer, Integer> getRandomPlayerIdStakeScoreMap() {
 		return randomPlayerIdStakeScoreMap;
 	}
