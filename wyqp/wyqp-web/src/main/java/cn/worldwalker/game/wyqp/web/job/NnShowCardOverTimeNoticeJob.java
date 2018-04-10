@@ -13,9 +13,13 @@ import org.springframework.stereotype.Component;
 
 import cn.worldwalker.game.wyqp.common.channel.ChannelContainer;
 import cn.worldwalker.game.wyqp.common.constant.Constant;
+import cn.worldwalker.game.wyqp.common.domain.base.BaseMsg;
+import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
 import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
+import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
+import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
 import cn.worldwalker.game.wyqp.nn.enums.NnPlayerStatusEnum;
 import cn.worldwalker.game.wyqp.nn.enums.NnRoomBankerTypeEnum;
@@ -85,11 +89,18 @@ public class NnShowCardOverTimeNoticeJob {
 					}
 					
 					if (player.getStatus() < NnPlayerStatusEnum.showCard.status) {
+						BaseRequest request = new BaseRequest();
+						request.setGameType(GameTypeEnum.nn.gameType);
+						request.setMsgType(MsgTypeEnum.showCard.msgType);
+						BaseMsg msg = new BaseMsg();
+						msg.setRoomId(roomId);
+						msg.setPlayerId(player.getPlayerId());
+						request.setMsg(msg);
 						UserInfo userInfo = new UserInfo();
 						userInfo.setPlayerId(player.getPlayerId());
 						userInfo.setRoomId(roomId);
-						log.info("==============自动亮牌============");
-						nnGameService.showCard(null, null, userInfo);
+						log.info(player.getPlayerId() + player.getNickName() + "==============自动亮牌============");
+						nnGameService.showCard(null, request, userInfo);
 					}
 				}
 				redisOperationService.delNnShowCardIpRoomIdTime(roomId);

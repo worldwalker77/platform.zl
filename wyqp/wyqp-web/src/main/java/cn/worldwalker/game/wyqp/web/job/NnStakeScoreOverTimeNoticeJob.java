@@ -18,6 +18,8 @@ import cn.worldwalker.game.wyqp.common.domain.nn.NnMsg;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnRequest;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
+import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
+import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
 import cn.worldwalker.game.wyqp.nn.enums.NnButtomScoreTypeEnum;
 import cn.worldwalker.game.wyqp.nn.enums.NnPlayerStatusEnum;
@@ -81,11 +83,14 @@ public class NnStakeScoreOverTimeNoticeJob {
 							userInfo.setPlayerId(player.getPlayerId());
 							userInfo.setRoomId(roomId);
 							NnRequest request = new NnRequest();
+							request.setGameType(GameTypeEnum.nn.gameType);
+							request.setMsgType(MsgTypeEnum.stakeScore.msgType);
 							NnMsg msg = new NnMsg();
 							NnButtomScoreTypeEnum nnButtomScoreTypeEnum = NnButtomScoreTypeEnum.getNnButtomScoreTypeEnum(nnRoomInfo.getButtomScoreType());
 							/**自动压分压最低分*/
 							msg.setStakeScore(Integer.valueOf(nnButtomScoreTypeEnum.value.split("_")[0]));
 							request.setMsg(msg);
+							log.info(player.getPlayerId() + player.getNickName() + "==============自动压分============" + msg.getStakeScore() + "分");
 							nnGameService.stakeScore(null, request, userInfo);
 						}
 					}

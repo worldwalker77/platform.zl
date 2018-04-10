@@ -1,6 +1,5 @@
 package cn.worldwalker.game.wyqp.web.job;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,11 +20,9 @@ import cn.worldwalker.game.wyqp.common.domain.nn.NnRequest;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
-import cn.worldwalker.game.wyqp.common.result.Result;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
-import cn.worldwalker.game.wyqp.common.utils.GameUtil;
+import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import cn.worldwalker.game.wyqp.nn.enums.NnPlayerStatusEnum;
-import cn.worldwalker.game.wyqp.nn.enums.NnRoomStatusEnum;
 import cn.worldwalker.game.wyqp.nn.service.NnGameService;
 /**
  * 牛牛
@@ -69,43 +66,28 @@ public class NnRobBankerOverTimeNoticeJob {
 				if (System.currentTimeMillis() - time < 5000) {
 					continue;
 				}
-				Integer robBankerId = null;
-				if (nnRoomInfo.getCurGame() == 1) {
-					robBankerId = nnRoomInfo.getRoomOwnerId();
-				}else{
-					robBankerId = nnRoomInfo.getCurWinnerId();
-				}
 				List<NnPlayerInfo> playerList = nnRoomInfo.getPlayerList();
 				NnRequest request = new NnRequest();
+				request.setGameType(GameTypeEnum.nn.gameType);
+				request.setMsgType(MsgTypeEnum.robBanker.msgType);
 				NnMsg msg = new NnMsg();
 				request.setMsg(msg);
 				UserInfo userInfo = new UserInfo();
 				userInfo.setRoomId(roomId);
 				/**模拟抢庄流程，robBankerId抢庄，其他玩家不抢*/
 				for(NnPlayerInfo player : playerList){
-					/**玩家状态小于已准备，则说明是观察者*/
-					if (player.getStatus() < NnPlayerStatusEnum.ready.status) {
-						continue;
-					}
-					userInfo.setPlayerId(player.getPlayerId());
-					if (player.getPlayerId().equals(robBankerId)) {
+					/**状态为经准备的玩家才自动抢庄*/
+					if (player.getStatus().equals(NnPlayerStatusEnum.ready.status)) {
+						userInfo.setPlayerId(player.getPlayerId());
+						userInfo.setRoomId(roomId);
 						msg.setIsRobBanker(NnPlayerStatusEnum.rob.status);
 						msg.setRobMultiple(1);
-					}else{
-						msg.setIsRobBanker(NnPlayerStatusEnum.notRob.status);
-						msg.setRobMultiple(0);
+						msg.setRoomId(roomId);
+						msg.setPlayerId(player.getPlayerId());
+						log.info(player.getPlayerId()+ player.getNickName() + "==========自动抢庄===============" + JsonUtil.toJson(request));
+						nnGameService.robBanker(null, request, userInfo);
 					}
-					nnGameService.robBanker(null, request, userInfo);
 				}
-//				nnRoomInfo.setStatus(NnRoomStatusEnum.inStakeScore.status);
-//				redisOperationService.setRoomIdRoomInfo(roomId, nnRoomInfo);
-//				Result result = new Result();
-//				result.setGameType(GameTypeEnum.nn.gameType);
-//				Map<String, Object> data = new HashMap<String, Object>();
-//				result.setData(data);
-//				result.setMsgType(MsgTypeEnum.readyStake.msgType);
-//				data.put("roomBankerId", nnRoomInfo.getRoomBankerId());
-//				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(nnRoomInfo.getPlayerList()));
 			} catch (Exception e) {
 				log.error("roomId:" + entry.getKey(), e);
 			}

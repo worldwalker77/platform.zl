@@ -17,6 +17,8 @@ import cn.worldwalker.game.wyqp.common.domain.jh.JhMsg;
 import cn.worldwalker.game.wyqp.common.domain.jh.JhPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.jh.JhRequest;
 import cn.worldwalker.game.wyqp.common.domain.jh.JhRoomInfo;
+import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
+import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.jh.enums.JhPlayerStatusEnum;
@@ -77,6 +79,8 @@ public class JhNoOperationOverTimeNoticeJob {
 					continue;
 				}
 				JhRequest request = new JhRequest();
+				request.setGameType(GameTypeEnum.jh.gameType);
+				request.setMsgType(MsgTypeEnum.stake.msgType);
 				JhMsg msg = new JhMsg();
 				msg.setRoomId(roomId);
 				msg.setPlayerId(playerId);

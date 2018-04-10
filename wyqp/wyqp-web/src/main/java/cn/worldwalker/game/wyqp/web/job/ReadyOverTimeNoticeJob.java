@@ -17,9 +17,12 @@ import cn.worldwalker.game.wyqp.common.domain.base.RedisRelaModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.domain.jh.JhPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.jh.JhRoomInfo;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnMsg;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnPlayerInfo;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnRequest;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
+import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
 import cn.worldwalker.game.wyqp.jh.enums.JhPlayerStatusEnum;
 import cn.worldwalker.game.wyqp.jh.enums.JhRoomStatusEnum;
@@ -93,12 +96,20 @@ public class ReadyOverTimeNoticeJob {
 		}
 		/**将没有准备的人设置为观察者，并且发牌给其他的人，同时通过刷新房间接口返回个所有玩家*/
 		List<JhPlayerInfo> playerList = roomInfo.getPlayerList();
+		NnRequest request = new NnRequest();
+		request.setGameType(GameTypeEnum.jh.gameType);
+		request.setMsgType(MsgTypeEnum.ready.msgType);
+		NnMsg msg = new NnMsg();
+		request.setMsg(msg);
+		msg.setRoomId(roomId);
+		UserInfo userInfo = new UserInfo();
+		userInfo.setRoomId(roomId);
 		for(JhPlayerInfo player : playerList){
 			/**玩家的状态为没有准备，则自动准备*/
 			if (!player.getStatus().equals(JhPlayerStatusEnum.ready.status)) {
-				UserInfo userInfo = new UserInfo();
 				userInfo.setPlayerId(player.getPlayerId());
-				userInfo.setRoomId(roomId);
+				msg.setPlayerId(player.getPlayerId());
+				log.info(player.getPlayerId() + player.getNickName() + "==============金花自动准备============");
 				jhGameService.ready(null, null, userInfo);
 			}
 		}
@@ -123,13 +134,21 @@ public class ReadyOverTimeNoticeJob {
 		
 		/**将没有准备的人自动调用准备接口*/
 		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
+		NnRequest request = new NnRequest();
+		request.setGameType(GameTypeEnum.nn.gameType);
+		request.setMsgType(MsgTypeEnum.ready.msgType);
+		NnMsg msg = new NnMsg();
+		request.setMsg(msg);
+		msg.setRoomId(roomId);
+		UserInfo userInfo = new UserInfo();
+		userInfo.setRoomId(roomId);
 		for(NnPlayerInfo player : playerList){
 			/**除观察者外，没有准备的自动准备*/
 			if (!player.getStatus().equals(NnPlayerStatusEnum.ready.status) && player.getStatus() > NnPlayerStatusEnum.observer.status) {
-				UserInfo userInfo = new UserInfo();
 				userInfo.setPlayerId(player.getPlayerId());
-				userInfo.setRoomId(roomId);
-				nnGameService.ready(null, null, userInfo);
+				msg.setPlayerId(player.getPlayerId());
+				log.info(player.getPlayerId() + player.getNickName() + "==============牛牛自动准备============");
+				nnGameService.ready(null, request, userInfo);
 			}
 		}
 		/**删除未准备10秒计时器*/

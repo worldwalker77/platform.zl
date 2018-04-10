@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ import cn.worldwalker.game.wyqp.common.enums.RoomCardOperationEnum;
 import cn.worldwalker.game.wyqp.common.exception.BusinessException;
 import cn.worldwalker.game.wyqp.common.exception.ExceptionEnum;
 import cn.worldwalker.game.wyqp.common.result.Result;
+import cn.worldwalker.game.wyqp.common.roomlocks.RoomLockContainer;
 import cn.worldwalker.game.wyqp.common.service.BaseGameService;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
@@ -96,6 +98,12 @@ public class NnGameService extends BaseGameService{
 				return;
 			}
 		}
+		/**校验玩家状态，避免网络原因重复操作导致数据异常*/
+		if (isPlayerNeedRefreshRoom(roomInfo, playerId, request.getMsgType())) {
+			refreshRoom(ctx, request, userInfo);
+			return;
+		}
+		
 		
 		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
 		/**玩家已经准备计数*/
@@ -159,8 +167,6 @@ public class NnGameService extends BaseGameService{
 			/**如果是抢庄类型，则给每个玩家返回四张牌，并通知准备抢庄.同时开启后台定时任务计数*/
 			if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
 				redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
-				/**开启自动抢庄定时任务*/
-				redisOperationService.setNnRobIpRoomIdTime(roomId);
 				result.setMsgType(MsgTypeEnum.readyRobBanker.msgType);
 				for(int i = 0; i < size; i++ ){
 					NnPlayerInfo player = playerList.get(i);
@@ -168,6 +174,8 @@ public class NnGameService extends BaseGameService{
 					data.put("cardList", cardList);
 					channelContainer.sendTextMsgByPlayerIds(result, player.getPlayerId());
 				}
+				/**开启自动抢庄定时任务*/
+				redisOperationService.setNnRobIpRoomIdTime(roomId);
 			}else{/**如果是非抢庄类型，则通知玩家谁是庄家并准备压分*/
 				result.setMsgType(MsgTypeEnum.readyStake.msgType);
 				data.put("roomBankerId", roomInfo.getRoomBankerId());
@@ -205,16 +213,55 @@ public class NnGameService extends BaseGameService{
 		result.setMsgType(MsgTypeEnum.ready.msgType);
 		data.put("playerId", playerId);
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
-		
-		/**如果准备的玩家数为2，则启动计时器，并返回消息告诉前端开始10秒计时*/
-		if (readyCount == 1 && (size - observerCount) > 1) {
-			redisOperationService.setNotReadyIpRoomIdTime(roomId);
-			result.setMsgType(MsgTypeEnum.notReadyTimer.msgType);
-			channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
-			return;
+		/**从第二局开始自动准备*/
+		if (roomInfo.getCurGame() > 0) {
+			/**如果准备的玩家数为2，则启动计时器，并返回消息告诉前端开始10秒计时*/
+			if (readyCount == 1 && (size - observerCount) > 1) {
+				redisOperationService.setNotReadyIpRoomIdTime(roomId);
+				result.setMsgType(MsgTypeEnum.notReadyTimer.msgType);
+				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+				return;
+			}
 		}
 	}
-	
+	private boolean isPlayerNeedRefreshRoom(NnRoomInfo roomInfo, Integer playerId, Integer msgType){
+		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
+		NnPlayerInfo curPlayer = null;
+		for(NnPlayerInfo player : playerList){
+			if (player.getPlayerId().equals(playerId)) {
+				curPlayer = player;
+				break;
+			}
+		}
+		boolean result = false;
+		MsgTypeEnum msgTypeEnum = MsgTypeEnum.getMsgTypeEnumByType(msgType);
+		switch (msgTypeEnum) {
+			case ready:
+				if (curPlayer.getStatus().equals(NnPlayerStatusEnum.ready.status)) {
+					result = true;
+				}
+				break;
+			case robBanker:
+				if (curPlayer.getStatus() >= NnPlayerStatusEnum.notRob.status) {
+					result = true;
+				}
+				break;
+			case stakeScore:
+				if (curPlayer.getStatus() >= NnPlayerStatusEnum.stakeScore.status) {
+					result = true;
+				}
+				break;
+			case showCard:
+				if (curPlayer.getStatus() >= NnPlayerStatusEnum.showCard.status) {
+					result = true;
+				}
+				break;
+			default:
+				break;
+		}
+		
+		return result;
+	}
 	/**
 	 * 抢庄
 	 * 
@@ -229,6 +276,11 @@ public class NnGameService extends BaseGameService{
 		Integer playerId = userInfo.getPlayerId();
 		Integer roomId = userInfo.getRoomId();
 		NnRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, NnRoomInfo.class);
+		/**校验玩家状态，避免网络原因重复操作导致数据异常*/
+		if (isPlayerNeedRefreshRoom(roomInfo, playerId, request.getMsgType())) {
+			refreshRoom(ctx, request, userInfo);
+			return;
+		}
 		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
 		/**玩家已经抢庄计数*/
 		int robCount = 0;
@@ -254,7 +306,7 @@ public class NnGameService extends BaseGameService{
 		
 		/**如果都抢完庄(玩家总数减去观察者玩家数),则通知玩家庄家并开始压分*/
 		if (robCount > 1 && robCount == (size - observerCount)) {
-			/**如果都抢完庄，则删除自动抢庄定时任务标记*/
+			/**则删除自动抢庄定时任务标记*/
 			redisOperationService.delNnRobIpRoomIdTime(roomId);
 			/**计算是谁抢到庄**/
 			NnPlayerInfo bankerPlayer = playerList.get(0);
@@ -268,7 +320,11 @@ public class NnGameService extends BaseGameService{
 						if (player.getRobMultiple() > bankerPlayer.getRobMultiple()) {
 							bankerPlayer = player;
 						}else if(player.getRobMultiple().equals(bankerPlayer.getRobMultiple())){
-							if (bankerPlayer.getRobBankerTime() > player.getRobBankerTime()) {
+//							if (bankerPlayer.getRobBankerTime() > player.getRobBankerTime()) {
+//								bankerPlayer = player;
+//							}
+							/**如果倍数相同，则随机*/
+							if (GameUtil.genZeroOrOne() > 0) {
 								bankerPlayer = player;
 							}
 						}
@@ -341,6 +397,11 @@ public class NnGameService extends BaseGameService{
 		NnRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, NnRoomInfo.class);
 		if (roomInfo.getRoomBankerId().equals(playerId)) {
 			throw new BusinessException(ExceptionEnum.ROOM_BANKER_CAN_NOT_STAKE_SCORE);
+		}
+		/**校验玩家状态，避免网络原因重复操作导致数据异常*/
+		if (isPlayerNeedRefreshRoom(roomInfo, playerId, request.getMsgType())) {
+			refreshRoom(ctx, request, userInfo);
+			return;
 		}
 		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
 		/**玩家已经压分计数*/
@@ -452,6 +513,7 @@ public class NnGameService extends BaseGameService{
 	}
 	
 	public void showCard(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Lock lock = RoomLockContainer.getLockByRoomId(userInfo.getRoomId());
 		Result result = new Result();
 		result.setGameType(GameTypeEnum.nn.gameType);
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -459,6 +521,11 @@ public class NnGameService extends BaseGameService{
 		Integer playerId = userInfo.getPlayerId();
 		Integer roomId = userInfo.getRoomId();
 		NnRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, NnRoomInfo.class);
+		/**校验玩家状态，避免网络原因重复操作导致数据异常*/
+		if (isPlayerNeedRefreshRoom(roomInfo, playerId, request.getMsgType())) {
+			refreshRoom(ctx, request, userInfo);
+			return;
+		}
 		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
 		List<Card> cardList = null;
 		List<Card> nnCardList = null;
@@ -552,6 +619,176 @@ public class NnGameService extends BaseGameService{
 		data.put("nnCardList", nnCardList);
 		data.put("isLastShowCard", 0);
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+		
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		/**一个玩家点亮牌之后，给其他的玩家亮牌*/
+		Integer[] arr = GameUtil.getPlayerIdArrWithOutSelf(playerList, playerId);
+		BaseRequest tempRequest = null;
+		UserInfo tempUserInfo = null;
+		BaseMsg msg = null;
+		for(Integer tempPlayerId : arr){
+			tempRequest = new BaseRequest();
+			tempRequest.setMsgType(request.getMsgType());
+			tempRequest.setGameType(request.getGameType());
+			msg = new BaseMsg();
+			msg.setRoomId(roomId);
+			msg.setPlayerId(tempPlayerId);
+			tempRequest.setMsg(msg);
+			
+			tempUserInfo = new UserInfo();
+			tempUserInfo.setRoomId(roomId);
+			tempUserInfo.setPlayerId(tempPlayerId);
+			showCard1(null, tempRequest, tempUserInfo);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+	}
+	
+	public void showCard1(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Lock lock = RoomLockContainer.getLockByRoomId(userInfo.getRoomId());
+		Result result = new Result();
+		result.setGameType(GameTypeEnum.nn.gameType);
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		Integer playerId = userInfo.getPlayerId();
+		Integer roomId = userInfo.getRoomId();
+		NnRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, NnRoomInfo.class);
+		/**校验玩家状态，避免网络原因重复操作导致数据异常*/
+		if (isPlayerNeedRefreshRoom(roomInfo, playerId, request.getMsgType())) {
+			refreshRoom(ctx, request, userInfo);
+			return;
+		}
+		List<NnPlayerInfo> playerList = roomInfo.getPlayerList();
+		List<Card> cardList = null;
+		List<Card> nnCardList = null;
+		Integer cardType = null;
+		int showCardNum = 0;
+		/**开始玩游戏后才进来的玩家计数  addby liujinfengnew*/
+		int observerCount = 0;
+		int size = playerList.size();
+		for(int i = 0; i < size; i++){
+			NnPlayerInfo player = playerList.get(i);
+			if (player.getPlayerId().equals(playerId)) {
+				player.setStatus(NnPlayerStatusEnum.showCard.status);
+				if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
+					List<Card> list = player.getRobFourCardList();
+					List<Card> list1 = new ArrayList<Card>();
+					list1.addAll(list);
+					list1.add(player.getFifthCard());
+					cardList = list1;
+				}else{
+					cardList = player.getCardList();
+				}
+				
+				cardType = player.getCardType();
+				nnCardList = player.getNnCardList();
+			}
+			if (NnPlayerStatusEnum.showCard.status.equals(player.getStatus())) {
+				showCardNum++;
+			}
+			if (NnPlayerStatusEnum.observer.status.equals(player.getStatus())) {
+				observerCount++;
+			}
+		}
+		/**如果所有的玩家都已经翻牌（除去观察者数量），则计算得分**/
+		if (showCardNum == (size - observerCount)) {
+			/**删除翻牌计数*/
+			redisOperationService.delNnShowCardIpRoomIdTime(roomId);
+			try {
+				calculateScoreAndRoomBanker(roomInfo);
+			} catch (Exception e) {
+				log.error("roomInfo:" + JsonUtil.toJson(roomInfo), e);
+				throw e;
+			}
+			redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+			NnRoomInfo newRoomInfo = new NnRoomInfo();
+			newRoomInfo.setTotalWinnerId(roomInfo.getTotalWinnerId());
+			newRoomInfo.setRoomId(roomId);
+			newRoomInfo.setRoomOwnerId(roomInfo.getRoomOwnerId());
+			newRoomInfo.setRoomBankerId(roomInfo.getRoomBankerId());
+			newRoomInfo.setUpdateTime(roomInfo.getUpdateTime());
+			for(NnPlayerInfo player : playerList){
+				NnPlayerInfo newPlayer = new NnPlayerInfo();
+				newPlayer.setPlayerId(player.getPlayerId());
+				newPlayer.setCurScore(player.getCurScore());
+				newPlayer.setTotalScore(player.getTotalScore());
+				newPlayer.setCardType(player.getCardType());
+				newPlayer.setMaxCardType(player.getMaxCardType());
+				newPlayer.setWinTimes(player.getWinTimes());
+				newPlayer.setLoseTimes(player.getLoseTimes());
+				
+				newPlayer.setBankerCount(player.getBankerCount());
+				newPlayer.setBombNiuCount(player.getBombNiuCount());
+				newPlayer.setFiveSmallNiuCount(player.getFiveSmallNiuCount());
+				newPlayer.setGoldNiuCount(player.getGoldNiuCount());
+				newPlayer.setNiuNiuCount(player.getNiuNiuCount());
+				newPlayer.setYouNiuCount(player.getYouNiuCount());
+				newPlayer.setWuNiuCount(player.getWuNiuCount());
+				newRoomInfo.getPlayerList().add(newPlayer);
+			}
+			
+			result.setMsgType(MsgTypeEnum.showCard.msgType);
+			data.put("playerId", playerId);
+			data.put("cardList", cardList);
+			data.put("cardType", cardType);
+			data.put("nnCardList", nnCardList);
+			data.put("isLastShowCard", 1);
+			channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+			if (NnRoomStatusEnum.totalGameOver.status.equals(roomInfo.getStatus())) {
+				result.setMsgType(MsgTypeEnum.totalSettlement.msgType);
+			}else{
+				result.setMsgType(MsgTypeEnum.curSettlement.msgType);
+			}
+			result.setData(newRoomInfo);
+			channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+			return;
+		}
+		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+		result.setMsgType(MsgTypeEnum.showCard.msgType);
+		data.put("playerId", playerId);
+		data.put("cardList", cardList);
+		data.put("cardType", cardType);
+		data.put("nnCardList", nnCardList);
+		data.put("isLastShowCard", 0);
+		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+		
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		/**一个玩家点亮牌之后，给其他的三个玩家*/
+		Integer[] arr = GameUtil.getPlayerIdArrWithOutSelf(playerList, playerId);
+		BaseRequest tempRequest = null;
+		UserInfo tempUserInfo = null;
+		BaseMsg msg = null;
+		for(Integer tempPlayerId : arr){
+			tempRequest = new BaseRequest();
+			tempRequest.setMsgType(request.getMsgType());
+			tempRequest.setGameType(request.getGameType());
+			msg = new BaseMsg();
+			msg.setRoomId(roomId);
+			msg.setPlayerId(tempPlayerId);
+			tempRequest.setMsg(msg);
+			
+			tempUserInfo = new UserInfo();
+			tempUserInfo.setRoomId(roomId);
+			tempUserInfo.setPlayerId(tempPlayerId);
+			showCard(null, tempRequest, userInfo);
+		}
+		
 		
 	}
 	
