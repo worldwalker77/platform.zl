@@ -10,6 +10,14 @@ public class UserSession implements Serializable{
 	private String mobilePhone;
 	private String wechatNum;
 	private String realName;
+	private Integer isAdmin;
+	
+	public Integer getIsAdmin() {
+		return isAdmin;
+	}
+	public void setIsAdmin(Integer isAdmin) {
+		this.isAdmin = isAdmin;
+	}
 	public Integer getProxyId() {
 		return proxyId;
 	}

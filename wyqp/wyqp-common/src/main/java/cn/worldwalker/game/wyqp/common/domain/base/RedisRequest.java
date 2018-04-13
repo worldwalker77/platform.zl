@@ -10,6 +10,15 @@ public class RedisRequest {
 	public Object value;
 	public int start;
 	public int end;
+	
+	private String secret;
+	
+	public String getSecret() {
+		return secret;
+	}
+	public void setSecret(String secret) {
+		this.secret = secret;
+	}
 	public String getKey() {
 		return key;
 	}

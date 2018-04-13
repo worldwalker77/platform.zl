@@ -93,6 +93,14 @@
 			<bean class="cn.worldwalker.game.wyqp.web.interceptor.LoginInterceptor" />
 		</mvc:interceptor>
 		<mvc:interceptor>
+			<mvc:mapping path="/backend/versioncontroll"/>
+			<bean class="cn.worldwalker.game.wyqp.web.interceptor.LoginInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/backend/uploadClientfile"/>
+			<bean class="cn.worldwalker.game.wyqp.web.interceptor.LoginInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
 			<mvc:mapping path="/**"/>
 			<bean class="cn.worldwalker.game.wyqp.web.interceptor.VersionHandlerInterceptor" />
 		</mvc:interceptor>

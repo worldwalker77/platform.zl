@@ -22,6 +22,7 @@
 		<result column="create_time" property="createTime"/>
 		<result column="room_card_num" property="roomCardNum"/>
 		<result column="win_probability" property="winProbability"/>
+		<result column="is_admin" property="isAdmin"/>
 	</resultMap>
 	
 	
@@ -138,7 +139,7 @@
 	</select>
 	
 	<select id="getProxyByPhoneAndPassword"  parameterType = "gameQuery" resultMap="gameModelResultMap">
-	    select proxy_id,player_id,nick_name,mobile_phone,wechat_num,real_name
+	    select proxy_id,player_id,nick_name,mobile_phone,wechat_num,real_name,is_admin
 	    from t_proxy
 	    where mobile_phone = #{mobilePhone} and password = #{password}
 	    <if test="proxyId !=null ">  

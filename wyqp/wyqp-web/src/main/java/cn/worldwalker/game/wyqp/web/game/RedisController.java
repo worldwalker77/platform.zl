@@ -1,5 +1,6 @@
 package cn.worldwalker.game.wyqp.web.game;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,14 @@ public class RedisController {
     @ResponseBody
     public RedisResponse redisOperation(@RequestBody RedisRequest request) {
 		RedisResponse response = new RedisResponse();
+		if (StringUtils.isBlank(request.getSecret())) {
+			response.setDes("无权限");
+			return response;
+		}
+		if (!Constant.apiSecret.equals(request.getSecret())) {
+			response.setDes("无权限");
+			return response;
+		}
 		String operation = request.getOperation();
 		try {
 			switch (operation) {

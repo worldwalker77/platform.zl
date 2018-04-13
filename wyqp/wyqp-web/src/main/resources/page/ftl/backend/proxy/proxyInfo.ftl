@@ -93,7 +93,7 @@
 									<span>老密码</span>
 								</div>
 								<div class="col-xs-4">
-									<input size="16" type="text" id="oldPassword">
+									<input size="16" type="password" id="oldPassword">
 								</div>
 							</div>
 							<div class="row"> 
@@ -101,7 +101,7 @@
 									<span>新密码</span>
 								</div>
 								<div class="col-xs-4">
-									<input size="16" type="text" id="newPassword">
+									<input size="16" type="password" id="newPassword">
 								</div>
 							</div>
 		            </div>
@@ -119,6 +119,7 @@
 		  });
 		</script>
 		<script src="/resources/jquery-weui-build/js/jquery-weui.js"></script>
+		<script src="/resources/jquery-weui-build/lib/jQuery.md5.js"></script>
 		<script type="text/javascript" src="/resources/js/wechat/proxyInfo.js?version=${version}"></script>
     </body>
 </html>

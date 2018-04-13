@@ -13,8 +13,8 @@ var proxyInfoUtil = {
 		doModifyPassword:function(){
 			var data = {
 					mobilePhone:$("#mobilePhone").val(),
-					oldPassword:$("#oldPassword").val(),
-					newPassword:$("#newPassword").val()
+					oldPassword:$.md5($("#oldPassword").val()),
+					newPassword:$.md5($("#newPassword").val())
 			}
 			$.ajax({
 		        type: "post",

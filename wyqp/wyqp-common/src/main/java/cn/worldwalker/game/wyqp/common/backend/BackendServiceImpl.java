@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cn.worldwalker.game.wyqp.common.constant.Constant;
 import cn.worldwalker.game.wyqp.common.dao.GameDao;
 import cn.worldwalker.game.wyqp.common.exception.BusinessException;
 import cn.worldwalker.game.wyqp.common.exception.ExceptionEnum;
@@ -27,15 +26,14 @@ public class BackendServiceImpl implements BackendService{
 	@Autowired
 	private BackendManager gameManager;
 	
-	private static Map<String, String> adminPhoneMap = new HashMap<String, String>();
-	static{
-		adminPhoneMap.put(Constant.adminMobile, Constant.adminMobile);
-//		adminPhoneMap.put("13006339022", "13006339022");
-	}
 	@Override
 	public boolean isAdmin(){
-		String mobile = RequestUtil.getUserSession().getMobilePhone();
-		return adminPhoneMap.containsKey(mobile);
+		Integer isAdmin = RequestUtil.getUserSession().getIsAdmin();
+		if (isAdmin == 1) {
+			return true;
+		}else{
+			return false;
+		}
 	}
 	@Override
 	public Result doLogin(GameQuery gameQuery) {
@@ -53,6 +51,7 @@ public class BackendServiceImpl implements BackendService{
 		userSession.setRealName(gameModel.getRealName());
 		userSession.setWechatNum(gameModel.getWechatNum());
 		userSession.setMobilePhone(gameModel.getMobilePhone());
+		userSession.setIsAdmin(gameModel.getIsAdmin());
 		RequestUtil.setUserSession(genToken(gameQuery.getMobilePhone()), userSession);
 		return result;
 	}
@@ -283,7 +282,7 @@ public class BackendServiceImpl implements BackendService{
 			if (gameQuery.getProxyId() > 0) {
 				gameDao.updateProxy(gameQuery);
 			}else{
-				gameQuery.setPassword(gameQuery.getMobilePhone());
+				gameQuery.setPassword(MD5Util1.encryptByMD5(gameQuery.getMobilePhone()));
 				gameDao.insertProxy(gameQuery);
 			}
 		} catch (Exception e) {
@@ -316,10 +315,10 @@ public class BackendServiceImpl implements BackendService{
 				result.setDesc("手机号或者老密码错误");
 				return result;
 			}
-			GameQuery tempQuery1 = new GameQuery();
-			tempQuery1.setProxyId(RequestUtil.getProxyId());
-			tempQuery1.setNewPassword(gameQuery.getNewPassword());
-			gameDao.updateProxy(gameQuery);
+			GameQuery newGameQuery= new GameQuery();
+			newGameQuery.setProxyId(RequestUtil.getProxyId());
+			newGameQuery.setNewPassword(gameQuery.getNewPassword());
+			gameDao.updateProxy(newGameQuery);
 		} catch (Exception e) {
 			log.error("doModifyPassword异常，gameQuery：" + JsonUtil.toJson(gameQuery), e);
 			result.setCode(1);

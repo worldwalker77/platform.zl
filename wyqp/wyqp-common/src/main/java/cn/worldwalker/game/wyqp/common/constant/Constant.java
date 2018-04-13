@@ -90,8 +90,6 @@ public class Constant {
 	
 	public final static int gameInfoStorageType = Integer.valueOf(CustomizedPropertyConfigurer.getContextProperty("game.info.storage.type"));
 	
-	public final static String adminMobile = CustomizedPropertyConfigurer.getContextProperty("admin.mobile");
-	
 	public final static String clientFileUploadFolder = CustomizedPropertyConfigurer.getContextProperty("client.file.upload.folder");
 	
 	public final static String clientFileUnrarFolder = CustomizedPropertyConfigurer.getContextProperty("client.file.unrar.folder");
@@ -116,4 +114,5 @@ public class Constant {
 	
 	/**clubId与roomId关系映射*/
 	public final static String teaHouseNumPlayerIdSet = curCompany + "_tea_house_num_player_id_set_";
+	public static final String apiSecret = CustomizedPropertyConfigurer.getContextProperty("api.secret");
 }

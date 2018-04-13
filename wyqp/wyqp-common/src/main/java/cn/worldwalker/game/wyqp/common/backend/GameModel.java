@@ -38,6 +38,14 @@ public class GameModel {
 	/**概率控制*/
 	private Integer winProbability;
 	
+	private Integer isAdmin;
+	
+	public Integer getIsAdmin() {
+		return isAdmin;
+	}
+	public void setIsAdmin(Integer isAdmin) {
+		this.isAdmin = isAdmin;
+	}
 	public Integer getWinProbability() {
 		return winProbability;
 	}

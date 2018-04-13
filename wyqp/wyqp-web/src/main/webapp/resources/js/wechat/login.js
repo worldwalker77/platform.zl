@@ -13,7 +13,7 @@
 //		data["password"] = password;
 		$.ajax({
 //	        type: "post",
-	        url: '/login/doLogin?' + "mobilePhone=" + mobilePhone + '&password=' + password,
+	        url: '/login/doLogin?' + "mobilePhone=" + mobilePhone + '&password=' + $.md5(password),
 	        dataType: "json",
 //	        data:data,
 	        beforeSend: function () {

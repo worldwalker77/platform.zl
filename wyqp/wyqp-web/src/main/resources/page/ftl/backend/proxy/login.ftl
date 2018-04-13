@@ -30,7 +30,7 @@
 		  <div class="weui-cell">
 		    <div class="weui-cell__hd"><label class="weui-label">密码</label></div>
 		    <div class="weui-cell__bd">
-		      <input id="password" class="weui-input" type="number" pattern="[0-9]*" placeholder="请输入密码">
+		      <input id="password" class="weui-input" type="password" pattern="[0-9]*" placeholder="请输入密码">
 		    </div>
 		  </div>
 		  <div id="confirmLogin" class="weui-btn weui-btn_warn">确认</div>
@@ -38,6 +38,7 @@
 		<script src="/resources/jquery-weui-build/lib/jquery-2.1.4.js"></script>
 		<script src="/resources/jquery-weui-build/lib/fastclick.js"></script>
 		<script src="/resources/jquery-weui-build/js/jquery-weui.js"></script>
+		<script src="/resources/jquery-weui-build/lib/jQuery.md5.js"></script>
 		<script type="text/javascript" src="/resources/js/wechat/login.js?version=${version}"></script>
     </body>
 </html>
